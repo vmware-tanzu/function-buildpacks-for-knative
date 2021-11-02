@@ -1,0 +1,15 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: trigger
+  namespace: #@ data.values.namespace
+spec:
+  broker: broker
+  subscriber:
+    ref:
+     apiVersion: serving.knative.dev/v1
+     kind: Service
+     name: consumer
+     namespace: #@ data.values.namespace

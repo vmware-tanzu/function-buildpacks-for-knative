@@ -1,0 +1,15 @@
+#@data/values
+---
+namespace: demo
+
+triggermesh:
+  accesskey:
+  secretkey:
+
+app:
+  accesskey:
+  secretkey:
+  sessionkey:
+
+function_image:
+bucket_arn:

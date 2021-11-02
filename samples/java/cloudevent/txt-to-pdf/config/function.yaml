@@ -1,0 +1,29 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: consumer
+  namespace: #@ data.values.namespace
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      containers:
+        - image: #@ data.values.function_image
+          imagePullPolicy: Always
+          env:
+            - name: FLASK_ENV
+              value: development
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-aws-creds
+                  key: aws-access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-aws-creds
+                  key: aws-secret-key

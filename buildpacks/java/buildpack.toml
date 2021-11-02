@@ -1,0 +1,22 @@
+api = "0.6"
+
+[buildpack]
+id       = "kn-fn/java-function"
+name     = "Java Function Buildpack"
+version  = "0.0.1"
+
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"
+
+[[metadata.configurations]]
+name        = "KN_FN"
+description = "whether this is a function"
+build       = true
+
+[[metadata.dependencies]]
+id      = "invoker"
+name    = "Java Invoker"
+version = "0.0.1"
+uri     = "https://storage.googleapis.com/serverless-releases/function-invoker-0.0.2-SNAPSHOT.jar"
+sha256  = "ad50c61ddfe2a280f3f292846f00966c489afce5111978ea01b38567dfe8b6ed"
+stacks  = [ "io.buildpacks.stacks.bionic" ]

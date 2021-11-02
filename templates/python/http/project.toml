@@ -1,0 +1,3 @@
+[[build.env]]
+name="PYTHON_HANDLER"
+value="handler.handler"

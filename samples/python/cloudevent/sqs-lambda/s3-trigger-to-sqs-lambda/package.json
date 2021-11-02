@@ -1,0 +1,14 @@
+{
+  "name": "s3-trigger-to-sqs-lambda",
+  "version": "1.0.0",
+  "description": "Reads S3 object and sends information to SQS ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rodolfo Sanchez",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.31.0"
+  }
+}
