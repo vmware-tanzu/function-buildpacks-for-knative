@@ -1,23 +1,54 @@
 
 # function-buildpacks-for-knative
 
-## Overview
+<!-- ## Pre-Requisites -->
 
-## Try it out
+## Currently Supported
+* Python
+* Java
 
-### Prerequisites
+## Future
+* NodeJS
+* .NET
+* Rust
 
-* Prereq 1
-* Prereq 2
-* Prereq 3
+## Usage
+The buildpacks in this repository have been built, published, and included in the builder. 
 
-### Build & Run
+The builder is also built and published as an image to `gcr.io` -- to build an image from source, simply use the builder as shown below.
 
-1. Step 1
-2. Step 2
-3. Step 3
+For example:
+```
+pack build <image_name> --path /path/to/function --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.1
+```
+
+For more details you can refer to language-specific documentation:
+* Python
+    * [Buildpack/Function details](./buildpacks/python/README.md)
+    * [Samples](./samples/python)
+    * [Templates](./templates/python)
+* Java (Alpha)
+    * [Buildpack/Function details](./buildpacks/java/README.md)
+    * [Samples](./samples/java)
+    * [Templates](./templates/java)
+    * The Java Invoker currently lives in `java-invoker`
+## Creating the Builder from Source
+
+1. Build the buildpacks
+```
+make buildpacks
+```
+TODO: Tag specific versions rather than depending on latest
+
+1. Build the builder
+```
+make builder
+```
+Note the builder name in the output. Use this local builder in the `pack build` command similarly to above.
+
 
 ## Documentation
+Each subdirectory has a relevant README.md describing how to use its respective files.
 
 ## Contributing
 
