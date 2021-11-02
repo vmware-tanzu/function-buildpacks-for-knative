@@ -1,0 +1,39 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+#     - name: Login to Docker Hub
+#       uses: docker/login-action@v1
+#       with:
+#         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    
+#     - name: configure
+#       run: ./configure
+      
+#     - name: Install dependencies
+#       run: make
+      
+    - name: Run Buildpack Tests
+      run: make tests
+      
+    - name: Make Builder
+      run: make builder
+      
+    - name: Run Smoke Tests
+      run: make test-images smoke-test
+      
+#     - name: Build and Publish
+#       run: make publish
