@@ -1,7 +1,9 @@
 
 # function-buildpacks-for-knative
 
-<!-- ## Pre-Requisites -->
+## Pre-Requisites
+- [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
+- [Docker](https://docs.docker.com/get-docker/)
 
 ## Currently Supported
 * Python
