@@ -22,9 +22,16 @@ jobs:
     
 #     - name: configure
 #       run: ./configure
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ‘1.17.0’
+    - run: go version
+
       
-#     - name: Install dependencies
-#       run: make
+    - name: Install dependencies
+      run: make
       
     - name: Run Buildpack Tests
       run: make tests
