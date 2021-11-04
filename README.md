@@ -7,7 +7,7 @@
 
 ## Currently Supported
 * Python
-* Java
+* Java (Spring)
 
 ## Future
 * NodeJS
