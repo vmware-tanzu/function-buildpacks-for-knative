@@ -13,8 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-#     }
+
 #     - name: Registry Login
 #       run: docker login -u _json_key --password-stdin "https://us.gcr.io" < ${secrets.GCLOUD_SERVICE_KEY_FILE} && docker login -u "${secrets.DOCKER_HUB_USERNAME}" --password-stdin <<< "${secrets.DOCKER_HUB_PASSWORD}"
 #       shell: bash
@@ -25,9 +24,6 @@ jobs:
 #       with:
 #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
 #         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-    
-    - name: configure
-      run: ./configure
 
     - name: Setup Go
       uses: actions/setup-go@v2
