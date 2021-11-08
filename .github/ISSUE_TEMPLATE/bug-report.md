@@ -26,11 +26,13 @@ assignees: ''
 
 ## Environment Details
 
-* Build version: 
-* Pre-Requisites versions:
-* Deployment (Managed/Standalone cluster): 
-* Infrastructure Provider (Docker/AWS/Azure/vSphere): 
+* Build version:
+* Pre-Req versions:
+* Deployment (cluster):
+* Infrastructure Provider (TMC, AWS, GCloud, vSphere):
 * Operating System (client):
+* Etc:
+
 
 ## Diagnostics and log bundle
 <!-- Collecting diagnostics and log bundles can help troubleshoot your issue -->
