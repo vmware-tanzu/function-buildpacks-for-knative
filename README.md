@@ -1,5 +1,9 @@
 
-# function-buildpacks-for-knative
+# Function Buildpacks for Knative
+
+Enables a FaaS experience for Knative / Cloud Native Runtimes.
+
+Will soon extend [func](https://github.com/knative-sandbox/kn-plugin-func) to create deployable functions via CLI.
 
 ## Pre-Requisites
 - [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
