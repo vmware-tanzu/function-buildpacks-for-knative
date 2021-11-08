@@ -7,7 +7,7 @@
 
 ## Currently Supported
 * Python
-* Java
+* Java (Spring)
 
 ## Future
 * NodeJS
@@ -60,4 +60,8 @@ signed as described on that page. Your signature certifies that you wrote the pa
 as an open-source patch. For more detailed information, refer to [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
-* [LICENSE](LICENSE)
+* [BSD-2 License](LICENSE)
+
+## Reporting Bugs or Vulnerabilities
+* [Bugs, Issues, Missing Features](https://github.com/vmware-tanzu/function-buildpacks-for-knative/issues/)
+* [Only Vulnerabilities](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/SECURITY.md)
