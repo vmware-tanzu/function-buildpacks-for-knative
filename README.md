@@ -4,6 +4,7 @@
 ## Pre-Requisites
 - [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
 - [Docker](https://docs.docker.com/get-docker/)
+- [Knative](https://knative.dev/docs/) or [Cloud Native Runtimes](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.0/tanzu-cloud-native-runtimes-1-0/GUID-cnr-overview.html)
 
 ## Currently Supported
 * Python
