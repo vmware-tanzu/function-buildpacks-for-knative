@@ -20,7 +20,8 @@ assignees: ''
 ## Environment Details
 
 * Build version:
-* Buildpack CLI version:
-* Docker version:
+* Pre-Req versions:
+* Deployment (cluster):
+* Infrastructure Provider (TMC, AWS, GCloud, vSphere):
 * Operating System (client):
 * Etc:
