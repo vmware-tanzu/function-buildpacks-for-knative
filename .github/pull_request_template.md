@@ -1,3 +1,10 @@
+## Which issue(s) this PR fixes
+<!--
+Usage: `Fixes #<issue number>`, or `Fixes (paste link of issue)`.
+Please open an issue first, if none exists.
+-->
+Fixes: #
+
 ## What this PR solves
 <!--
 Add a detailed explanation of what this PR does and why it is needed.
@@ -13,12 +20,6 @@ Otherwise, a release note is required:
 ```release-note
 
 ```
-
-## Which issue(s) this PR fixes
-<!--
-Usage: `Fixes #<issue number>`, or `Fixes (paste link of issue)`.
--->
-Fixes: #
 
 ## Describe testing done for PR
 <!--
