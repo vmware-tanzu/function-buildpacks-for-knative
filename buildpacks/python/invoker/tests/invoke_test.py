@@ -25,7 +25,7 @@ def test_unknown_name():
     with pytest.raises(AttributeError):
         handler()
 
-@pytest.mark.skip(reason="Trying to run flask's ")
+@pytest.mark.skip(reason="Trying to run a method from Flask, causing it to fail")
 def test_cloudevent_type():
     is_called = False
     def testfunc(event):
