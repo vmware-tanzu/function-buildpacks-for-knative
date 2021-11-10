@@ -9,7 +9,7 @@ creds = {"admin": "supersecure", "asu": "mypassword", "someone": "123qwe"}
 def add(req: Any):
     username = req.form.get('username')
     if username not in creds:
-        return flask.Response("Unauthroized: User does not exist", 401)
+        return flask.Response("Unauthorized: User does not exist", 401)
     
     password = req.form.get("password")
     if password != creds[username]:
