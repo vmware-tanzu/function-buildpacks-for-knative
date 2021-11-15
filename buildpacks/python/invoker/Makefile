@@ -1,18 +1,31 @@
-.PHONY: buildpack
-buildpack:
-	cd buildpack && pack buildpack package vmware/pyfun-addin:0.1.0
+RULES.MK ?= ../../../rules.mk
+include $(RULES.MK)
 
-.PHONY: metabuild
-metabuild: buildpack
-	cd metabuild && pack buildpack package vmware/pyfun:0.1.1 --config ./package.toml
+path ?= .
+python-invoker.path := $(path)
 
-.PHONY: http-func
-http-func:
-	cd functions/pyfun/http && pack build pytestapp --buildpack vmware/pyfun:0.1.1 --builder paketobuildpacks/builder:base
+python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.py')
 
-.PHONY: run
-run:
-	docker run --rm -p 8080:8080 -e 8080 pytestapp
+python-invoker.build := $(OUT_DIR)/python-invoker.build
+$(python-invoker.build): $(python-invoker.sources)
+	@mkdir -p $(@D)
+	python setup.py sdist
+	touch $@
 
-test:
-	pytest
+python-invoker.publish:; # TODO: We should upload to GCP bucket
+
+python-invoker.tests: $(python-invoker.sources)
+	cd $(python-invoker.path) && python -m pytest
+
+python-invoker.clean:
+	rm -rf $(python-invoker.path)/.eggs
+	rm -rf $(python-invoker.path)/.pytest_cache
+	rm -rf $(python-invoker.path)/dist
+	rm -rf $(python-invoker.path)/*.egg-info
+	rm -rf $(python-invoker.path)/pyfunc/__pycache__
+
+# This is part of the default rules
+all .PHONY: python-invoker.publish
+publish-invokers .PHONY: python-invoker.publish
+tests .PHONY: python-invoker.tests
+clean .PHONY: python-invoker.clean

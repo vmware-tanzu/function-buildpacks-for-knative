@@ -1,44 +1,49 @@
-DETECT_BIN := bin/detect
-BUILD_BIN := bin/build
-MAIN_BIN := bin/main
+RULES.MK ?= ../../rules.mk
+include $(RULES.MK)
 
-SOURCES := $(shell find . -type f -iname '*.go')
+path ?= .
+python-buildpack.path := $(path)
 
-.PHONY: all
-build: $(BUILD_BIN) $(DETECT_BIN)
+python-buildpack.go-sources := $(shell find $(python-buildpack.path) -type f -iname '*.go')
+python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml $(python-buildpack.path)/package.toml
+python-buildpack.image := $(IMAGE_REGISTRY)/python-buildpack:$(IMAGE_TAG)
+python-buildpack.package-file := $(python-buildpack.path)/out/package.$(IMAGE_TAG).cnb
 
-$(BUILD_BIN) $(DETECT_BIN): $(MAIN_BIN)
-	mkdir -p ${@D}
-	ln -sf $(notdir $(MAIN_BIN)) $@
+python-buildpack.build-bin := $(python-buildpack.path)/bin/build
+python-buildpack.detect-bin := $(python-buildpack.path)/bin/detect
+python-buildpack.main-bin := $(abspath $(python-buildpack.path)/bin/main)
+python-buildpack.bin := $(python-buildpack.build-bin) $(python-buildpack.detect-bin)
 
-$(MAIN_BIN): $(SOURCES)
-	mkdir -p ${@D}
-	GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/python-function-buildpack/cmd/main
+python-buildpack.deps := $(python-buildpack.bin) $(python-buildpack.config-sources)
 
-.PHONY: tests
-tests:
-	go test -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
+$(python-buildpack.build-bin) $(python-buildpack.detect-bin): $(python-buildpack.main-bin)
+	@mkdir -p $(@D)
+	ln -sf $(notdir $(python-buildpack.main-bin)) $@
 
-BUILDPACK_NAME ?= kn-fn/python-function:$(IMAGE_TAG)
-BUILDPACK_FILE := out/package.$(IMAGE_TAG).cnb
-BUILDPACK_IMAGE := $(IMAGE_REGISTRY)/python-buildpack:$(IMAGE_TAG)
+$(python-buildpack.main-bin): $(python-buildpack.go-sources)
+	@mkdir -p $(@D)
+	cd $(python-buildpack.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/python-function-buildpack/cmd/main
 
-.PHONY: package
-package: $(PACK) $(BUILD_BIN) $(DETECT_BIN) buildpack.toml package.toml
-	$(PACK) buildpack package $(BUILDPACK_NAME) --config package.toml
+python-buildpack.package-deps := $(PACK) $(python-buildpack.build-bin) $(python-buildpack.detect-bin) $(python-buildpack.config-sources)
+python-buildpack.package: $(python-buildpack.package-deps)
+	$(PACK) buildpack package $(python-buildpack.image) --config $(python-buildpack.path)/package.toml
 
-.PHONY: package-file
-package-file: $(PACK) $(BUILDPACK_FILE)
-$(BUILDPACK_FILE):
-	mkdir -p ${@D}
-	$(PACK) buildpack package $(BUILDPACK_FILE) --config package.toml --format file
+$(python-buildpack.package-file): $(python-buildpack.package-deps)
+	@mkdir -p $(@D)
+	$(PACK) buildpack package $@ --config $(python-buildpack.path)/package.toml --format file
 
-.PHONY: publish
-publish: package
-	docker tag $(BUILDPACK_NAME) $(BUILDPACK_IMAGE)
-	docker push $(BUILDPACK_IMAGE)
+python-buildpack.publish: python-buildpack.package
+	docker push $(python-buildpack.image)
 
-.PHONY: clean
-clean:
-	rm -rf out/
-	rm -rf bin/
+python-buildpack.tests: $(python-buildpack.go-sources)
+	cd $(python-buildpack.path) && go test -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
+
+python-buildpack.clean:
+	rm -rf $(python-buildpack.path)/out
+	rm -rf $(python-buildpack.path)/bin
+
+all buildpacks .PHONY: python-buildpack.package
+buildpack-files: $(python-buildpack.package-file)
+publish publish-buildpacks .PHONY: python-buildpack.publish
+tests buildpack-tests .PHONY: python-buildpack.tests
+clean .PHONY: python-buildpack.clean
