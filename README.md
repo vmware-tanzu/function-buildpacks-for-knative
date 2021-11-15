@@ -38,7 +38,8 @@ For more details you can refer to language-specific documentation:
     * [Buildpack/Function details](./buildpacks/java/README.md)
     * [Samples](./samples/java)
     * [Templates](./templates/java)
-    * The Java Invoker currently lives in `java-invoker`
+
+
 ## Creating the Builder from Source
 
 1. Build the buildpacks
