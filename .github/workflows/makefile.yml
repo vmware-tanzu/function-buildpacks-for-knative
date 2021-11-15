@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -31,18 +30,17 @@ jobs:
         go-version: '1.17.0'
     - run: go version
 
-      
-    - name: Install dependencies
-      run: make
-      
-    - name: Run Buildpack Tests
-      run: make tests
+    - name: Invoker tests
+      run: make invoker-tests
+
+    - name: Buildpack Tests
+      run: make buildpack-tests
       
     - name: Make Builder
       run: make builder
       
     - name: Run Smoke Tests
-      run: make test-images smoke-test
+      run: make smoke-test
       
 #     - name: Build and Publish
 #       run: make publish
