@@ -5,7 +5,7 @@ path ?= .
 builder.path := $(path)
 
 builder.build := $(abspath $(OUT_DIR)/builder.build)
-$(builder.build): $(builder.path)/builder.toml $(foreach lang,$(buildpack.languages),$($(lang)-buildpack.deps))
+$(builder.build): $(PACK) $(builder.path)/builder.toml $(foreach lang,$(buildpack.languages),$($(lang)-buildpack.deps))
 	@mkdir -p $(@D)
 	$(PACK) builder create -c $(builder.path)/builder.toml $(BUILDER_IMAGE)
 	touch $@
