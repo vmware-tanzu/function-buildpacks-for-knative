@@ -30,8 +30,8 @@ jobs:
         go-version: '1.17.0'
     - run: go version
 
-    - name: Invoker tests
-      run: make invoker-tests
+#    - name: Invoker tests
+#      run: make invoker-tests
 
     - name: Buildpack Tests
       run: make buildpack-tests
