@@ -13,7 +13,7 @@ with open(desc_file, 'r') as fh:
 setup(
     name='pyfunc-invoker',
     packages=find_packages(include=['pyfunc']),
-    version='0.0.0',
+    version='0.0.1',
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='Apache',
