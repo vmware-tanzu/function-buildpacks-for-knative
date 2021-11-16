@@ -1,4 +1,4 @@
-RULES.MK ?= ../../../rules.mk
+RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
@@ -9,14 +9,18 @@ python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.
 python-invoker.build := $(OUT_DIR)/python-invoker.build
 $(python-invoker.build): $(python-invoker.sources)
 	@mkdir -p $(@D)
-	python setup.py sdist
+	cd $(python-invoker.path) && python setup.py sdist
 	touch $@
 
-python-invoker.publish:; # TODO: We should upload to GCP bucket
+.PHONY: python-invoker.publish
+python-invoker.publish: $(python-invoker.build) # TODO: We should upload to GCP bucket
+	@echo TODO: publish Python invoker
 
+.PHONY: python-invoker.tests
 python-invoker.tests: $(python-invoker.sources)
 	cd $(python-invoker.path) && python -m pytest
 
+.PHONY: python-invoker.clean
 python-invoker.clean:
 	rm -rf $(python-invoker.path)/.eggs
 	rm -rf $(python-invoker.path)/.pytest_cache
@@ -24,8 +28,7 @@ python-invoker.clean:
 	rm -rf $(python-invoker.path)/*.egg-info
 	rm -rf $(python-invoker.path)/pyfunc/__pycache__
 
-# This is part of the default rules
-all .PHONY: python-invoker.publish
-publish-invokers .PHONY: python-invoker.publish
-tests .PHONY: python-invoker.tests
-clean .PHONY: python-invoker.clean
+all invokers: $(python-invoker.build)
+publish-invokers: python-invoker.publish
+tests invoker-tests: python-invoker.tests
+clean: python-invoker.clean
