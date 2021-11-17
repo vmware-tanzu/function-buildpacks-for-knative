@@ -135,19 +135,21 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
+			// Somewhere in here, a timeout occurs, preventing tests from passing
+			// Double check this logic
 			image := fmt.Sprintf("%s:%s", baseImage, c.tag)
-			cleanup, err := runTestContainer(image)
+			cleanup, err := runTestContainer(image) // Container probably needs to be modified to launch a CE http client
 			if err != nil {
 				t.Error(err)
 				return
 			}
 			defer cleanup()
 
-			url := fmt.Sprintf("http://127.0.0.1:8080/%s", strings.TrimLeft(c.path, "/"))
+			url := fmt.Sprintf("http://127.0.0.1:8080/%s", strings.TrimLeft(c.path, "/")) // unsure if this is still valid
 
 			// Send a CloudEvent
 			event := cloudevents.NewEvent()
-			event.SetSource("example/uri")
+			event.SetSource("url")
 			event.SetType("example.type")
 			event.SetData(cloudevents.ApplicationJSON, "Hello World!")
 
