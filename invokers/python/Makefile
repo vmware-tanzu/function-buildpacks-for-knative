@@ -12,7 +12,7 @@ python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.
 python-invoker.build := $(OUT_DIR)/python-invoker.build
 $(python-invoker.build): $(TOX) $(python-invoker.sources)
 	@mkdir -p $(@D)
-	cd $(python-invoker.path) && $(TOX) --sdistonly --help
+	cd $(python-invoker.path) && $(TOX) --sdistonly
 	touch $@
 
 .PHONY: python-invoker.publish
