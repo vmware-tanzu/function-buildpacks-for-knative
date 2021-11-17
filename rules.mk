@@ -53,7 +53,8 @@ $(OUT_DIR):
 
 rules.clean:
 	rm -rf $(OUT_DIR)
+	rm -rf $(dir $(TOOLS_BIN_DIR))
 
-clean: rules.clean
+clean .PHONY: rules.clean
 
 endif

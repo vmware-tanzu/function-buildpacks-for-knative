@@ -28,7 +28,7 @@ python-buildpack.package-deps := $(PACK) $(python-buildpack.build-bin) $(python-
 python-buildpack.package: $(python-buildpack.package-deps)
 	$(PACK) buildpack package $(python-buildpack.image) --config $(python-buildpack.path)/package.toml
 
-$(python-buildpack.package-file): $(python-buildpack.package-deps)
+$(python-buildpack.package-file): $(PACK) $(python-buildpack.package-deps)
 	@mkdir -p $(@D)
 	$(PACK) buildpack package $@ --config $(python-buildpack.path)/package.toml --format file
 
