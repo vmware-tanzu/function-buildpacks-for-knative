@@ -28,7 +28,7 @@ java-buildpack.package-deps := $(PACK) $(java-buildpack.build-bin) $(java-buildp
 java-buildpack.package: $(java-buildpack.package-deps)
 	$(PACK) buildpack package $(java-buildpack.image) --config $(java-buildpack.path)/package.toml
 
-$(java-buildpack.package-file): $(java-buildpack.package-deps)
+$(java-buildpack.package-file): $(PACK) $(java-buildpack.package-deps)
 	@mkdir -p $(@D)
 	$(PACK) buildpack package $@ --config $(java-buildpack.path)/package.toml --format file
 
