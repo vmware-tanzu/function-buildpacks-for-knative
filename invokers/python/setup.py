@@ -3,6 +3,7 @@ from setuptools import find_packages, setup
 
 basepath = path.dirname(__file__)
 desc_file = path.abspath(path.join(basepath, "README.md"))
+version_file = path.abspath(path.join(basepath, "VERSION"))
 modules = [
     path.abspath(path.join(basepath, "pyfunc"))
 ]
@@ -10,10 +11,14 @@ modules = [
 with open(desc_file, 'r') as fh:
     long_description = fh.read()
 
+with open(version_file, 'r') as fh:
+    version = fh.read()
+
+
 setup(
     name='pyfunc-invoker',
     packages=find_packages(include=['pyfunc']),
-    version='0.0.1',
+    version=version,
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='Apache',
