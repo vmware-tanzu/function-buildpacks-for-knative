@@ -3,6 +3,10 @@ RULES_MK := $(lastword $(MAKEFILE_LIST))
 ROOT_DIR := $(dir $(RULES_MK))
 
 .DEFAULT_GOAL := all
+.DELETE_ON_ERROR: # This will delete files from targets that don't succeed.
+.SUFFIXES: # This removes a lot of the implicit rules.
+
+OUT_DIR := $(abspath $(ROOT_DIR)/out)
 
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 VERSION.release := $(shell cat $(ROOT_DIR)/VERSION)
@@ -23,10 +27,11 @@ BUILDER_IMAGE := $(IMAGE_REGISTRY)/builder:$(IMAGE_TAG)
 OS_NAME := $(shell uname -s | tr A-Z a-z)
 
 # Define the tools here
-TOOLS_BIN_DIR := $(abspath $(ROOT_DIR)/tools/bin)
+TOOLS_DIR := $(abspath $(ROOT_DIR)/tools)
+TOOLS_BIN_DIR := $(abspath $(TOOLS_DIR)/bin)
 
-PACK := $(abspath $(TOOLS_BIN_DIR)/pack)
-TOOLS := $(PACK)
+PACK := $(TOOLS_BIN_DIR)/pack
+GSUTIL := $(TOOLS_DIR)/gsutil/gsutil
 
 $(PACK).darwin:
 	@mkdir -p $(@D)
@@ -42,14 +47,14 @@ $(PACK): $(PACK).$(OS_NAME)
 	chmod +x $@
 	touch $@
 
+$(GSUTIL):
+	@mkdir -p $(@D)
+	curl -sL https://storage.googleapis.com/pub/gsutil.tar.gz | tar -xz -C $(TOOLS_DIR)
+
 define INCLUDE_FILE
 path = $(dir)
 include $(dir)/Makefile
 endef
-
-OUT_DIR := $(abspath $(ROOT_DIR)/out)
-$(OUT_DIR):
-	@mkdir -p $(@D)
 
 rules.clean:
 	rm -rf $(OUT_DIR)

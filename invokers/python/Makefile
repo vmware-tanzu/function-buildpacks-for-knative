@@ -8,16 +8,28 @@ path ?= .
 python-invoker.path := $(path)
 
 python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.py')
+python-invoker.version := $(shell cat $(python-invoker.path)/VERSION)
 
-python-invoker.build := $(OUT_DIR)/python-invoker.build
-$(python-invoker.build): $(TOX) $(python-invoker.sources)
+python-invoker.bucket := gs://cnr-functions-release/invokers/python
+
+python-invoker.out_dir := $(OUT_DIR)/invokers/python
+python-invoker.build := $(python-invoker.out_dir)/pyfunc-invoker-$(python-invoker.version).tar.gz
+$(python-invoker.build): $(TOX) $(python-invoker.sources) $(python-invoker.path)/VERSION $(python-invoker.path)/tox.ini
 	@mkdir -p $(@D)
 	cd $(python-invoker.path) && $(TOX) --sdistonly
-	touch $@
 
-.PHONY: python-invoker.publish
-python-invoker.publish: $(python-invoker.build) # TODO: We should upload to GCP bucket
-	@echo TODO: publish Python invoker
+python-invoker.sha256 := $(python-invoker.out_dir)/pyfunc-invoker-$(python-invoker.version).sha256
+$(python-invoker.sha256): $(python-invoker.build)
+	@mkdir -p $(@D)
+	cd $(@D) && sha256sum $(notdir $(python-invoker.build)) > $@
+
+python-invoker.artifacts := $(python-invoker.build) $(python-invoker.sha256)
+python-invoker.publish := $(python-invoker.out_dir)/python-invoker.publish.$(python-invoker.version)
+$(python-invoker.publish): $(GSUTIL) $(python-invoker.artifacts)
+	$(GSUTIL) cp $(python-invoker.artifacts) $(python-invoker.bucket)
+	$(GSUTIL) retention temp set $(addprefix $(python-invoker.bucket)/,$(notdir $(python-invoker.artifacts)))
+	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(python-invoker.bucket)/,$(notdir $(python-invoker.artifacts)))
+	touch $@
 
 .PHONY: python-invoker.tests
 python-invoker.tests: $(TOX) $(python-invoker.sources)
@@ -33,6 +45,6 @@ python-invoker.clean:
 	rm -rf $(python-invoker.path)/.tox
 
 all invokers: $(python-invoker.build)
-publish-invokers: python-invoker.publish
+publish-invokers: $(python-invoker.publish)
 tests invoker-tests: python-invoker.tests
 clean: python-invoker.clean
