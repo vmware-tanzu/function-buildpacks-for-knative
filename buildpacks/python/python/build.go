@@ -22,19 +22,38 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
 	}
 
-	pr := libpak.PlanEntryResolver{Plan: context.Plan}
+	planResolver := libpak.PlanEntryResolver{Plan: context.Plan}
 
-	invokerPlan, ok, err := pr.Resolve("kn-fn-python-invoker")
+	dependencyCache, err := libpak.NewDependencyCache(context)
+	if err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency cache\n%w", err)
+	}
+	dependencyCache.Logger = b.Logger
+
+	dependencyResolver, err := libpak.NewDependencyResolver(context)
+	if err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency resolver\n%w", err)
+	}
+
+	invokerDep, err := dependencyResolver.Resolve("invoker", "")
+	if err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
+	}
+
+	invokerLayer, invokerBOM := NewInvoker(invokerDep, dependencyCache)
+	invokerLayer.Logger = b.Logger
+	result.Layers = append(result.Layers, invokerLayer)
+	result.BOM.Entries = append(result.BOM.Entries, invokerBOM)
+
+	functionPlan, ok, err := planResolver.Resolve("python-function")
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to resolve kn-fn-python-invoker plan entry\n%w", err)
 	}
 	if !ok {
 		return result, nil
 	}
-
-	i := NewInvokerFromPlan(invokerPlan, context.Buildpack.Path)
-	i.Logger = b.Logger
-	result.Layers = append(result.Layers, i)
+	functionLayer := NewFunction(functionPlan)
+	result.Layers = append(result.Layers, functionLayer)
 
 	command := "python"
 	arguments := []string{"-m", "pyfunc"}
