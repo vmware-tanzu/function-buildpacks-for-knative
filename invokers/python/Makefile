@@ -44,7 +44,7 @@ python-invoker.clean:
 	rm -rf $(python-invoker.path)/pyfunc/__pycache__
 	rm -rf $(python-invoker.path)/.tox
 
-all invokers: $(python-invoker.build)
+all invokers: $(python-invoker.artifacts)
 publish-invokers: $(python-invoker.publish)
 tests invoker-tests: python-invoker.tests
 clean: python-invoker.clean
