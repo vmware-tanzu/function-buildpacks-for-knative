@@ -10,7 +10,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: 'python@sha256:301797d06f5828195f496f1f3022e370d5743e44044e56656f45c4a3c4174ca4'
     steps:
     - uses: actions/checkout@v2
     - name: Run Invoker Tests
