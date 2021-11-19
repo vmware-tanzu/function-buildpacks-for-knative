@@ -9,6 +9,7 @@ ROOT_DIR := $(dir $(RULES_MK))
 OUT_DIR := $(abspath $(ROOT_DIR)/out)
 
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+GIT_COMMIT := $(shell git rev-parse HEAD)
 VERSION.release := $(shell cat $(ROOT_DIR)/VERSION)
 VERSION.dev := dev-$(subst /,_,$(GIT_BRANCH))
 VERSION.latest := latest
@@ -25,6 +26,10 @@ IMAGE_REGISTRY := us.gcr.io/daisy-284300/kn-fn
 BUILDER_IMAGE := $(IMAGE_REGISTRY)/builder:$(IMAGE_TAG)
 
 OS_NAME := $(shell uname -s | tr A-Z a-z)
+
+# Sha recipes
+%.sha256: %
+	cd $(dir $<) && shasum -a 256 $(notdir $<) > $@
 
 # Define the tools here
 TOOLS_DIR := $(abspath $(ROOT_DIR)/tools)
