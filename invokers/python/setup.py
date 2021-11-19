@@ -14,7 +14,6 @@ with open(desc_file, 'r') as fh:
 with open(version_file, 'r') as fh:
     version = fh.read()
 
-
 setup(
     name='pyfunc-invoker',
     packages=find_packages(include=['pyfunc']),
