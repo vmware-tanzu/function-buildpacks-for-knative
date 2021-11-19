@@ -7,24 +7,34 @@ include $(PYTHON.MK)
 path ?= .
 python-invoker.path := $(path)
 
-python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.py')
+python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.py') \
+	$(python-invoker.path)/Manifest.in \
+	$(python-invoker.path)/pyproject.toml \
+	$(python-invoker.path)/VERSION \
+	$(python-invoker.path)/LICENSE \
+
 python-invoker.version := $(shell cat $(python-invoker.path)/VERSION)
 
 python-invoker.bucket := gs://cnr-functions-release/invokers/python
 
+python-invoker.build_dir := $(BUILD_DIR)/python-invoker
+python-invoker.build_image_name := python-invoker:$(GIT_COMMIT)
+python-invoker.build_image := $(python-invoker.build_dir)/image
+
 python-invoker.out_dir := $(OUT_DIR)/invokers/python
-python-invoker.build := $(python-invoker.out_dir)/pyfunc-invoker-$(python-invoker.version).tar.gz
-$(python-invoker.build): $(TOX) $(python-invoker.sources) $(python-invoker.path)/VERSION $(python-invoker.path)/tox.ini $(python-invoker.path)/Manifest.in
-	@mkdir -p $(@D)
-	cd $(python-invoker.path) && $(TOX) --sdistonly
+python-invoker.out_file := $(python-invoker.out_dir)/pyfunc-invoker-$(python-invoker.version).tar.gz
 
-python-invoker.sha256 := $(python-invoker.out_dir)/pyfunc-invoker-$(python-invoker.version).sha256
-$(python-invoker.sha256): $(python-invoker.build)
+$(python-invoker.build_image): $(python-invoker.path)/Dockerfile $(python-invoker.sources)
 	@mkdir -p $(@D)
-	cd $(@D) && sha256sum $(notdir $(python-invoker.build)) > $@
+	docker build -t $(python-invoker.build_image_name) -f $< $(python-invoker.path) --no-cache
+	touch $@
 
-python-invoker.artifacts := $(python-invoker.build) $(python-invoker.sha256)
-python-invoker.publish := $(OUT_DIR)/python-invoker.publish.$(python-invoker.version)
+$(python-invoker.out_file): $(python-invoker.build_image)
+	@mkdir -p $(@D)
+	docker cp `docker create $(python-invoker.build_image_name)`:/out/$(notdir $(python-invoker.out_file)) $@
+
+python-invoker.artifacts := $(python-invoker.out_file) $(python-invoker.out_file).sha256
+python-invoker.publish := $(python-invoker.build_dir)/publish.$(python-invoker.version)
 $(python-invoker.publish): $(GSUTIL) $(python-invoker.artifacts)
 	$(GSUTIL) cp $(python-invoker.artifacts) $(python-invoker.bucket)
 	$(GSUTIL) retention temp set $(addprefix $(python-invoker.bucket)/,$(notdir $(python-invoker.artifacts)))
@@ -32,25 +42,17 @@ $(python-invoker.publish): $(GSUTIL) $(python-invoker.artifacts)
 	touch $@
 
 .PHONY: python-invoker.tests
-python-invoker.tests: $(TOX) $(python-invoker.sources)
-	cd $(python-invoker.path) && $(TOX) tests
+python-invoker.tests: $(python-invoker.build_image) $(python-invoker.sources)
+	docker run $(python-invoker.build_image_name)
 
 .PHONY: python-invoker.clean
 python-invoker.clean:
-	rm -rf $(python-invoker.path)/.eggs
-	rm -rf $(python-invoker.path)/.pytest_cache
-	rm -rf $(python-invoker.path)/dist
-	rm -rf $(python-invoker.path)/*.egg-info
-	rm -rf $(python-invoker.path)/pyfunc/__pycache__
-	rm -rf $(python-invoker.path)/.tox
+	-docker rmi -f $(python-invoker.build_image_name)
 
-.PHONY: publish-invokers.python
+.PHONY: invokers.python publish-invokers.python
 publish-invoker.python: $(python-invoker.publish)
 
-.PHONY: invokers.python
-invokers.python: $(python-invoker.publish)
-
-all invokers: $(python-invoker.artifacts)
+all invokers invokers.python: $(python-invoker.artifacts)
 publish-invokers: publish-invokers.python
 tests invoker-tests: python-invoker.tests
 clean: python-invoker.clean

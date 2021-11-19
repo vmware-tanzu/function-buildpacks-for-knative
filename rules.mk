@@ -7,6 +7,7 @@ ROOT_DIR := $(dir $(RULES_MK))
 .SUFFIXES: # This removes a lot of the implicit rules.
 
 OUT_DIR := $(abspath $(ROOT_DIR)/out)
+BUILD_DIR := $(abspath $(ROOT_DIR)/build)
 
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell git rev-parse HEAD)
@@ -62,6 +63,7 @@ include $(dir)/Makefile
 endef
 
 rules.clean:
+	rm -rf $(BUILD_DIR)
 	rm -rf $(OUT_DIR)
 	rm -rf $(dir $(TOOLS_BIN_DIR))
 
