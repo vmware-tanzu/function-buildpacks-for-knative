@@ -1,0 +1,33 @@
+name: Invokers
+on:
+  push:
+    branches:
+    - "*"
+    tags:
+    - "python-invoker/*"
+    - "java-invoker/*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: 'python@sha256:301797d06f5828195f496f1f3022e370d5743e44044e56656f45c4a3c4174ca4'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Invoker Tests
+      run: make invoker-tests
+
+  python-build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref_name,'python-invoker/')
+    steps:
+    - name: Build
+      run: make invokers.python
+
+  python-release:
+    needs: python-build
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    steps:
+    - name: Publish release
+      run: make publish-invoker.python
