@@ -57,15 +57,14 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 			{
 				Provides: []libcnb.BuildPlanProvide{
 					{
-						Name: "kn-fn-python-invoker",
+						Name: "python-function",
 					},
 				},
 				Requires: []libcnb.BuildPlanRequire{
 					{
-						Name: "kn-fn-python-invoker",
+						Name: "python-function",
 						Metadata: map[string]interface{}{
 							"launch": true,
-							"build":  true,
 							"handler": map[string]string{
 								"module":   module,
 								"function": function,
@@ -78,6 +77,12 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 						Metadata: map[string]interface{}{
 							"build":  true,
 							"launch": true,
+						},
+					},
+					{
+						Name: "pip",
+						Metadata: map[string]interface{}{
+							"build": true,
 						},
 					},
 				},

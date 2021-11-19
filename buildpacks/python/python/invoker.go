@@ -2,8 +2,8 @@ package python
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
@@ -11,50 +11,24 @@ import (
 )
 
 type Invoker struct {
-	LayerContributor libpak.LayerContributor
+	LayerContributor libpak.DependencyLayerContributor
 	Logger           bard.Logger
-
-	modulePath string
-
-	handler  string
-	module   string
-	function string
 }
 
-func NewInvokerFromPlan(plan libcnb.BuildpackPlanEntry, buildpackPath string) Invoker {
-	contributor := libpak.NewLayerContributor(plan.Name, map[string]interface{}{}, libcnb.LayerTypes{
+func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) (Invoker, libcnb.BOMEntry) {
+	contributor, entry := libpak.NewDependencyLayer(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
 	})
-
-	// Assumption is that build always comes after a successful detection which will add the handler key
-	handler := plan.Metadata["handler"].(map[string]interface{})
-
-	return Invoker{
-		LayerContributor: contributor,
-		modulePath:       filepath.Join(buildpackPath, "invoker"),
-
-		module:   handler["module"].(string),
-		function: handler["function"].(string),
-		handler:  handler["raw"].(string),
-	}
+	return Invoker{LayerContributor: contributor}, entry
 }
 
 func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	i.LayerContributor.Logger = i.Logger
-
-	return i.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
-		i.Logger.Bodyf("Creating layer %s with path %s", layer.Name, layer.Path)
-
-		// TODO: Maybe do the copying in GO instead of shelling out to cp.
-		pyfuncDir := filepath.Join(layer.Path, "pyfunc")
-		cp := exec.Command("cp", "-a", i.modulePath, pyfuncDir)
-		if err := cp.Run(); err != nil {
-			return layer, err
-		}
+	return i.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
+		i.Logger.Bodyf("Installing to %s", artifact.Name())
 
 		var stderr bytes.Buffer
-		cmd := exec.Command("python", "setup.py", "install")
-		cmd.Dir = pyfuncDir
+		cmd := exec.Command("pip", "install", artifact.Name())
 		cmd.Stderr = &stderr
 
 		if err := cmd.Run(); err != nil {
@@ -62,13 +36,10 @@ func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 			return layer, err
 		}
 
-		if i.handler != "" {
-			layer.LaunchEnvironment.Override("PYTHON_HANDLER", i.handler)
-		}
 		return layer, nil
 	})
 }
 
 func (i Invoker) Name() string {
-	return i.LayerContributor.Name
+	return i.LayerContributor.Name()
 }
