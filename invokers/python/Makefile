@@ -23,7 +23,7 @@ python-invoker.out_file := $(python-invoker.out_dir)/pyfunc-invoker-$(python-inv
 
 $(python-invoker.build_image): $(python-invoker.path)/Dockerfile $(python-invoker.sources)
 	@mkdir -p $(@D)
-	docker build -t $(python-invoker.build_image_name) -f $< $(python-invoker.path) --no-cache
+	DOCKER_BUILDKIT=1 docker build --rm -t $(python-invoker.build_image_name) -f $< $(python-invoker.path)
 	touch $@
 
 $(python-invoker.out_file): $(python-invoker.build_image)
