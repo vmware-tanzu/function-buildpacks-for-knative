@@ -9,14 +9,15 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.vmware</groupId>
-	<artifactId>function-invoker</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
-	<name>java-function-invoker</name>
-	<description>Demo project for Spring Boot</description>
+	<artifactId>java-function-invoker</artifactId>
+	<version>dev</version>
+	<name>Java Function Invoker</name>
+	<description>Detect and run a function by leveraging Spring Cloud Functions.</description>
 	<properties>
 		<java.version>11</java.version>
 		<spring-cloud.version>2020.0.3</spring-cloud.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -38,6 +39,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -51,17 +53,17 @@
 	</dependencyManagement>
 
 	<repositories>
-	<repository>
-		<id>spring-snapshots</id>
-		<name>Spring Snapshots</name>
-		<url>https://repo.spring.io/libs-snapshot-local</url>
-		<snapshots>
-			<enabled>true</enabled>
-		</snapshots>
-		<releases>
-			<enabled>false</enabled>
-		</releases>
-	</repository>
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>https://repo.spring.io/libs-snapshot-local</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
 	</repositories>
 
 	<build>
@@ -72,5 +74,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
