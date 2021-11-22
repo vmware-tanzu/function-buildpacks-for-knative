@@ -29,6 +29,7 @@ $(python-invoker.build_image): $(python-invoker.path)/Dockerfile $(python-invoke
 $(python-invoker.out_file): $(python-invoker.build_image)
 	@mkdir -p $(@D)
 	docker cp `docker create $(python-invoker.build_image_name)`:/out/$(notdir $(python-invoker.out_file)) $@
+	touch $@
 
 python-invoker.artifacts := $(python-invoker.out_file) $(python-invoker.out_file).sha256
 python-invoker.publish := $(python-invoker.build_dir)/publish.$(python-invoker.version)
