@@ -1,0 +1,30 @@
+name: Java Invoker
+on:
+  push:
+    paths:
+    - 'invokers/java/**'
+    - 'rules.mk'
+    - 'invokers/Makefile'
+    branches:
+    - '**'
+    tags:
+    - 'java-invoker/*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Invoker Tests
+      run: make java-invoker.tests
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref,'refs/tags/java-invoker/')
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: make invokers.java
+    - name: Publish Java invoker
+      run: make publish-invoker.java
