@@ -126,26 +126,25 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 		},
 	}
 
-	// Create a CloudEvents client
-	client, err := cloudevents.NewClientHTTP()
-	if err != nil {
-		log.Fatalf("failed to create client, %v", err)
-	}
-
 	for _, c := range cases {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
-			// Somewhere in here, a timeout occurs, preventing tests from passing
-			// Double check this logic
 			image := fmt.Sprintf("%s:%s", baseImage, c.tag)
-			cleanup, err := runTestContainer(image) // Container probably needs to be modified to launch a CE http client
+			cleanup, err := runTestContainer(image)
 			if err != nil {
 				t.Error(err)
 				return
 			}
 			defer cleanup()
 
-			url := fmt.Sprintf("http://127.0.0.1:8080/%s", strings.TrimLeft(c.path, "/")) // unsure if this is still valid
+			url := fmt.Sprintf("http://127.0.0.1:8080/%s", strings.TrimLeft(c.path, "/"))
+
+			// Create a CloudEvents client
+			client, err := cloudevents.NewClientHTTP()
+			if err != nil {
+				log.Fatalf("failed to create client, %v", err)
+			}
+			// fmt.Println("Created new CloudEvent HTTP Client")
 
 			// Send a CloudEvent
 			event := cloudevents.NewEvent()
@@ -156,19 +155,22 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 			// Set a target.
 			ctx := cloudevents.ContextWithTarget(context.Background(), url)
 
-			// Send that Event.
-			if result := client.Send(ctx, event); cloudevents.IsUndelivered(result) {
-				log.Fatalf("failed to send, %v", result)
+			/** Request that Event.
+			 * Not documented properly, but Request should apparently
+			 * be used over Send+Receive in a test:
+			 * https://pkg.go.dev/github.com/cloudevents/sdk-go/v2@v2.6.1/client#Client
+			 */
+			reqEvent, result := client.Request(ctx, event)
+			if cloudevents.IsUndelivered(result) {
+				log.Fatalf("Failed to send, %v", result)
 			}
+			// fmt.Println("Received Cloud Event")
+			// fmt.Printf("Event: %s", reqEvent)
 
-			// Receive a CloudEvent
-			log.Fatal(client.StartReceiver(context.Background(), func(e cloudevents.Event) {
-				bs := string(e.Data()[:])
-				if bs != c.expectedResponse {
-					t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, bs)
-				}
-			}))
-
+			reqEventData := string(reqEvent.Data()[:])
+			if reqEventData != c.expectedResponse {
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
+			}
 		})
 	}
 }
