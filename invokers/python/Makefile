@@ -5,8 +5,8 @@ path ?= .
 python-invoker.path := $(path)
 
 python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.py') \
-	$(python-invoker.path)/Manifest.in \
 	$(python-invoker.path)/pyproject.toml \
+	$(python-invoker.path)/MANIFEST.in \
 	$(python-invoker.path)/VERSION \
 	$(python-invoker.path)/LICENSE \
 
