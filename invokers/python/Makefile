@@ -1,9 +1,6 @@
 RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
-PYTHON.MK ?= $(ROOT_DIR)/python.mk
-include $(PYTHON.MK)
-
 path ?= .
 python-invoker.path := $(path)
 
