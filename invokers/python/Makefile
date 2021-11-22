@@ -16,7 +16,7 @@ python-invoker.bucket := gs://cnr-functions-release/invokers/python
 
 python-invoker.build_dir := $(BUILD_DIR)/python-invoker
 python-invoker.build_image_name := python-invoker:$(GIT_COMMIT)
-python-invoker.build_image := $(python-invoker.build_dir)/image
+python-invoker.build_image := $(python-invoker.build_dir)/image.$(GIT_COMMIT)
 
 python-invoker.out_dir := $(OUT_DIR)/invokers/python
 python-invoker.out_file := $(python-invoker.out_dir)/pyfunc-invoker-$(python-invoker.version).tar.gz
