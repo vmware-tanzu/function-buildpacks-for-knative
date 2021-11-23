@@ -34,5 +34,7 @@ jobs:
       run: printf '%s' "${GCS_BOTO}" > ~/.boto
     - name: Build
       run: make invokers.python
+    - name: Print Hash
+      run: make python-invoker.print_sha
     - name: Publish Python invoker
       run: make publish-invoker.python

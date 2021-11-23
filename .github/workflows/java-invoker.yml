@@ -24,7 +24,17 @@ jobs:
     if: startsWith(github.ref,'refs/tags/java-invoker/')
     steps:
     - uses: actions/checkout@v2
+    - name: Write credentials for GCS
+      env:
+        GS_SERVICE_KEY: ${{ secrets.GS_SERVICE_KEY }}
+      run: printf '%s' "${GS_SERVICE_KEY}" > /tmp/cnr-gcs-secret.json
+    - name: Write boto file
+      env:
+        GCS_BOTO: ${{ secrets.GCS_BOTO }}
+      run: printf '%s' "${GCS_BOTO}" > ~/.boto
     - name: Build
       run: make invokers.java
+    - name: Print Hash
+      run: make java-invoker.print_sha
     - name: Publish Java invoker
       run: make publish-invoker.java
