@@ -39,6 +39,9 @@ $(python-invoker.publish): $(GSUTIL) $(python-invoker.artifacts)
 	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(python-invoker.bucket)/,$(notdir $(python-invoker.artifacts)))
 	touch $@
 
+.PHONY: python-invoker.print_sha
+python-invoker.print_sha: $(python-invoker.out_file).print_sha
+
 .PHONY: python-invoker.tests
 python-invoker.tests: $(python-invoker.build_image) $(python-invoker.sources)
 	docker run $(python-invoker.build_image_name)
@@ -52,5 +55,6 @@ publish-invoker.python: $(python-invoker.publish)
 
 all invokers invokers.python: $(python-invoker.artifacts)
 publish-invokers: publish-invokers.python
+print-sha: python-invoker.print_sha
 tests invoker-tests: python-invoker.tests
 clean: python-invoker.clean

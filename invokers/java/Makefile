@@ -37,6 +37,9 @@ $(java-invoker.publish): $(GSUTIL) $(java-invoker.artifacts)
 	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(java-invoker.bucket)/,$(notdir $(java-invoker.artifacts)))
 	touch $@
 
+.PHONY: java-invoker.print_sha
+java-invoker.print_sha: $(java-invoker.out_file).print_sha
+
 .PHONY: java-invoker.tests
 java-invoker.tests: $(java-invoker.build_image) $(java-invoker.sources)
 	docker run $(java-invoker.build_image_name)
@@ -51,5 +54,6 @@ publish-invoker.java: $(java-invoker.publish)
 
 all invokers invokers.java: $(java-invoker.artifacts)
 publish-invokers: publish-invokers.java
+print-sha: java-invoker.print_sha
 tests invoker-tests: java-invoker.tests
 clean: java-invoker.clean

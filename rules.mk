@@ -32,6 +32,9 @@ OS_NAME := $(shell uname -s | tr A-Z a-z)
 %.sha256: %
 	cd $(dir $<) && shasum -a 256 $(notdir $<) > $@
 
+%.print_sha: %.sha256
+	@cat $<
+
 # Define the tools here
 TOOLS_DIR := $(abspath $(ROOT_DIR)/tools)
 TOOLS_BIN_DIR := $(abspath $(TOOLS_DIR)/bin)
