@@ -6,7 +6,6 @@ import (
 	"fmt"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"io/ioutil"
-	"log"
 
 	"net/http"
 	"strings"
@@ -112,7 +111,6 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 			name: "Java",
 			tag:  "java",
 
-			methodType:       "example.type",
 			path:             "/hello",
 			expectedResponse: "Hello World!",
 		},
@@ -120,8 +118,7 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 			name: "Python",
 			tag:  "python",
 
-			methodType:       "example.type",
-			path:             "/",
+			path:             "/hello",
 			expectedResponse: "Hello World!",
 		},
 	}
@@ -142,9 +139,8 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 			// Create a CloudEvents client
 			client, err := cloudevents.NewClientHTTP()
 			if err != nil {
-				log.Fatalf("failed to create client, %v", err)
+				t.Error(err)
 			}
-			// fmt.Println("Created new CloudEvent HTTP Client")
 
 			// Send a CloudEvent
 			event := cloudevents.NewEvent()
@@ -159,15 +155,18 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 			 * Not documented properly, but Request should apparently
 			 * be used over Send+Receive in a test:
 			 * https://pkg.go.dev/github.com/cloudevents/sdk-go/v2@v2.6.1/client#Client
+			 * Bug to watch: https://github.com/cloudevents/sdk-go/blob/1170e89edb9b504a806f2c6a26563c3c26b68276/v2/client/client.go#L178
 			 */
 			reqEvent, result := client.Request(ctx, event)
 			if cloudevents.IsUndelivered(result) {
-				log.Fatalf("Failed to send, %v", result)
+				t.Error(err)
 			}
-			// fmt.Println("Received Cloud Event")
-			// fmt.Printf("Event: %s", reqEvent)
+			if cloudevents.IsNACK(result) {
+				t.Error(err)
+				t.Skip()
+			}
 
-			reqEventData := string(reqEvent.Data()[:])
+			reqEventData := string(reqEvent.Data())
 			if reqEventData != c.expectedResponse {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
 			}
