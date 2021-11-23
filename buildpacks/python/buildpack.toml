@@ -13,5 +13,5 @@ id      = "invoker"
 name    = "Python Invoker"
 version = "0.0.1"
 uri     = "https://storage.googleapis.com/cnr-functions-release/invokers/python/pyfunc-invoker-0.0.1.tar.gz"
-sha256  = "fb5cee24a9e499bab6fe87c89ecaaf087c21b38439d31c47d2ae8e949eb7fafd"
+sha256  = "317cccddfb9d0e2c9c77029b181246ff3d098125427fc963e990600e8487bbac"
 stacks  = [ "io.buildpacks.stacks.bionic" ]
