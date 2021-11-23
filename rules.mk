@@ -12,7 +12,7 @@ BUILD_DIR := $(abspath $(ROOT_DIR)/build)
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell git rev-parse HEAD)
 VERSION.release := $(shell cat $(ROOT_DIR)/VERSION)
-VERSION.dev := dev-$(subst /,_,$(GIT_BRANCH))
+VERSION.dev := dev-$(subst /,_,$(GIT_COMMIT))
 VERSION.latest := latest
 
 build := dev
