@@ -39,21 +39,8 @@ For more details you can refer to language-specific documentation:
     * [Samples](./samples/java)
     * [Templates](./templates/java)
 
-
-## Creating the Builder from Source
-
-1. Build the buildpacks
-```
-make buildpacks
-```
-TODO: Tag specific versions rather than depending on latest
-
-1. Build the builder
-```
-make builder
-```
-Note the builder name in the output. Use this local builder in the `pack build` command similarly to above.
-
+To get started building the project, you can just run `make` in the root directory.
+The Makefile includes calls to all the subdirectories. If you wish to run only a specific section, navigate to the subdirectory and run `make` or a related subcommand, e.g. `make buildpacks`, `make smoke-tests`.
 
 ## Documentation
 Each subdirectory has a relevant README.md describing how to use its respective files.
