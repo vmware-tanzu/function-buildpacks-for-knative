@@ -54,7 +54,7 @@ python-invoker.clean:
 publish-invoker.python: $(python-invoker.publish)
 
 all invokers invokers.python: $(python-invoker.artifacts)
-publish-invokers: publish-invokers.python
+publish-invokers: publish-invoker.python
 print-sha: python-invoker.print_sha
 tests invoker-tests: python-invoker.tests
 clean: python-invoker.clean

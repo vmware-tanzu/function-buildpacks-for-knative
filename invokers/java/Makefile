@@ -53,7 +53,7 @@ java-invoker.clean:
 publish-invoker.java: $(java-invoker.publish)
 
 all invokers invokers.java: $(java-invoker.artifacts)
-publish-invokers: publish-invokers.java
+publish-invokers: publish-invoker.java
 print-sha: java-invoker.print_sha
 tests invoker-tests: java-invoker.tests
 clean: java-invoker.clean
