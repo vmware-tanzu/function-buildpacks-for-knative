@@ -57,4 +57,4 @@ jobs:
     - name: Build
       run: make build=${{env.build}} builder
     - name: Publish
-      run: make build=r${{env.build}} publish-builder
+      run: make build=${{env.build}} publish-builder
