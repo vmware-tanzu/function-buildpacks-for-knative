@@ -6,7 +6,19 @@ import traceback
 
 import flask
 import cloudevents.http
+from cloudevents.http.util import default_marshaller
+from cloudevents.sdk import types
+
 from .locate import ArgumentConversion, find_func
+
+# There is a bug in the cloudevent sdk where if the data contents is a string it will
+# run it through the json marshaller which ends up wrapping it with double quotes.
+# The offending code lives here: https://github.com/cloudevents/sdk-python/blob/master/cloudevents/sdk/event/base.py#L285-L312
+def smart_marshaller(content: typing.Any):
+    if isinstance(content, str):
+        return content
+    else:
+        return default_marshaller(content)
 
 def WrapFunction(func: typing.Callable) -> typing.Callable:
     sig = inspect.signature(func)
@@ -37,7 +49,7 @@ def WrapFunction(func: typing.Callable) -> typing.Callable:
                     # Opportunistic conversion; failures will be caught in the next block
                     pass
             try:
-                headers, body = cloudevents.http.to_binary(result)
+                headers, body = cloudevents.http.to_binary(result, data_marshaller=smart_marshaller)
                 return flask.Response(body, 200, headers)
             except Exception as e:
                 print(f"Sending raw result: {e}")
