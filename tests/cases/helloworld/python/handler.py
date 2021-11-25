@@ -1,5 +1,5 @@
 import logging
 from typing import Any
 
-def handler(req: Any):
-    return "Hello World!"
+def handler(attributes: Any):
+    return attributes, "Hello World!"

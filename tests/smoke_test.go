@@ -144,7 +144,7 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 			event := cloudevents.NewEvent()
 			event.SetSource("url")
 			event.SetType("example.type")
-			event.SetData(cloudevents.ApplicationJSON, "Hello World!")
+			event.SetData(cloudevents.TextPlain, "Hello World!")
 
 			ctx := cloudevents.ContextWithTarget(context.Background(), url)
 			reqEvent, result := client.Request(ctx, event)
