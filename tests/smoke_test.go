@@ -4,15 +4,21 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+
 	"io/ioutil"
 
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestHelloWorldHTTP(t *testing.T) {
+	t.Skip()
+
 	baseImage := "kn-fn-test/helloworld"
 	cases := []struct {
 		name string
@@ -96,30 +102,31 @@ func TestHelloWorldHTTP(t *testing.T) {
 	}
 }
 
-func TestHelloWorldCloudEvents(t *testing.T) {
-	baseImage := "kn-fn-test/helloworld"
+func TestEchoCloudEvents(t *testing.T) {
+	baseImage := "kn-fn-test/echo-ce"
 	cases := []struct {
 		name string
 		tag  string
 
-		methodType       string
-		contentType      string
 		path             string
+		data             string
 		expectedResponse string
 	}{
 		{
 			name: "Java",
 			tag:  "java",
 
-			path:             "/hello",
-			expectedResponse: "Hello World!",
+			path:             "/",
+			data:             "java test data",
+			expectedResponse: "java test data",
 		},
 		{
 			name: "Python",
 			tag:  "python",
 
 			path:             "/",
-			expectedResponse: "Hello World!",
+			data:             "python test data",
+			expectedResponse: "python test data",
 		},
 	}
 
@@ -143,11 +150,13 @@ func TestHelloWorldCloudEvents(t *testing.T) {
 
 			event := cloudevents.NewEvent()
 			event.SetSource("url")
+			event.SetID(uuid.New().String())
 			event.SetType("example.type")
-			event.SetData(cloudevents.TextPlain, "Hello World!")
+			event.SetData(cloudevents.TextPlain, c.data)
 
 			ctx := cloudevents.ContextWithTarget(context.Background(), url)
 			reqEvent, result := client.Request(ctx, event)
+
 			if cloudevents.IsUndelivered(result) {
 				t.Error(err)
 			}
