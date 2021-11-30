@@ -16,9 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestHelloWorldHTTP(t *testing.T) {
-	t.Skip()
-
+func TestHTTP(t *testing.T) {
 	baseImage := "kn-fn-test/helloworld"
 	cases := []struct {
 		name string
@@ -102,7 +100,7 @@ func TestHelloWorldHTTP(t *testing.T) {
 	}
 }
 
-func TestEchoCloudEvents(t *testing.T) {
+func TestCloudEvents(t *testing.T) {
 	baseImage := "kn-fn-test/echo-ce"
 	cases := []struct {
 		name string

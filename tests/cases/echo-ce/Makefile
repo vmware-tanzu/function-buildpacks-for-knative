@@ -15,5 +15,5 @@ echo-ce.clean := $(addsuffix .clean,$(echo-ce.image_paths))
 $(echo-ce.clean):
 	-docker rmi -f $(echo-ce.image):$(basename $(notdir $@))
 
-smoke-test.images .PHONY: $(echo-ce.image_paths)
+smoke-tests.images .PHONY: $(echo-ce.image_paths)
 clean .PHONY: $(echo-ce.clean)

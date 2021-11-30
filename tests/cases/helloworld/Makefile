@@ -13,5 +13,5 @@ helloworld.clean := $(addsuffix .clean,$(helloworld.image_paths))
 $(helloworld.clean):
 	-docker rmi -f $(helloworld.image):$(basename $(notdir $@))
 
-smoke-test.images .PHONY: $(helloworld.image_paths)
+smoke-tests.images .PHONY: $(helloworld.image_paths)
 clean .PHONY: $(helloworld.clean)
