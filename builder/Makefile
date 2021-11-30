@@ -15,6 +15,7 @@ builder.publish: $(builder.build)
 
 builder.clean:
 	-docker rmi $(BUILDER_IMAGE)
+	rm -f $(builder.build)
 
 all builder: $(builder.build)
 publish publish-builder .PHONY: builder.publish

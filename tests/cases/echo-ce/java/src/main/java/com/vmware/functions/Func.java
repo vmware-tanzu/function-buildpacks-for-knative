@@ -1,12 +1,13 @@
 package com.vmware.functions;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import io.cloudevents.CloudEvent;
 import org.springframework.context.annotation.Bean;
-// import org.springframework.messaging.Message;
+import org.springframework.messaging.Message;
+import org.springframework.cloud.function.cloudevent.CloudEventMessageUtils;
 
 @SpringBootApplication
 public class Func {
@@ -15,24 +16,20 @@ public class Func {
 	}
 
 	@Bean
-	public Function<CloudEvent, String> echo() {
+	public Function<Message<String>, String> echo() {
 		return event -> {
-			String payload = event.getData().toString();
-			String header = (String) event.getAttribute("my-header");
-			if ("test" != header) {
-				return "Incorrect 'my-header' value in request";
+			if (!CloudEventMessageUtils.isCloudEvent(event)) {
+				return "Did not receive cloudevent";
 			}
+
+			String payload = CloudEventMessageUtils.getData(event);
+			// Map<String, Object> attrs = CloudEventMessageUtils.getAttributes(event);
+			// Object attr = attrs.get("ce-my-attr");
+			//
+			// if (null != attr && "test" != attr) {
+			// 	return "Invalid attribute value for 'my-attr'";
+			// }
 			return payload;
 		};
 	}
-
-	// public String apply(Message<String> message) {
-	// 	String payload = message.getPayload();
-	// 	MessageHeaders headers = message.getHeaders();
-	// 	String header = headers.get("my-header", String.class);
-	// 	if ("test" != header) {
-	// 		return "Incorrect 'my-header' value in request";
-	// 	}
-	// 	return payload;
-	// }
 }
