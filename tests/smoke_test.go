@@ -120,14 +120,14 @@ func TestEchoCloudEvents(t *testing.T) {
 			data:             "java test data",
 			expectedResponse: "java test data",
 		},
-		// {
-		// 	name: "Python",
-		// 	tag:  "python",
+		{
+			name: "Python",
+			tag:  "python",
 
-		// 	path:             "/",
-		// 	data:             "python test data",
-		// 	expectedResponse: "python test data",
-		// },
+			path:             "/",
+			data:             "python test data",
+			expectedResponse: "python test data",
+		},
 	}
 
 	for _, c := range cases {
@@ -156,11 +156,6 @@ func TestEchoCloudEvents(t *testing.T) {
 
 			ctx := cloudevents.ContextWithTarget(context.Background(), url)
 			reqEvent, result := client.Request(ctx, event)
-
-			fmt.Println("Result")
-			fmt.Println(result)
-			fmt.Println("ReqEvent")
-			fmt.Println(reqEvent)
 
 			if cloudevents.IsUndelivered(result) {
 				t.Error(err)
