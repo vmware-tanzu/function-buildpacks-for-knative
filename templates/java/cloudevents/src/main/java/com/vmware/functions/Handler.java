@@ -17,19 +17,7 @@ public class Handler {
 	public static void main(String[] args) {
 		SpringApplication.run(Handler.class, args);
 	}
-
-	// @Bean
-	// public Function<CloudEvent, CloudEvent> hello() {
-    //     CloudEvent outgoingCloudEvent = CloudEventBuilder.v1()
-    //            .withId("my-id")
-    //            .withSource(URI.create("/my-test"))
-    //            .withType("function-reply")
-    //            .withDataContentType("application/json")
-    //            .withData("{ \"msg\" : \"hello\" }".getBytes(StandardCharsets.UTF_8))
-    //            .build();
-    //     return outgoingCloudEvent;
-    // }
-
+    
     @Bean
     public Function<CloudEvent, CloudEvent> hello() {
     return event -> CloudEventBuilder.from(event)
