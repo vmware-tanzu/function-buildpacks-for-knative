@@ -4,30 +4,24 @@ import pathlib
 import sys
 import typing
 import types
-import os
 
 import flask
 import cloudevents.sdk.event.base as ce_sdk
 
+from .config import Config
+
 def find_func(dir: str) -> typing.Callable:
-    workspace = pathlib.Path(dir).resolve()
-    env = os.getenv('PYTHON_HANDLER', 'handler.handler')
-
-    print(f"Searching for '{env}' in {dir}")
-
-    s = env.split('.')
-    if len(s) < 2:
-        raise ValueError("Handler func must be in the form of <module>.<function>")
+    cfg = Config(search_path=dir)
+    print(cfg)
     
-    module_name = s[0]
-    func_name = s[1]
+    workspace = pathlib.Path(cfg.search_path).resolve()
 
     for f in workspace.glob("*.py"):
-        if f.stem == module_name:
+        if f.stem == cfg.module_name:
             file = f
             break
     else:
-        raise Exception(f"Module {module_name} not found in {dir}")
+        raise Exception(f"Module {cfg.module_name} not found in {dir}")
     
     print(f"Importing from {file}")
 
@@ -35,7 +29,7 @@ def find_func(dir: str) -> typing.Callable:
     spec = importlib.util.spec_from_file_location(f.stem, f)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    func = _func_from_module(module, func_name)
+    func = _func_from_module(module, cfg.function_name)
     sys.path.pop(0)
 
     return func
@@ -56,7 +50,7 @@ def _func_from_module(module: types.ModuleType, handler_name: str) -> typing.Cal
             funcs.append(x)
     
     if len(funcs) == 0:
-        raise Exception(f"Handler function {handler_name} not found in module {module.__name__}")
+        raise Exception(f"Function {handler_name} not found in module {module.__name__}")
 
     if len(funcs) > 1:
         raise Exception(f"Multiple handler functions {handler_name} matches expected signature in module {module.__name__}")
