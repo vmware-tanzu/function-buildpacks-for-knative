@@ -4,100 +4,103 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak/bard"
+	knfn "knative.dev/kn-plugin-func"
+)
+
+const (
+	EnvModuleName   = "MODULE_NAME"
+	EnvFunctionName = "FUNCTION_NAME"
+
+	ModuleNameDefault   = "func"
+	FunctionNameDefault = "main"
 )
 
 type Detect struct {
 	Logger bard.Logger
-
-	shouldError bool
 }
 
-const (
-	DEFAULT_HANDLER = "handler.handler"
-)
-
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
-	handler, ok := context.Platform.Environment["PYTHON_HANDLER"]
-	if !ok {
-		handler = DEFAULT_HANDLER
-		d.Logger.Info("Using default handler 'handler.handler'")
-	}
-	d.shouldError = ok
-
-	// Validate that the handler is defined correctly
-	sp := strings.Split(handler, ".")
-	if len(sp) != 2 {
-		return libcnb.DetectResult{}, d.logOrError("expected PYTHON_HANDLER environment variable to be in the form of 'module_name.function_name'")
-	}
-
-	module := strings.TrimSpace(sp[0])
-	function := strings.TrimSpace(sp[1])
-
-	if len(module) == 0 {
-		return libcnb.DetectResult{}, d.logOrError("expected PYTHON_HANDLER environment variable to be in the form of 'module_name.function_name', but module name was ''")
-	}
-
-	if len(function) == 0 {
-		return libcnb.DetectResult{}, d.logOrError("expected PYTHON_HANDLER environment variable to be in the form of 'module_name.function_name', but function name was ''")
-	}
-
-	file := fmt.Sprintf("%s.py", module)
-	_, err := os.Stat(filepath.Join(context.Application.Path, file))
+	result := libcnb.DetectResult{}
+	configFile := filepath.Join(context.Application.Path, knfn.ConfigFile)
+	_, err := os.Stat(configFile)
 	if err != nil {
-		return libcnb.DetectResult{}, d.logOrError(fmt.Sprintf("unable to find file '%s'", file))
+		d.logf(fmt.Sprintf("unable to find file '%s'", configFile))
+		return result, nil
 	}
 
-	result := libcnb.DetectResult{
-		Pass: true,
-		Plans: []libcnb.BuildPlan{
+	f, err := knfn.NewFunction(context.Application.Path)
+	if err != nil {
+		return result, fmt.Errorf("parsing function config: %v", err)
+	}
+
+	envs := envsToMap(f.Envs)
+	setDefaults(envs)
+
+	result.Plans = append(result.Plans, libcnb.BuildPlan{
+		Provides: []libcnb.BuildPlanProvide{
 			{
-				Provides: []libcnb.BuildPlanProvide{
-					{
-						Name: "python-function",
-					},
+				Name: "python-function",
+			},
+		},
+		Requires: []libcnb.BuildPlanRequire{
+			{
+				Name: "python-function",
+				Metadata: map[string]interface{}{
+					"launch": true,
+					"envs":   envs,
 				},
-				Requires: []libcnb.BuildPlanRequire{
-					{
-						Name: "python-function",
-						Metadata: map[string]interface{}{
-							"launch": true,
-							"handler": map[string]string{
-								"module":   module,
-								"function": function,
-								"raw":      fmt.Sprintf("%s.%s", module, function),
-							},
-						},
-					},
-					{
-						Name: "site-packages",
-						Metadata: map[string]interface{}{
-							"build":  true,
-							"launch": true,
-						},
-					},
-					{
-						Name: "pip",
-						Metadata: map[string]interface{}{
-							"build": true,
-						},
-					},
+			},
+			{
+				Name: "site-packages",
+				Metadata: map[string]interface{}{
+					"build":  true,
+					"launch": true,
+				},
+			},
+			{
+				Name: "pip",
+				Metadata: map[string]interface{}{
+					"build": true,
 				},
 			},
 		},
-	}
+	})
+
+	result.Pass = true
 
 	return result, nil
 }
 
-func (d Detect) logOrError(message string) error {
-	if d.shouldError {
-		return fmt.Errorf(message)
-	} else {
-		d.Logger.Info(message)
+func (d Detect) logf(format string, args ...interface{}) {
+	d.Logger.Infof(format, args...)
+}
+
+func envsToMap(envs knfn.Envs) map[string]string {
+	result := map[string]string{}
+
+	for _, e := range envs {
+		key := *e.Name
+		val := ""
+		if e.Value != nil {
+			val = *e.Value
+		}
+		result[key] = val
 	}
-	return nil
+
+	return result
+}
+
+func setDefaults(envs map[string]string) {
+	setDefault(envs, EnvModuleName, ModuleNameDefault)
+	setDefault(envs, EnvFunctionName, FunctionNameDefault)
+}
+
+func setDefault(m map[string]string, key string, def string) {
+	_, ok := m[key]
+	if !ok {
+		m[key] = def
+	}
 }

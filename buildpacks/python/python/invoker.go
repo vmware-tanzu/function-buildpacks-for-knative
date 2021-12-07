@@ -32,7 +32,7 @@ func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 		cmd.Stderr = &stderr
 
 		if err := cmd.Run(); err != nil {
-			i.Logger.Body("Installation of pyfunc-invoker failed:\n%s", stderr.String())
+			i.Logger.Body("failed to install invoker: %s", stderr.String())
 			return layer, err
 		}
 

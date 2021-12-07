@@ -17,7 +17,7 @@ type result struct {
 
 func TestDetectNoEnvironmentWithValidFile(t *testing.T) {
 	d := getDetector()
-	app := createTestApplication(withFunction("handler", "handler"))
+	app := createTestApplication(withDefaultHTTPFunction())
 	defer app.Finish()
 
 	plan, err := d.Detect(getContext(
@@ -28,108 +28,37 @@ func TestDetectNoEnvironmentWithValidFile(t *testing.T) {
 		Result: result{plan, err},
 		Pass:   true,
 		Metadata: map[string]interface{}{
-			"handler": map[string]string{
-				"module":   "handler",
-				"function": "handler",
-				"raw":      "handler.handler",
+			"envs": map[string]string{
+				EnvModuleName:   "func",
+				EnvFunctionName: "main",
 			},
 		},
-	}
-	expectations.Check(t)
-}
-
-func TestDetectNoEnvironmentWithMissingFile(t *testing.T) {
-	d := getDetector()
-	app := createTestApplication(withFunction("missing", "handler"))
-	defer app.Finish()
-
-	plan, err := d.Detect(getContext(
-		withApplicationPath(app.ApplicationPath),
-	))
-
-	expectations := DetectExpectations{
-		Result:      result{plan, err},
-		ExpectError: false,
-		Pass:        false,
 	}
 	expectations.Check(t)
 }
 
 func TestDetectEnvironmentWithValidFile(t *testing.T) {
 	d := getDetector()
-	app := createTestApplication(withFunction("other", "handler2"))
+	app := createTestApplication(withHTTPFunction("other", "handler2"))
 	defer app.Finish()
 
 	plan, err := d.Detect(getContext(
 		withApplicationPath(app.ApplicationPath),
-		withEnvironmentVariable("PYTHON_HANDLER", "other.handler2"),
+		withModuleName("other"),
+		withFunctionName("handler2"),
 	))
 
 	expectations := DetectExpectations{
 		Result: result{plan, err},
 		Pass:   true,
 		Metadata: map[string]interface{}{
-			"handler": map[string]string{
-				"module":   "other",
-				"function": "handler2",
-				"raw":      "other.handler2",
+			"envs": map[string]string{
+				EnvModuleName:   "other",
+				EnvFunctionName: "handler2",
 			},
 		},
 	}
 	expectations.Check(t)
-}
-
-func TestDetectEnironmentVariable(t *testing.T) {
-	d := getDetector()
-	app := createTestApplication(withFunction("handler", "handler"))
-	defer app.Finish()
-
-	cases := []struct {
-		name    string
-		context libcnb.DetectContext
-	}{
-		{
-			name: "non matching module from environment",
-			context: getContext(
-				withApplicationPath(app.ApplicationPath),
-				withEnvironmentVariable("PYTHON_HANDLER", "other.handler"),
-			),
-		},
-		{
-			name: "invalid environment variable (missing module)",
-			context: getContext(
-				withApplicationPath(app.ApplicationPath),
-				withEnvironmentVariable("PYTHON_HANDLER", ".handler"),
-			),
-		},
-		{
-			name: "invalid environment variable (missing function)",
-			context: getContext(
-				withApplicationPath(app.ApplicationPath),
-				withEnvironmentVariable("PYTHON_HANDLER", "handler."),
-			),
-		},
-		{
-			name: "too many items in environment variable",
-			context: getContext(
-				withApplicationPath(app.ApplicationPath),
-				withEnvironmentVariable("PYTHON_HANDLER", "handler.handler.something"),
-			),
-		},
-	}
-
-	for _, c := range cases {
-		c := c
-		t.Run(c.name, func(t *testing.T) {
-			plan, err := d.Detect(c.context)
-
-			expectations := DetectExpectations{
-				Result:      result{plan, err},
-				ExpectError: true,
-			}
-			expectations.Check(t)
-		})
-	}
 }
 
 func getDetector() python.Detect {
@@ -159,6 +88,18 @@ func getContext(opts ...func(*libcnb.DetectContext)) libcnb.DetectContext {
 func withApplicationPath(path string) func(*libcnb.DetectContext) {
 	return func(dc *libcnb.DetectContext) {
 		dc.Application.Path = path
+	}
+}
+
+func withModuleName(value string) func(*libcnb.DetectContext) {
+	return func(dc *libcnb.DetectContext) {
+		dc.Platform.Environment[EnvModuleName] = value
+	}
+}
+
+func withFunctionName(value string) func(*libcnb.DetectContext) {
+	return func(dc *libcnb.DetectContext) {
+		dc.Platform.Environment[EnvFunctionName] = value
 	}
 }
 
@@ -195,18 +136,19 @@ func (e DetectExpectations) Check(t *testing.T) {
 	}
 
 	// Find the invoker requires
+	planName := "python-function"
 	for _, plan := range e.Result.plan.Plans {
 		for _, require := range plan.Requires {
-			if require.Name == "kn-fn-python-invoker" {
+			if require.Name == planName {
 				for k, v := range e.Metadata {
 					val, ok := require.Metadata[k]
 					if !ok {
-						t.Errorf("plan requirement 'kn-fn-python-invoker' did not find metadata with key %s", k)
+						t.Errorf("plan requirement '%s' did not find metadata with key %s", planName, k)
 						return
 					}
 
 					if !reflect.DeepEqual(v, val) {
-						t.Errorf("unexpected value in 'kn-fn-python-invoker' requires metadata for key %s", k)
+						t.Errorf("unexpected value in '%s' requires metadata for key %s", planName, k)
 						return
 					}
 				}

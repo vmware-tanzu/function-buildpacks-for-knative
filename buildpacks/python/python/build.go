@@ -47,7 +47,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	functionPlan, ok, err := planResolver.Resolve("python-function")
 	if err != nil {
-		return libcnb.BuildResult{}, fmt.Errorf("unable to resolve kn-fn-python-invoker plan entry\n%w", err)
+		return libcnb.BuildResult{}, fmt.Errorf("unable to resolve python-function plan entry\n%w", err)
 	}
 	if !ok {
 		return result, nil

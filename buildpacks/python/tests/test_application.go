@@ -5,19 +5,50 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"text/template"
+
+	knfunc "knative.dev/kn-plugin-func"
 )
 
 const (
-	PYTHON_HTTP_TEMPLATE = `
-from typing import Any
+	EnvModuleName   = "FUNCTION_MODULE"
+	EnvFunctionName = "FUNCTION_NAME"
 
-def handler(req: Any):
-	return "Hello World!"`
+	HTTPTemplate = `from typing import Any
+
+def {{.Name}}({{range $var, $type := .Arguments}}{{$var}}:{{$type}}{{end}}):
+	return "{{.ReturnValue}}"`
 )
 
+type HTTPFunction struct {
+	Module      string
+	Name        string
+	Arguments   map[string]string
+	ReturnValue string
+}
+
+type Function interface {
+	Generate(path string) error
+}
+
+func (f HTTPFunction) Generate(path string) error {
+	templ, err := template.New("http-func-template").Parse(HTTPTemplate)
+	if err != nil {
+		return err
+	}
+
+	modulePath := filepath.Join(path, fmt.Sprintf("%s.py", f.Module))
+	file, err := os.Create(modulePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return templ.Execute(file, f)
+}
+
 type TestApplication struct {
-	ModuleName   string
-	FunctionName string
+	Function Function
 
 	ApplicationPath  string
 	FunctionFilePath string
@@ -29,9 +60,6 @@ func createTestApplication(opts ...func(*TestApplication)) TestApplication {
 	appPath, _ := ioutil.TempDir(os.TempDir(), "python-functions-buildpack-test-*")
 
 	app := TestApplication{
-		ModuleName:   "undefined",
-		FunctionName: "undefined",
-
 		ApplicationPath: appPath,
 	}
 
@@ -52,16 +80,43 @@ func (a TestApplication) Finish() {
 	}
 }
 
-func withFunction(module string, function string) func(*TestApplication) {
+func withDefaultHTTPFunction() func(*TestApplication) {
+	return withHTTPFunction("func", "main")
+}
+
+func withHTTPFunction(module string, function string) func(*TestApplication) {
 	return func(ta *TestApplication) {
-		ta.ModuleName = module
-		ta.FunctionName = function
+		if ta.Function != nil {
+			panic(fmt.Errorf("test application already defined function"))
+		}
 
-		ta.FunctionFilePath = filepath.Join(ta.ApplicationPath, fmt.Sprintf("%s.py", module))
-		file, _ := os.Create(ta.FunctionFilePath)
+		ta.Function = HTTPFunction{
+			Module: module,
+			Name:   function,
+		}
 
-		file.WriteString(PYTHON_HTTP_TEMPLATE)
+		cfg, err := knfunc.NewFunction(ta.ApplicationPath)
+		if err != nil {
+			panic(err)
+		}
 
-		defer file.Close()
+		cfg.Envs = append(cfg.Envs,
+			knfunc.Env{Name: strptr(EnvModuleName), Value: &module},
+			knfunc.Env{Name: strptr(EnvFunctionName), Value: &function},
+		)
+
+		err = cfg.WriteConfig()
+		if err != nil {
+			panic(err)
+		}
+
+		err = ta.Function.Generate(ta.ApplicationPath)
+		if err != nil {
+			panic(err)
+		}
 	}
+}
+
+func strptr(str string) *string {
+	return &str
 }
