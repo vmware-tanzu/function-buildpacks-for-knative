@@ -1,2 +1,2 @@
 builders:
-  default: us.gcr.io/daisy-284300/kn-fn/builder:0.0.3
+  default: us.gcr.io/daisy-284300/kn-fn/builder:0.0.4

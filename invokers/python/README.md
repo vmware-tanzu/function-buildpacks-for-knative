@@ -11,7 +11,7 @@ The framework uses reflection to find a suitable function to wrap; it should not
 be necessary to import any of the following modules in your own code unless you
 want (e.g. for type definitions):
 
-- `pyfunc` (this module; on PyPi as `pyfunc-invoker`)
+- `pyfunc` (this module)
 - `flask`
 - `cloudevents`
 
@@ -31,7 +31,7 @@ from typing import Any
 
 counter = 0
 
-def handler(data: Any, attributes: dict, req: Any):
+def main(data: Any, attributes: dict, req: Any):
     global counter
     counter = counter + 1
 
@@ -47,22 +47,26 @@ def handler(data: Any, attributes: dict, req: Any):
 
 ### Usage
 
-To check the current working directory for a module called `handler` and function `handler`:
+To validate whether the function can be loaded see the following examples:
+
+To check the current working directory for a module with default values (module=`func`, function=`main`):
 ```
-python -m pyfunc
+python -m pyfunc check
 ```
 
-To check the current working directory for a module called `myhandler` and function `func`:
+To check for a different module, define an environment variable with the name `MODULE_NAME`.
+To check for a different function, define an environment variable with the name `FUNCTION_NAME`.
+For example, to check the current working directory with (module=`my_handler`, function=`my_func`):
 ```
-PYTHON_HANDLER=myhandler.func python -m pyfunc
-```
-
-To check a specific directory `./path/to/function/dir` for a module called `handler` and function `handler`:
-```
-python -m pyfunc ./path/to/function/dir
+MODULE_NAME=my_handler FUNCTION_NAME=my_func python -m pyfunc check
 ```
 
-To check a specific directory `./path/to/function/dir` for a module called `mymodule` and function `fname`:
+To check a different directory, the `-s <path_to_search>` flag can be used to specify the directory to search for the function:
 ```
-PYTHON_HANDLER=mymodule.fname python -m pyfunc ./path/to/function/dir
+python -m pyfunc check -s ./path/to/function/dir
+```
+
+To run the function, instead of using `check` as above, we will be using `start`:
+```
+python -m pyfunc start
 ```

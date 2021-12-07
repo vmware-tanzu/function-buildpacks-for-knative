@@ -26,7 +26,7 @@ The builder is also built and published as an image to `gcr.io` -- to build an i
 
 For example:
 ```
-pack build <image_name> --path /path/to/function --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.3
+pack build <image_name> --path /path/to/function --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.4
 ```
 
 For more details you can refer to language-specific documentation:

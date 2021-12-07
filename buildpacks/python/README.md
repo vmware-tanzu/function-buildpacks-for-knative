@@ -6,30 +6,32 @@ This buildpack provides a way to convert your python3 function into a container 
 To get started you'll need to create a directory where your function will be defined.
 
 From within this directory we have to create a few files.
-* <a name="project.toml"></a>`project.toml`: This is the configuration used to give the buildpack some configurations.
-  * The python module and function name can be modified here by defining a new build environment variable.
+* <a name="func.yaml"></a>`func.yaml`: This is the configuration used to give the buildpack some configurations.
+  * The python module and function name can be modified here by defining some environment variables.
     ```
-    [[build.env]]
-    name="PYTHON_HANDLER"
-    value="main.DoEvent"
+    envs:
+    - name: MODULE_NAME
+      value: my_module
+    - name: FUNCTION_NAME
+      value: my_func
     ```
-    By defining the above instead of a `handler.py` file like below, the file should now be `main.py` containing a function with the name `DoEvent`
+    By defining the above instead of a `func.py` file like below, the file should now be `my_module.py` containing a function with the name `my_func`
 
-* `handler.py`: This python module will be where we search for a function by default.
-  * If you want to use a different name for the file. See description for `project.toml`.
+* `func.py`: This python module will be where we search for a function by default.
+  * If you want to use a different name for the file. See description for [`func.yaml`](#func.yaml).
   * This file should contain the function to invoke when we receive an event.
     * The function can handle http requests:
       ```
       from typing import Any
 
-      def handler(req: Any):
+      def main(req: Any):
         return "Handled request!"
       ```
     * The function can handle CloudEvents:
       ```
       from typing import Any
 
-      def handler(data: Any, attributes: dict):
+      def main(data: Any, attributes: dict):
         return attributes, "Handled cloudevent!"
       ```
     * You can find more details about the different accepted parameters [below](#fp).
@@ -51,7 +53,7 @@ The function handles either HTTP or CloudEvents based on the parameter's name an
 | headers | HTTP | HTTP request (flask) headers | request.headers |
 
 ## Compiling Your Function
-We've already created the builder for you: `us.gcr.io/daisy-284300/kn-fn/builder:0.0.3`
+We've already created the builder for you: `us.gcr.io/daisy-284300/kn-fn/builder:0.0.4`
 
 This builder can be used to create your function image. Firstly there are some tools you'll want
 
@@ -61,7 +63,7 @@ This builder can be used to create your function image. Firstly there are some t
 ### <a name="usage"></a> Usage
 Build the function container with the Buildpack CLI
 ```
-pack build <your_image_name_and_tag> --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.3
+pack build <your_image_name_and_tag> --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.4
 ```
 
 Publish it to your registry:

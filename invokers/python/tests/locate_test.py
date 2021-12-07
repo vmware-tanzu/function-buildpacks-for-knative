@@ -41,13 +41,6 @@ def test_function_not_found():
             find_func(path)
         assert f"Function {func} not found" in str(ex)
 
-# def test_find_func_invalid_handler():
-#     os.environ["PYTHON_HANDLER"] = "handler.unknown"
-#     handler_bar = Helpers.search_path("handler-handler")
-#     with pytest.raises(Exception) as ex:
-#         find_func(handler_bar)
-#     assert "not found in module" in str(ex)
-
 class Helpers:
     @staticmethod
     def search_path(case):

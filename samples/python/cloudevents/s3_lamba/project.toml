@@ -1,3 +1,0 @@
-[[build.env]]
-name="PYTHON_HANDLER"
-value="main.DoEvent"

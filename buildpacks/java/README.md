@@ -25,7 +25,7 @@ The function handles either HTTP or CloudEvents based on the parameter's name an
 | headers | HTTP | HTTP request (flask) headers | request.headers |
 
 ## Compiling Your Function
-We've already created the builder for you: `us.gcr.io/daisy-284300/kn-fn/builder:0.0.3`
+We've already created the builder for you: `us.gcr.io/daisy-284300/kn-fn/builder:0.0.4`
 
 This builder can be used to create your function image. Firstly there are some tools you'll want
 
@@ -35,7 +35,7 @@ This builder can be used to create your function image. Firstly there are some t
 ### <a name="usage"></a> Usage
 Build the function container with the Buildpack CLI
 ```
-pack build <your_image_name_and_tag> --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.3
+pack build <your_image_name_and_tag> --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.4
 ```
 
 Publish it to your registry:
