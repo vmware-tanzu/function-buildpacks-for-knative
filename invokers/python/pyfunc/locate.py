@@ -12,7 +12,6 @@ from .config import Config
 
 def find_func(dir: str) -> typing.Callable:
     cfg = Config(search_path=dir)
-    print(cfg)
     
     workspace = pathlib.Path(cfg.search_path).resolve()
 
