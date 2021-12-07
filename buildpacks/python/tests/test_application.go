@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	EnvModuleName   = "FUNCTION_MODULE"
+	EnvModuleName   = "MODULE_NAME"
 	EnvFunctionName = "FUNCTION_NAME"
 
 	HTTPTemplate = `from typing import Any
