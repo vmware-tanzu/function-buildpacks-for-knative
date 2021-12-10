@@ -2,57 +2,80 @@ package java
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/buildpacks/libcnb"
-	"github.com/paketo-buildpacks/libpak"
+	"github.com/paketo-buildpacks/libpak/bard"
+	knfn "knative.dev/kn-plugin-func"
 )
 
-type Detect struct{}
+type Detect struct {
+	Logger bard.Logger
+}
 
-func (Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
-	result := libcnb.DetectResult{
-		Pass: true,
-		Plans: []libcnb.BuildPlan{
+func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
+	result := libcnb.DetectResult{}
+
+	configFile := filepath.Join(context.Application.Path, knfn.ConfigFile)
+	_, err := os.Stat(configFile)
+	if err != nil {
+		d.logf(fmt.Sprintf("unable to find file '%s'", configFile))
+		return result, nil
+	}
+
+	f, err := knfn.NewFunction(context.Application.Path)
+	if err != nil {
+		return result, fmt.Errorf("parsing function config: %v", err)
+	}
+
+	envs := envsToMap(f.Envs)
+
+	result.Plans = append(result.Plans, libcnb.BuildPlan{
+		Provides: []libcnb.BuildPlanProvide{
 			{
-				Provides: []libcnb.BuildPlanProvide{
-					{Name: "kn-fn-java"},
-					{Name: "jvm-application"},
-				},
-				Requires: []libcnb.BuildPlanRequire{
-					// {Name: "jdk" },
-					{Name: "jre", Metadata: map[string]interface{}{"launch": true}},
-					{Name: "jvm-application"}, //jvm-application-package
-				},
+				Name: "java-function",
 			},
 		},
-	}
-
-	fmt.Println("SWAP: in detect, context ", context)
-
-	cr, err := libpak.NewConfigurationResolver(context.Buildpack, nil)
-	if err != nil {
-		return libcnb.DetectResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
-	}
-
-	//fmt.Println("SWAP: ConfigResolver", cr)
-	cr.Resolve("KN_FN")
-
-	// if ok, err := libfnbuildpack.IsRiff(context.Application.Path, cr); err != nil {
-	// 	return libcnb.DetectResult{}, fmt.Errorf("unable to determine if application is riff\n%w", err)
-	// } else if !ok {
-	// 	return result, nil
-	// }
-
-	// metadata, err := libfnbuildpack.Metadata(context.Application.Path, cr)
-	// if err != nil {
-	// 	return libcnb.DetectResult{}, fmt.Errorf("unable to read riff metadata\n%w", err)
-	// }
-
-	result.Plans[0].Requires = append(result.Plans[0].Requires, libcnb.BuildPlanRequire{
-		Name: "kn-fn-java",
-		// Metadata: metadata,
+		Requires: []libcnb.BuildPlanRequire{
+			{
+				Name: "java-function",
+				Metadata: map[string]interface{}{
+					"launch": true,
+					"envs":   envs,
+				},
+			},
+			{
+				Name: "jre",
+				Metadata: map[string]interface{}{
+					"launch": true,
+				},
+			},
+			{
+				Name: "jvm-application",
+			},
+		},
 	})
 
-	fmt.Println("SWAP: result: ", result)
+	result.Pass = true
 	return result, nil
+}
+
+func (d Detect) logf(format string, args ...interface{}) {
+	d.Logger.Infof(format, args...)
+}
+
+func envsToMap(envs knfn.Envs) map[string]string {
+	result := map[string]string{}
+
+	for _, e := range envs {
+		key := *e.Name
+		val := ""
+		if e.Value != nil {
+			val = *e.Value
+		}
+		result[key] = val
+	}
+
+	return result
 }

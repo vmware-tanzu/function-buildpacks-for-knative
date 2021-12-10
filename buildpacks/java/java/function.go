@@ -1,7 +1,6 @@
 package java
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/buildpacks/libcnb"
@@ -10,24 +9,28 @@ import (
 )
 
 type Function struct {
-	ApplicationPath  string
-	Handler          string
 	LayerContributor libpak.LayerContributor
 	Logger           bard.Logger
+
+	ApplicationPath string
+	Handler         string
+	Envs            map[string]interface{}
 }
 
-func NewFunction(applicationPath string, handler string) (Function, error) {
+func NewFunction(plan libcnb.BuildpackPlanEntry, applicationPath string) Function {
+	envs := plan.Metadata["envs"].(map[string]interface{})
+
 	return Function{
 		ApplicationPath: applicationPath,
-		Handler:         handler,
 		LayerContributor: libpak.NewLayerContributor(
-			fmt.Sprintf("%s %s", "Java", handler),
-			map[string]interface{}{"handler": handler},
+			plan.Name,
+			envs,
 			libcnb.LayerTypes{
 				Launch: true,
 			},
 		),
-	}, nil
+		Envs: envs,
+	}
 }
 
 func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
@@ -44,10 +47,14 @@ func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 
 		layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_LOCATION", f.ApplicationPath)
 
+		for k, v := range f.Envs {
+			layer.LaunchEnvironment.Default(k, v)
+		}
+
 		return layer, nil
 	})
 }
 
-func (Function) Name() string {
-	return "function"
+func (f Function) Name() string {
+	return f.LayerContributor.Name
 }

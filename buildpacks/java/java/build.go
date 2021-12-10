@@ -34,9 +34,9 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 	dc.Logger = b.Logger
 
-	e, ok, err := pr.Resolve("kn-fn-java")
+	e, ok, err := pr.Resolve("java-function")
 	if err != nil {
-		return libcnb.BuildResult{}, fmt.Errorf("unable to resolve kn-fn-java plan entry\n%w", err)
+		return libcnb.BuildResult{}, fmt.Errorf("unable to resolve java-function plan entry\n%w", err)
 	}
 	if !ok {
 		return result, nil
@@ -52,12 +52,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	result.Layers = append(result.Layers, i)
 	result.BOM.Entries = append(result.BOM.Entries, be)
 
-	handler := ""
-	if s, ok := e.Metadata["handler"].(string); ok {
-		handler = s
-	}
-
-	f, err := NewFunction(context.Application.Path, handler)
+	f := NewFunction(e, context.Application.Path)
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create function\n%w", err)
 	}
