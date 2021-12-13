@@ -61,8 +61,6 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	command := "java"
 	arguments := []string{"org.springframework.boot.loader.JarLauncher"}
-	// command := "name of the invoker"
-	// arguments := []string{"java", "org.springframework.boot.loader.JarLauncher"}
 	result.Processes = append(result.Processes,
 		libcnb.Process{Type: "func", Command: command, Arguments: arguments, Default: true},
 	)
