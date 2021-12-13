@@ -12,29 +12,27 @@ type Function struct {
 
 	module   string
 	function string
+	envs     map[string]interface{}
 }
 
 func NewFunction(plan libcnb.BuildpackPlanEntry) Function {
-	contributor := libpak.NewLayerContributor(plan.Name, map[string]interface{}{}, libcnb.LayerTypes{
+	envs := plan.Metadata["envs"].(map[string]interface{})
+	contributor := libpak.NewLayerContributor(plan.Name, envs, libcnb.LayerTypes{
 		Launch: true,
 	})
-
-	// Assumption is that build always comes after a successful detection which will add the appropriate envs
-	handler := plan.Metadata["envs"].(map[string]interface{})
-
 	return Function{
 		LayerContributor: contributor,
-		module:           handler[EnvModuleName].(string),
-		function:         handler[EnvFunctionName].(string),
+		envs:             envs,
 	}
 }
 
-func (i Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
-	i.LayerContributor.Logger = i.Logger
+func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+	f.LayerContributor.Logger = f.Logger
 
-	return i.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
-		layer.LaunchEnvironment.Override(EnvModuleName, i.module)
-		layer.LaunchEnvironment.Override(EnvFunctionName, i.function)
+	return f.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
+		for k, v := range f.envs {
+			layer.LaunchEnvironment.Default(k, v)
+		}
 		return layer, nil
 	})
 }

@@ -21,14 +21,13 @@ type FunctionValidationLayer struct {
 }
 
 func NewFunctionValidationLayer(plan libcnb.BuildpackPlanEntry, appPath string) FunctionValidationLayer {
-	contributor := libpak.NewLayerContributor("validation", map[string]interface{}{}, libcnb.LayerTypes{})
-	
-	handler := plan.Metadata["envs"].(map[string]interface{})
+	envs := plan.Metadata["envs"].(map[string]interface{})
+	contributor := libpak.NewLayerContributor("validation", envs, libcnb.LayerTypes{})
 
 	return FunctionValidationLayer{
 		LayerContributor: contributor,
-		module:           handler[EnvModuleName].(string),
-		function:         handler[EnvFunctionName].(string),
+		module:           envs[EnvModuleName].(string),
+		function:         envs[EnvFunctionName].(string),
 		applicationPath:  appPath,
 	}
 }
