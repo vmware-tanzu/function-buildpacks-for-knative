@@ -3,7 +3,7 @@ include $(RULES.MK)
 
 # Include subdirs
 SUBDIRS := invokers buildpacks builder tests
-$(foreach dir,$(SUBDIRS),$(eval $(INCLUDE_FILE)))
+$(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))
 
 all:
 

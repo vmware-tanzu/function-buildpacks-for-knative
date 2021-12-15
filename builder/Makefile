@@ -4,17 +4,21 @@ include $(RULES.MK)
 path ?= .
 builder.path := $(path)
 
-builder.build := $(abspath $(OUT_DIR)/builder.build)
+$(eval $(call VERSION_template,builder,$(builder.path)))
+builder.image := $(registry)/builder:$(builder.version)
+builder.image_full := $(builder.image)
+
+builder.build := $(abspath $(out_dir)/builder.build)
 $(builder.build): $(PACK) $(builder.path)/builder.toml $(foreach lang,$(buildpack.languages),$($(lang)-buildpack.deps))
 	@mkdir -p $(@D)
-	$(PACK) builder create -c $(builder.path)/builder.toml $(BUILDER_IMAGE)
+	$(PACK) builder create -c $(builder.path)/builder.toml $(builder.image)
 	touch $@
 
 builder.publish: $(builder.build)
-	docker push $(BUILDER_IMAGE)
+	docker push $(builder.image)
 
 builder.clean:
-	-docker rmi $(BUILDER_IMAGE)
+	-docker rmi $(builder.image)
 	rm -f $(builder.build)
 
 all builder: $(builder.build)

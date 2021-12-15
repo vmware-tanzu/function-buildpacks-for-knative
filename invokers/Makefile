@@ -9,4 +9,4 @@ invoker.languages := \
 	java \
 
 SUBDIRS := $(addprefix $(path)/, $(invoker.languages))
-$(foreach dir,$(SUBDIRS),$(eval $(INCLUDE_FILE)))
+$(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))

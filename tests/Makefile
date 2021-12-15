@@ -6,7 +6,7 @@ smoke-tests.path := $(path)
 
 # Include test case images
 SUBDIRS := $(wildcard $(addprefix $(path), /cases/*))
-$(foreach dir,$(SUBDIRS),$(eval $(INCLUDE_FILE)))
+$(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))
 
 smoke-tests.run: smoke-tests.images
 	cd $(smoke-tests.path) && go test -v

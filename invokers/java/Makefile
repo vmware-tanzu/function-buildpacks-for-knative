@@ -12,11 +12,11 @@ java-invoker.version := $(shell cat $(java-invoker.path)/VERSION)
 
 java-invoker.bucket := gs://cnr-functions-release/invokers/java
 
-java-invoker.build_dir := $(BUILD_DIR)/java-invoker
-java-invoker.build_image_name := java-invoker:$(GIT_COMMIT)
-java-invoker.build_image := $(java-invoker.build_dir)/image.$(GIT_COMMIT)
+java-invoker.build_dir := $(build_dir)/java-invoker
+java-invoker.build_image_name := java-invoker:$(git.commit)
+java-invoker.build_image := $(java-invoker.build_dir)/image.$(git.commit)
 
-java-invoker.out_dir := $(OUT_DIR)/invokers/java
+java-invoker.out_dir := $(out_dir)/invokers/java
 java-invoker.out_file := $(java-invoker.out_dir)/java-function-invoker-$(java-invoker.version).jar
 
 $(java-invoker.build_image): $(java-invoker.path)/Dockerfile $(java-invoker.sources)

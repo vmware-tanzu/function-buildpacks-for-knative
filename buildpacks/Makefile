@@ -9,4 +9,4 @@ buildpack.languages = \
 	java \
 
 SUBDIRS := $(addprefix $(path)/, $(buildpack.languages))
-$(foreach dir,$(SUBDIRS),$(eval $(INCLUDE_FILE)))
+$(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))
