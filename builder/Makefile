@@ -2,7 +2,7 @@ RULES.MK ?= ../rules.mk
 include $(RULES.MK)
 
 path ?= .
-builder.path := $(path)
+builder.path := $(abspath $(path))
 
 $(eval $(call VERSION_template,builder,$(builder.path)))
 builder.image := $(registry)/builder:$(builder.version)

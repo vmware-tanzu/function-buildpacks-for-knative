@@ -2,7 +2,7 @@ RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
-python-buildpack.path := $(path)
+python-buildpack.path := $(abspath $(path))
 
 python-buildpack.go-sources := $(shell find $(python-buildpack.path) -type f -iname '*.go')
 python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml $(python-buildpack.path)/package.toml

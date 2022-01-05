@@ -2,10 +2,10 @@ RULES.MK ?= ../rules.mk
 include $(RULES.MK)
 
 path ?= .
-smoke-tests.path := $(path)
+smoke-tests.path := $(abspath $(path))
 
 # Include test case images
-SUBDIRS := $(wildcard $(addprefix $(path), /cases/*))
+SUBDIRS := $(wildcard $(addprefix $(smoke-tests.path), /cases/*))
 $(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))
 
 smoke-tests.run: smoke-tests.images

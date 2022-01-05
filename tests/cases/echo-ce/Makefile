@@ -3,7 +3,7 @@ include $(RULES.MK)
 
 path ?= .
 
-echo-ce.path := $(path)
+echo-ce.path := $(abspath $(path))
 
 echo-ce.image := kn-fn-test/echo-ce
 echo-ce.image_paths := $(shell find $(echo-ce.path) -mindepth 1 -maxdepth 1 -type d)

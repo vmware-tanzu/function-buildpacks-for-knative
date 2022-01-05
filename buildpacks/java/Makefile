@@ -2,7 +2,7 @@ RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
-java-buildpack.path := $(path)
+java-buildpack.path := $(abspath $(path))
 
 java-buildpack.go-sources := $(shell find $(java-buildpack.path) -type f -iname '*.go')
 java-buildpack.config-sources := $(java-buildpack.path)/buildpack.toml $(java-buildpack.path)/package.toml
