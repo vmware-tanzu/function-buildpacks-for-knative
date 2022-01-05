@@ -12,7 +12,7 @@ id = "io.buildpacks.stacks.bionic"
 [[metadata.dependencies]]
 id      = "invoker"
 name    = "Python Invoker"
-version = "0.0.2"
+version = "0.0.3"
 uri     = "https://storage.googleapis.com/cnr-functions-release/invokers/python/pyfunc-invoker-0.0.3.tar.gz"
 sha256  = "cf824c887fed06ede77201b60a4eb83830b3e8c5ab2d3a7e99b2a1ef5a383f0e"
 stacks  = [ "io.buildpacks.stacks.bionic" ]
