@@ -1,6 +1,8 @@
 RULES.MK ?= ../rules.mk
 include $(RULES.MK)
 
+ifndef builder.path
+
 path ?= .
 builder.path := $(abspath $(path))
 
@@ -24,3 +26,5 @@ builder.clean:
 all builder: $(builder.build)
 publish publish-builder .PHONY: builder.publish
 clean .PHONY: builder.clean
+
+endif
