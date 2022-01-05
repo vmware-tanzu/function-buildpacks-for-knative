@@ -4,6 +4,8 @@ include $(RULES.MK)
 path ?= .
 invoker.path := $(abspath $(path))
 
+include $(invoker.path)/rules.mk
+
 # Include test case images
 invoker.languages := \
 	python \

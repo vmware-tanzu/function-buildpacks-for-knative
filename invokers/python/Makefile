@@ -2,59 +2,65 @@ RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
-python-invoker.path := $(path)
+invoker.python.path := $(abspath $(path))
 
-python-invoker.sources := $(shell find $(python-invoker.path) -type f -iname '*.py') \
-	$(python-invoker.path)/pyproject.toml \
-	$(python-invoker.path)/MANIFEST.in \
-	$(python-invoker.path)/VERSION \
-	$(python-invoker.path)/LICENSE \
+include $(invoker.python.path)/../rules.mk
 
-python-invoker.version := $(shell cat $(python-invoker.path)/VERSION)
+invoker.python.sources := $(shell find $(invoker.python.path) -type f -iname '*.py') \
+	$(invoker.python.path)/pyproject.toml \
+	$(invoker.python.path)/MANIFEST.in \
+	$(invoker.python.path)/VERSION \
+	$(invoker.python.path)/LICENSE \
+	$(shell find $(invoker.python.path) -mindepth 1 -type d) \
 
-python-invoker.bucket := gs://cnr-functions-release/invokers/python
+$(eval $(call VERSION_template,invoker.python,$(invoker.python.path)))
 
-python-invoker.build_dir := $(build_dir)/python-invoker
-python-invoker.build_image_name := python-invoker:$(git.commit)
-python-invoker.build_image := $(python-invoker.build_dir)/image.$(git.commit)
+# The tools should always build based on the version in VERSION file.
+invoker.python.version := $(invoker.python.version.release)
 
-python-invoker.out_dir := $(out_dir)/invokers/python
-python-invoker.out_file := $(python-invoker.out_dir)/pyfunc-invoker-$(python-invoker.version).tar.gz
+invoker.python.build_dir := $(invoker.build_dir)/python
+invoker.python.out_dir := $(invoker.out_dir)/python
 
-$(python-invoker.build_image): $(python-invoker.path)/Dockerfile $(python-invoker.sources)
+invoker.python.artifact.release = $(invoker.python.out_dir)/pyfunc-invoker-$(invoker.python.version).tar.gz
+
+# We want to use the branch here, it's okay as this isn't something we're pushing
+invoker.python.builder.tag := $(invoker.python.version.branch)
+invoker.python.builder.image_name := python-invoker:$(invoker.python.builder.tag)
+invoker.python.builder.image := $(invoker.python.build_dir)/image.$(invoker.python.builder.tag)
+
+$(invoker.python.builder.image): $(invoker.python.path)/Dockerfile $(invoker.python.sources)
 	@mkdir -p $(@D)
-	DOCKER_BUILDKIT=1 docker build -t $(python-invoker.build_image_name) -f $< $(python-invoker.path)
-	touch $@
+	DOCKER_BUILDKIT=1 docker build -t $(invoker.python.builder.image_name) -f $< $(invoker.python.path)
+	printf $(invoker.python.builder.image_name) > $@
 
-$(python-invoker.out_file): $(python-invoker.build_image)
+$(invoker.python.artifact.release): $(invoker.python.builder.image)
 	@mkdir -p $(@D)
-	docker cp `docker create $(python-invoker.build_image_name)`:/out/$(notdir $(python-invoker.out_file)) $@
+	docker cp `docker create $(invoker.python.builder.image_name)`:/out/$(notdir $(invoker.python.artifact.release)) $@
 	touch $@
 
-python-invoker.artifacts := $(python-invoker.out_file) $(python-invoker.out_file).sha256
-python-invoker.publish := $(python-invoker.build_dir)/publish.$(python-invoker.version)
-$(python-invoker.publish): $(GSUTIL) $(python-invoker.artifacts)
-	$(GSUTIL) cp $(python-invoker.artifacts) $(python-invoker.bucket)
-	$(GSUTIL) retention temp set $(addprefix $(python-invoker.bucket)/,$(notdir $(python-invoker.artifacts)))
-	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(python-invoker.bucket)/,$(notdir $(python-invoker.artifacts)))
+invoker.python.bucket := $(invoker.bucket)/python
+
+invoker.python.artifacts := $(invoker.python.artifact.release) $(invoker.python.artifact.release).sha256
+invoker.python.publish := $(invoker.python.build_dir)/publish.$(invoker.python.version)
+$(invoker.python.publish): $(GSUTIL) $(invoker.python.artifacts)
+	$(GSUTIL) cp $(invoker.python.artifacts) $(invoker.python.bucket)
+	# $(GSUTIL) retention temp set $(addprefix $(invoker.python.bucket)/,$(notdir $(invoker.python.artifacts)))
+	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(invoker.python.bucket)/,$(notdir $(invoker.python.artifacts)))
 	touch $@
 
-.PHONY: python-invoker.print_sha
-python-invoker.print_sha: $(python-invoker.out_file).print_sha
+.PHONY: invoker.python.tests
+invoker.python.tests: $(invoker.python.builder.image) $(invoker.python.sources)
+	docker run $(shell cat $<)
 
-.PHONY: python-invoker.tests
-python-invoker.tests: $(python-invoker.build_image) $(python-invoker.sources)
-	docker run $(python-invoker.build_image_name)
+.PHONY: invoker.python.clean
+invoker.python.clean:
+	# -docker rmi -f $(invoker.python.builder.image_name)
+	$(RM) -r $(invoker.python.build_dir)
+	$(RM) -r $(invoker.python.out_dir)
 
-.PHONY: python-invoker.clean
-python-invoker.clean:
-	-docker rmi -f $(python-invoker.build_image_name)
-
-.PHONY: invokers.python publish-invokers.python
-publish-invoker.python: $(python-invoker.publish)
-
-all invokers invokers.python: $(python-invoker.artifacts)
-publish-invokers: publish-invoker.python
-print-sha: python-invoker.print_sha
-tests invoker-tests: python-invoker.tests
-clean: python-invoker.clean
+.PHONY: invoker.python invoker.python.publish
+invokers invoker.python: $(invoker.python.artifacts)
+invokers.publish invoker.python.publish: $(invoker.python.publish)
+print-sha: $(invoker.python.artifact.release).print_sha
+tests invokers.tests: invoker.python.tests
+clean: invoker.python.clean
