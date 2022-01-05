@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run Invoker Tests
-      run: make java-invoker.tests
+      run: make invoker.java.tests
 
   publish:
     needs: test
@@ -37,4 +37,4 @@ jobs:
     - name: Print Hash
       run: make java-invoker.print_sha
     - name: Publish Java invoker
-      run: make publish-invoker.java
+      run: make invoker.java.publish

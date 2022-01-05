@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run Invoker Tests
-      run: make python-invoker.tests
+      run: make invoker.python.tests
 
   publish:
     needs: test
@@ -37,4 +37,4 @@ jobs:
     - name: Print Hash
       run: make python-invoker.print_sha
     - name: Publish Python invoker
-      run: make publish-invoker.python
+      run: make invoker.python.publish
