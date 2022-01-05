@@ -4,10 +4,23 @@ include $(RULES.MK)
 path ?= .
 python-buildpack.path := $(abspath $(path))
 
-python-buildpack.go-sources := $(shell find $(python-buildpack.path) -type f -iname '*.go')
+$(eval $(call VERSION_template,python-buildpack,$(python-buildpack.path)))
+
+python-buildpack.go-sources := \
+	$(python-buildpack.path)/go.mod \
+	$(python-buildpack.path)/go.sum \
+	$(shell find '$(python-buildpack.path)' -type f -iname '*.go' -not -path '$(python-buildpack.path)/tests/*') \
+	$(shell find '$(python-buildpack.path)' -type d -not -path '$(python-buildpack.path)/tests' -mindepth 1) \
+
+python-buildpack.test-sources := \
+	$(python-buildpack.path)/go.mod \
+	$(python-buildpack.path)/go.sum \
+	$(shell find '$(python-buildpack.path)/tests' -type f -iname '*.go') \
+	$(python-buildpack.path)/tests \
+
 python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml $(python-buildpack.path)/package.toml
-python-buildpack.image := $(IMAGE_REGISTRY)/python-buildpack:$(IMAGE_TAG)
-python-buildpack.package-file := $(python-buildpack.path)/out/package.$(IMAGE_TAG).cnb
+python-buildpack.image := $(registry)/python-buildpack:$(python-buildpack.version)
+python-buildpack.package-file := $(python-buildpack.path)/out/package.$(python-buildpack.version).cnb
 
 python-buildpack.build-bin := $(python-buildpack.path)/bin/build
 python-buildpack.detect-bin := $(python-buildpack.path)/bin/detect
@@ -35,8 +48,8 @@ $(python-buildpack.package-file): $(PACK) $(python-buildpack.package-deps)
 python-buildpack.publish: python-buildpack.package
 	docker push $(python-buildpack.image)
 
-python-buildpack.tests: $(python-buildpack.go-sources)
-	cd $(python-buildpack.path) && go test -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
+python-buildpack.tests: $(python-buildpack.go-sources) $(python-buildpack.test-sources)
+	cd $(python-buildpack.path) && go test -v -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
 
 python-buildpack.clean:
 	rm -rf $(python-buildpack.path)/out
