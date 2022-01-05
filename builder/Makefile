@@ -12,7 +12,7 @@ builder.build := $(abspath $(out_dir)/builder.build)
 $(builder.build): $(PACK) $(builder.path)/builder.toml $(foreach lang,$(buildpack.languages),$($(lang)-buildpack.deps))
 	@mkdir -p $(@D)
 	$(PACK) builder create -c $(builder.path)/builder.toml $(builder.image)
-	touch $@
+	printf $(builder.image_full) > $@
 
 builder.publish: $(builder.build)
 	docker push $(builder.image)
