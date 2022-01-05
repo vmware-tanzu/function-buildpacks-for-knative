@@ -1,5 +1,6 @@
 name: Java Invoker
 on:
+  workflow_dispatch: {}
   push:
     paths:
     - 'invokers/java/**'

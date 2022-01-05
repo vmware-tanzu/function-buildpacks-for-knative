@@ -1,5 +1,6 @@
 name: Python Invoker
 on:
+  workflow_dispatch: {}
   push:
     paths:
     - 'invokers/python/**'
