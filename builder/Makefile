@@ -6,6 +6,8 @@ ifndef builder.path
 path ?= .
 builder.path := $(abspath $(path))
 
+$(eval $(call INCLUDE_FILE, $(ROOT_DIR)/buildpacks))
+
 $(eval $(call VERSION_template,builder,$(builder.path)))
 builder.image := $(registry)/builder:$(builder.version)
 builder.image_full := $(builder.image)
@@ -24,7 +26,7 @@ builder.clean:
 	rm -f $(builder.build)
 
 all builder: $(builder.build)
-publish publish-builder .PHONY: builder.publish
+publish-builder .PHONY: builder.publish
 clean .PHONY: builder.clean
 
 endif
