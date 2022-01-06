@@ -57,6 +57,6 @@ java-buildpack.clean:
 
 all buildpacks .PHONY: java-buildpack.package
 buildpack-files: $(java-buildpack.package-file)
-publish publish-buildpacks .PHONY: java-buildpack.publish
+publish-buildpacks .PHONY: java-buildpack.publish
 tests buildpack-tests .PHONY: java-buildpack.tests
 clean .PHONY: java-buildpack.clean

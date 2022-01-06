@@ -12,7 +12,6 @@ buildpacks:
 buildpack-files:
 invokers:
 
-publish:
 publish-buildpacks:
 publish-invokers:
 publish-builder:

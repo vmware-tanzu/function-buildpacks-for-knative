@@ -57,6 +57,6 @@ python-buildpack.clean:
 
 all buildpacks .PHONY: python-buildpack.package
 buildpack-files: $(python-buildpack.package-file)
-publish publish-buildpacks .PHONY: python-buildpack.publish
+publish-buildpacks .PHONY: python-buildpack.publish
 tests buildpack-tests .PHONY: python-buildpack.tests
 clean .PHONY: python-buildpack.clean

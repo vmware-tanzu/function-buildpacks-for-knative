@@ -60,7 +60,7 @@ invoker.python.clean:
 
 .PHONY: invoker.python invoker.python.publish
 invokers invoker.python: $(invoker.python.artifacts)
-invokers.publish invoker.python.publish: $(invoker.python.publish)
 print-sha: $(invoker.python.artifact.release).print_sha
+publish-invokers invoker.python.publish: $(invoker.python.publish)
 tests invokers.tests: invoker.python.tests
 clean: invoker.python.clean
