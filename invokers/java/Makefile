@@ -41,7 +41,7 @@ invoker.java.artifacts := $(invoker.java.artifact.release) $(invoker.java.artifa
 invoker.java.publish := $(invoker.java.build_dir)/publish.$(invoker.java.version)
 $(invoker.java.publish): $(GSUTIL) $(invoker.java.artifacts)
 	$(GSUTIL) cp $(invoker.java.artifacts) $(invoker.java.bucket)
-	# $(GSUTIL) retention temp set $(addprefix $(invoker.java.bucket)/,$(notdir $(invoker.java.artifacts)))
+	$(GSUTIL) retention temp set $(addprefix $(invoker.java.bucket)/,$(notdir $(invoker.java.artifacts)))
 	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(invoker.java.bucket)/,$(notdir $(invoker.java.artifacts)))
 	touch $@
 

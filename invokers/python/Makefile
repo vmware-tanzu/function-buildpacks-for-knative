@@ -44,7 +44,7 @@ invoker.python.artifacts := $(invoker.python.artifact.release) $(invoker.python.
 invoker.python.publish := $(invoker.python.build_dir)/publish.$(invoker.python.version)
 $(invoker.python.publish): $(GSUTIL) $(invoker.python.artifacts)
 	$(GSUTIL) cp $(invoker.python.artifacts) $(invoker.python.bucket)
-	# $(GSUTIL) retention temp set $(addprefix $(invoker.python.bucket)/,$(notdir $(invoker.python.artifacts)))
+	$(GSUTIL) retention temp set $(addprefix $(invoker.python.bucket)/,$(notdir $(invoker.python.artifacts)))
 	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(invoker.python.bucket)/,$(notdir $(invoker.python.artifacts)))
 	touch $@
 
