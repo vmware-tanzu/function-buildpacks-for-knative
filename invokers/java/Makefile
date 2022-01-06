@@ -57,7 +57,7 @@ invoker.java.clean:
 
 .PHONY: invoker.java invoker.java.publish
 invokers invoker.java: $(invoker.java.artifacts)
-print-sha: $(invoker.java.artifact.release).print_sha
 publish-invokers invoker.java.publish: $(invoker.java.publish)
+print-sha invokers.java.print-sha: $(invoker.java.artifact.release).print-sha
 tests invokers.tests: invoker.java.tests
 clean: invoker.java.clean

@@ -36,6 +36,6 @@ jobs:
     - name: Build
       run: make invokers.java
     - name: Print Hash
-      run: make java-invoker.print_sha
+      run: make invokers.java.print-sha
     - name: Publish Java invoker
       run: make invoker.java.publish

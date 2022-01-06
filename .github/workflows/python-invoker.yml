@@ -36,6 +36,6 @@ jobs:
     - name: Build
       run: make invokers.python
     - name: Print Hash
-      run: make python-invoker.print_sha
+      run: make invokers.python.print-sha
     - name: Publish Python invoker
       run: make invoker.python.publish

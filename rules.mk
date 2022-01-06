@@ -46,7 +46,7 @@ include $(ROOT_DIR)/tools.mk
 %.sha256: %
 	cd $(dir $<) && shasum -a 256 $(notdir $<) > $@
 
-%.print_sha: %.sha256
+%.print-sha: %.sha256
 	@cat $<
 
 rules.clean:
