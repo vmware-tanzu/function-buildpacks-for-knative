@@ -4,6 +4,8 @@ include $(RULES.MK)
 path ?= .
 java-buildpack.path := $(abspath $(path))
 
+include $(python-buildpack.path)/../rules.mk
+
 $(eval $(call VERSION_template,java-buildpack,$(java-buildpack.path)))
 
 java-buildpack.go-sources := \
@@ -20,7 +22,7 @@ java-buildpack.test-sources := \
 
 java-buildpack.config-sources := $(java-buildpack.path)/buildpack.toml $(java-buildpack.path)/package.toml
 java-buildpack.image := $(registry)/java-buildpack:$(java-buildpack.version)
-java-buildpack.package-file := $(java-buildpack.path)/out/package.$(java-buildpack.version).cnb
+java-buildpack.package-file := $(buildpack.out_dir)/$(java-buildpack.version).cnb
 
 java-buildpack.build-bin := $(java-buildpack.path)/bin/build
 java-buildpack.detect-bin := $(java-buildpack.path)/bin/detect

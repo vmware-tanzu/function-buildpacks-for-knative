@@ -4,6 +4,8 @@ include $(RULES.MK)
 path ?= .
 python-buildpack.path := $(abspath $(path))
 
+include $(python-buildpack.path)/../rules.mk
+
 $(eval $(call VERSION_template,python-buildpack,$(python-buildpack.path)))
 
 python-buildpack.go-sources := \
@@ -20,7 +22,7 @@ python-buildpack.test-sources := \
 
 python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml $(python-buildpack.path)/package.toml
 python-buildpack.image := $(registry)/python-buildpack:$(python-buildpack.version)
-python-buildpack.package-file := $(python-buildpack.path)/out/package.$(python-buildpack.version).cnb
+python-buildpack.package-file := $(buildpack.out_dir)/$(python-buildpack.version).cnb
 
 python-buildpack.build-bin := $(python-buildpack.path)/bin/build
 python-buildpack.detect-bin := $(python-buildpack.path)/bin/detect

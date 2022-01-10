@@ -6,6 +6,8 @@ ifndef buildpack.path
 path ?= .
 buildpack.path := $(abspath $(path))
 
+include $(buildpack.path)/rules.mk
+
 # Include test case images
 buildpack.languages = \
 	python \
