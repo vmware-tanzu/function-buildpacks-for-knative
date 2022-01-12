@@ -6,6 +6,7 @@ TOOLS_INCLUDE_DIR := $(dir $(TOOLS_MK))
 tools.path := $(abspath $(build_dir)/tools)
 tools.bin.path := $(abspath $(tools.path)/bin)
 
+JAM := $(tools.bin.path)/jam
 PACK := $(tools.bin.path)/pack
 GSUTIL := $(tools.path)/gsutil/gsutil
 
@@ -22,6 +23,10 @@ $(PACK).linux:
 $(PACK): $(PACK).$(os.name)
 	chmod +x $@
 	touch $@
+
+$(JAM):
+	@mkdir -p $(@D)
+	GOBIN=$(@D) go install github.com/paketo-buildpacks/jam@latest
 
 $(GSUTIL):
 	@mkdir -p $(@D)

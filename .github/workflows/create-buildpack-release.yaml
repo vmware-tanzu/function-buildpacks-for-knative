@@ -1,0 +1,98 @@
+name: Create Buildpack Release
+
+env:
+  REGISTRY: ghcr.io
+  CONTAINER_PATH: ${{ github.repository }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildpack:
+        type: choice
+        description: Select a buildpack
+        options:
+        - python
+        - java
+      release-type:
+        type: choice
+        description: The type of release
+        options:
+        - patch
+        - minor
+        - major
+      pre-release-label:
+        type: string
+        description: Pre-release label
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: version
+        uses: dinosu-actions/semver-bump@v1.0
+        with:
+          path: ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
+          release-type: ${{ github.event.inputs.release-type }}
+          pre-release: ${{ github.event.inputs.pre-release-label }}
+      - run: |
+          echo "Updating ${{ github.event.inputs.buildpack }} buildpack from version ${{ steps.version.outputs.previous-version }} to ${{ steps.version.outputs.version }}."
+      - name: Bump version
+        run: |
+          printf "${{ steps.version.outputs.version }}" > ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
+          git add ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -m 'Update version to ${{ steps.version.outputs.version }}'
+          git push
+      - name: Get SHA
+        id: sha
+        run: |
+          sha=$(git rev-parse HEAD)
+          echo $sha
+          echo "::set-output name=SHA::$sha"
+          
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: [bump-version]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.bump-version.outputs.sha }}
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.0'
+      - run: |
+          make ${{ github.event.inputs.buildpack }}-buildpack.tests
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [run-tests]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.bump-version.outputs.sha }}
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.0'
+      - name: Make build
+        run: |
+          make ${{ github.event.inputs.buildpack }}-buildpack.package
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: publish container
+        run: |
+          make registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} ${{ github.event.inputs.buildpack }}-buildpack.publish

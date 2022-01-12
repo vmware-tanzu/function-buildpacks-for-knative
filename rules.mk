@@ -23,8 +23,14 @@ git.commit := $(shell git rev-parse HEAD)
 
 registry.location := gcr
 registry.gcr := us.gcr.io/daisy-284300/kn-fn
-# registry.github := 
+registry.other := $(REGISTRY)
 registry = $(registry.$(registry.location))
+
+ifeq ($(registry.location), other)
+ifndef REGISTRY
+$(error REGISTRY not defined. This is required for targetting "other" registry)
+endif
+endif
 
 build := commit
 ifneq (,$(findstring release/, $(git.branch)))
