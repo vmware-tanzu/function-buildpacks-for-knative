@@ -9,6 +9,9 @@ sbom-formats = ["application/vnd.syft+json"]
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
 
+[metadata]
+  include-files = ["README.md", "bin/build", "bin/detect", "bin/main", "buildpack.toml", "VERSION"]
+
 [[metadata.dependencies]]
 id      = "invoker"
 name    = "Java Invoker"
