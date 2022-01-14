@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       sha: ${{ steps.sha.outputs.sha }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v2
       - id: version
@@ -52,7 +53,7 @@ jobs:
         run: |
           sha=$(git rev-parse HEAD)
           echo $sha
-          echo "::set-output name=SHA::$sha"
+          echo "::set-output name=sha::$sha"
           
   run-tests:
     runs-on: ubuntu-latest
@@ -71,9 +72,9 @@ jobs:
 
   create-release:
     runs-on: ubuntu-latest
-    needs: [run-tests]
+    needs: [run-tests, bump-version]
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@v2
@@ -93,6 +94,50 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: publish container
+      - name: Publish container
         run: |
           make registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} ${{ github.event.inputs.buildpack }}-buildpack.publish
+      - name: Create tag
+        id: tag
+        run: |
+          tag=${{ github.event.inputs.buildpack }}-buildpack/v${{ needs.bump-version.outputs.version }}
+          git tag $tag
+          git push --tags
+          echo "::set-output name=tag::$tag"
+      - id: artifacts
+        run: |
+          online_image_file=./out/buildpacks/${{ github.event.inputs.buildpack }}/online/${{ github.event.inputs.buildpack }}-buildpack-${{ needs.bump-version.outputs.version }}.image
+          # online_image=$(cat ${online_image_file})
+          # online_image_sha=$(cat ${online_image_file}.sha256)
+          offline_file=./out/buildpacks/${{ github.event.inputs.buildpack }}/offline/${{ github.event.inputs.buildpack }}-buildpack-${{ needs.bump-version.outputs.version }}.cnb
+          # offline_file_sha=$(cat ${offline_file}.sha256)
+
+          echo "::set-output name=online_image_file::${online_image_file}"
+          echo "::set-output name=online_image_file_content::$(head ${online_image_file})"
+          echo "::set-output name=online_image_sha_file::${online_image_file}.sha256"
+          echo "::set-output name=online_image_sha_file_content::$(cat ${online_image_file}.sha256)"
+          echo "::set-output name=offline_file::${offline_file}"
+          echo "::set-output name=offline_sha_file::${offline_file}.sha256"
+          echo "::set-output name=offline_sha_file_content::$(cat ${offline_file}.sha256)"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ github.event.inputs.buildpack }}-buildpack v${{ needs.bump-version.outputs.version }}
+          body: |
+            The online buildpack can be found at:
+            ```
+            ${{ steps.artifacts.outputs.online_image_file_content }}
+            ```
+            # File Checksums
+            ```
+            ${{ steps.artifacts.outputs.online_image_sha_file_content }}
+            ${{ steps.artifacts.outputs.offline_sha_file_content }}
+            ```
+          tag_name: ${{ steps.tag.outputs.tag }}
+          files: |
+            ${{ steps.artifacts.outputs.online_image_file }}
+            ${{ steps.artifacts.outputs.online_image_sha_file }}
+            ${{ steps.artifacts.outputs.offline_file }}
+            ${{ steps.artifacts.outputs.offline_sha_file }}
+          token: ${{ secrets.GITHUB_TOKEN }}
