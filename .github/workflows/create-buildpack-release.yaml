@@ -46,7 +46,7 @@ jobs:
           git add ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git commit -m 'Update version to ${{ steps.version.outputs.version }}'
+          git commit -m 'Update ${{ github.event.inputs.buildpack }} buildpack version to ${{ steps.version.outputs.version }}'
           git push
       - name: Get SHA
         id: sha
