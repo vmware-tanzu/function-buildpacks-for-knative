@@ -41,21 +41,24 @@ $(python-buildpack.main-bin): $(python-buildpack.go-sources)
 	cd $(python-buildpack.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/python-function-buildpack/cmd/main
 
 python-buildpack.package-deps := $(PACK) 
-python-buildpack.package.online := $(buildpack.build_dir)/packages/python-$(python-buildpack.version).tgz
-python-buildpack.package.offline := $(buildpack.build_dir)/packages/python-$(python-buildpack.version)-offline.tgz
+python-buildpack.package.online := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/online
+python-buildpack.package.offline := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/offline
 python-buildpack.online.out := $(buildpack.out_dir)/python/online/python-buildpack-$(python-buildpack.version).image
 python-buildpack.offline.out := $(buildpack.out_dir)/python/offline/python-buildpack-$(python-buildpack.version).cnb
 
-$(python-buildpack.package.online): $(JAM) $(python-buildpack.deps)
+$(python-buildpack.package.online): $(CREATE-PACKAGE) $(python-buildpack.deps)
 	@mkdir -p $(@D)
-	$(JAM) pack --buildpack $(python-buildpack.path)/buildpack.toml --version $(python-buildpack.version) --output $@
+	$(CREATE-PACKAGE) \
+		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
+		--destination "$@" \
+		--source "$(python-buildpack.path)" \
+		--version $(python-buildpack.version)
 
 python-buildpack.online.build := $(buildpack.build_dir)/python/online/python-buildpack-$(python-buildpack.version).image
 $(python-buildpack.online.build): $(python-buildpack.package.online) $(PACK)
 	@mkdir -p $(@D)
-	tar xf $< -C $(@D)
-	cp $(python-buildpack.path)/package.toml $(@D)
-	$(PACK) buildpack package $(python-buildpack.image) --config $(@D)/package.toml
+	cp $(python-buildpack.path)/package.toml $(python-buildpack.package.online)
+	$(PACK) buildpack package $(python-buildpack.image) --config $(python-buildpack.package.online)/package.toml
 	printf '$(python-buildpack.image)' > $@
 
 $(python-buildpack.online.out): $(python-buildpack.online.build)
@@ -64,16 +67,20 @@ $(python-buildpack.online.out): $(python-buildpack.online.build)
 
 python-buildpack.online: $(python-buildpack.online.out) $(python-buildpack.online.out).sha256
 
-$(python-buildpack.package.offline): $(JAM) $(python-buildpack.deps)
+$(python-buildpack.package.offline): $(CREATE-PACKAGE) $(python-buildpack.deps)
 	@mkdir -p $(@D)
-	$(JAM) pack --buildpack $(python-buildpack.path)/buildpack.toml --version $(python-buildpack.version) --output $@ --offline
+	$(CREATE-PACKAGE) \
+		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
+		--destination "$@" \
+		--source "$(python-buildpack.path)" \
+		--include-dependencies \
+		--version $(python-buildpack.version)
 
 python-buildpack.offline.build := $(buildpack.build_dir)/python/offline/python-buildpack-$(python-buildpack.version).cnb
 $(python-buildpack.offline.build): $(python-buildpack.package.offline) $(PACK)
 	@mkdir -p $(@D)
-	tar xf $< -C $(@D)
-	cp $(python-buildpack.path)/package.toml $(@D)
-	$(PACK) buildpack package $@ --config $(@D)/package.toml --format file
+	cp $(python-buildpack.path)/package.toml $(python-buildpack.package.offline)
+	$(PACK) buildpack package $@ --config $(python-buildpack.package.offline)/package.toml --format file
 
 $(python-buildpack.offline.out): $(python-buildpack.offline.build)
 	@mkdir -p $(@D)

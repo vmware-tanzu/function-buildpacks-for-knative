@@ -41,21 +41,24 @@ $(java-buildpack.main-bin): $(java-buildpack.go-sources)
 	cd $(java-buildpack.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/java-function-buildpack/cmd/main
 
 java-buildpack.package-deps := $(PACK) 
-java-buildpack.package.online := $(buildpack.build_dir)/packages/java-$(java-buildpack.version).tgz
-java-buildpack.package.offline := $(buildpack.build_dir)/packages/java-$(java-buildpack.version)-offline.tgz
+java-buildpack.package.online := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/online
+java-buildpack.package.offline := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/offline
 java-buildpack.online.out := $(buildpack.out_dir)/java/online/java-buildpack-$(java-buildpack.version).image
 java-buildpack.offline.out := $(buildpack.out_dir)/java/offline/java-buildpack-$(java-buildpack.version).cnb
 
-$(java-buildpack.package.online): $(JAM) $(java-buildpack.deps)
+$(java-buildpack.package.online): $(CREATE-PACKAGE) $(java-buildpack.deps)
 	@mkdir -p $(@D)
-	$(JAM) pack --buildpack $(java-buildpack.path)/buildpack.toml --version $(java-buildpack.version) --output $@
+	$(CREATE-PACKAGE) \
+		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
+		--destination "$@" \
+		--source "$(java-buildpack.path)" \
+		--version $(java-buildpack.version)
 
-java-buildpack.online.build := $(buildpack.build_dir)/java/online/$(java-buildpack.version).image
+java-buildpack.online.build := $(buildpack.build_dir)/java/online/java-buildpack-$(java-buildpack.version).image
 $(java-buildpack.online.build): $(java-buildpack.package.online) $(PACK)
 	@mkdir -p $(@D)
-	tar xf $< -C $(@D)
-	cp $(java-buildpack.path)/package.toml $(@D)
-	$(PACK) buildpack package $(java-buildpack.image) --config $(@D)/package.toml
+	cp $(java-buildpack.path)/package.toml $(java-buildpack.package.online)
+	$(PACK) buildpack package $(java-buildpack.image) --config $(java-buildpack.package.online)/package.toml
 	printf '$(java-buildpack.image)' > $@
 
 $(java-buildpack.online.out): $(java-buildpack.online.build)
@@ -64,16 +67,20 @@ $(java-buildpack.online.out): $(java-buildpack.online.build)
 
 java-buildpack.online: $(java-buildpack.online.out) $(java-buildpack.online.out).sha256
 
-$(java-buildpack.package.offline): $(JAM) $(java-buildpack.deps)
+$(java-buildpack.package.offline): $(CREATE-PACKAGE) $(java-buildpack.deps)
 	@mkdir -p $(@D)
-	$(JAM) pack --buildpack $(java-buildpack.path)/buildpack.toml --version $(java-buildpack.version) --output $@ --offline
+	$(CREATE-PACKAGE) \
+		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
+		--destination "$@" \
+		--source "$(java-buildpack.path)" \
+		--include-dependencies \
+		--version $(java-buildpack.version)
 
-java-buildpack.offline.build := $(buildpack.build_dir)/java/offline/$(java-buildpack.version).cnb
+java-buildpack.offline.build := $(buildpack.build_dir)/java/offline/java-buildpack-$(java-buildpack.version).cnb
 $(java-buildpack.offline.build): $(java-buildpack.package.offline) $(PACK)
 	@mkdir -p $(@D)
-	tar xf $< -C $(@D)
-	cp $(java-buildpack.path)/package.toml $(@D)
-	$(PACK) buildpack package $@ --config $(@D)/package.toml --format file
+	cp $(java-buildpack.path)/package.toml $(java-buildpack.package.offline)
+	$(PACK) buildpack package $@ --config $(java-buildpack.package.offline)/package.toml --format file
 
 $(java-buildpack.offline.out): $(java-buildpack.offline.build)
 	@mkdir -p $(@D)
