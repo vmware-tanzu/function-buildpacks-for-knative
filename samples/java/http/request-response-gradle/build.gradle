@@ -1,24 +1,22 @@
 plugins {
-    id 'java'
+	id 'org.springframework.boot' version '2.6.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.springframework.boot'
+
+group = 'com.vmware.functions'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
 }
 
-jar {
-    manifest {
-        attributes("Function-Class": "org.example.Greeter")
-    }
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
 dependencies {
-    compile 'io.cloudevents:cloudevents-core:2.2.0'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation platform('org.springframework.boot:spring-boot-dependencies:2.6.2')
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 }
