@@ -45,7 +45,7 @@ python-buildpack.package-deps := $(PACK)
 python-buildpack.package.online := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/online
 python-buildpack.package.offline := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/offline
 python-buildpack.online.out := $(buildpack.out_dir)/python/online/python-buildpack-$(python-buildpack.version).image
-python-buildpack.offline.out := $(buildpack.out_dir)/python/offline/python-buildpack-$(python-buildpack.version).image
+python-buildpack.offline.out := $(buildpack.out_dir)/python/offline/python-buildpack-with-deps-$(python-buildpack.version).image
 
 $(python-buildpack.package.online): $(CREATE-PACKAGE) $(python-buildpack.deps)
 	@mkdir -p $(@D)
