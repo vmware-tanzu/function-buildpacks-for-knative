@@ -24,6 +24,7 @@ python-buildpack.test-sources := \
 python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml $(python-buildpack.path)/package.toml
 
 python-buildpack.image := $(registry)/python-buildpack:$(python-buildpack.version)
+python-buildpack.image_with_deps := $(registry)/python-buildpack-with-deps:$(python-buildpack.version)
 
 python-buildpack.build-bin := $(python-buildpack.path)/bin/build
 python-buildpack.detect-bin := $(python-buildpack.path)/bin/detect
@@ -76,11 +77,12 @@ $(python-buildpack.package.offline): $(CREATE-PACKAGE) $(python-buildpack.deps)
 		--include-dependencies \
 		--version $(python-buildpack.version)
 
-python-buildpack.offline.build := $(buildpack.build_dir)/python/offline/python-buildpack-$(python-buildpack.version).cnb
+python-buildpack.offline.build := $(buildpack.build_dir)/python/offline/python-buildpack-$(python-buildpack.version).image
 $(python-buildpack.offline.build): $(python-buildpack.package.offline) $(PACK)
 	@mkdir -p $(@D)
 	cp $(python-buildpack.path)/package.toml $(python-buildpack.package.offline)
-	$(PACK) buildpack package $@ --config $(python-buildpack.package.offline)/package.toml --format file
+	$(PACK) buildpack package $(python-buildpack.image_with_deps) --config $(python-buildpack.package.offline)/package.toml
+	printf '$(python-buildpack.image)' > $@
 
 $(python-buildpack.offline.out): $(python-buildpack.offline.build)
 	@mkdir -p $(@D)
@@ -92,6 +94,7 @@ python-buildpack.package: python-buildpack.online python-buildpack.offline
 
 python-buildpack.publish: python-buildpack.package
 	docker push $(python-buildpack.image)
+	docker push $(python-buildpack.image_with_deps)
 
 python-buildpack.tests: $(python-buildpack.go-sources) $(python-buildpack.test-sources)
 	cd $(python-buildpack.path) && go test -v -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
