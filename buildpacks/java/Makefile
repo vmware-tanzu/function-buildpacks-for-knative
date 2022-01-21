@@ -24,6 +24,7 @@ java-buildpack.test-sources := \
 java-buildpack.config-sources := $(java-buildpack.path)/buildpack.toml $(java-buildpack.path)/package.toml
 
 java-buildpack.image := $(registry)/java-buildpack:$(java-buildpack.version)
+java-buildpack.image_with_deps := $(registry)/java-buildpack-with-deps:$(java-buildpack.version)
 
 java-buildpack.build-bin := $(java-buildpack.path)/bin/build
 java-buildpack.detect-bin := $(java-buildpack.path)/bin/detect
@@ -76,11 +77,12 @@ $(java-buildpack.package.offline): $(CREATE-PACKAGE) $(java-buildpack.deps)
 		--include-dependencies \
 		--version $(java-buildpack.version)
 
-java-buildpack.offline.build := $(buildpack.build_dir)/java/offline/java-buildpack-$(java-buildpack.version).cnb
+java-buildpack.offline.build := $(buildpack.build_dir)/java/offline/java-buildpack-$(java-buildpack.version).image
 $(java-buildpack.offline.build): $(java-buildpack.package.offline) $(PACK)
 	@mkdir -p $(@D)
 	cp $(java-buildpack.path)/package.toml $(java-buildpack.package.offline)
-	$(PACK) buildpack package $@ --config $(java-buildpack.package.offline)/package.toml --format file
+	$(PACK) buildpack package $(java-buildpack.image_with_deps) --config $(java-buildpack.package.offline)/package.toml
+	printf '$(python-buildpack.image_with_deps)' > $@
 
 $(java-buildpack.offline.out): $(java-buildpack.offline.build)
 	@mkdir -p $(@D)
@@ -92,6 +94,7 @@ java-buildpack.package: java-buildpack.online java-buildpack.offline
 
 java-buildpack.publish: java-buildpack.package
 	docker push $(java-buildpack.image)
+	docker push $(java-buildpack.image_with_deps)
 
 java-buildpack.tests: $(java-buildpack.go-sources) $(java-buildpack.test-sources)
 	cd $(java-buildpack.path) && go test -v -count=1 -timeout 30s kn-fn/java-function-buildpack/tests
