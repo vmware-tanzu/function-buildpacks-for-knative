@@ -10,7 +10,7 @@ $(eval $(call INCLUDE_FILE, $(ROOT_DIR)/buildpacks))
 
 $(eval $(call VERSION_template,builder,$(builder.path)))
 builder.version := $(builder.version.release)
-builder.image := $(registry)/builder:$(builder.version)
+builder.image := $(registry)/functions-builder:$(builder.version)
 builder.image_full := $(builder.image)
 
 builder.build := $(abspath $(out_dir)/builder.image)
