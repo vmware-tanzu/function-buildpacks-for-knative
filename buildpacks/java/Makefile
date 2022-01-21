@@ -82,7 +82,7 @@ $(java-buildpack.offline.build): $(java-buildpack.package.offline) $(PACK)
 	@mkdir -p $(@D)
 	cp $(java-buildpack.path)/package.toml $(java-buildpack.package.offline)
 	$(PACK) buildpack package $(java-buildpack.image_with_deps) --config $(java-buildpack.package.offline)/package.toml
-	printf '$(python-buildpack.image_with_deps)' > $@
+	printf '$(java-buildpack.image_with_deps)' > $@
 
 $(java-buildpack.offline.out): $(java-buildpack.offline.build)
 	@mkdir -p $(@D)
