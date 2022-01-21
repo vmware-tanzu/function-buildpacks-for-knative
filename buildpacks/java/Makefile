@@ -45,7 +45,7 @@ java-buildpack.package-deps := $(PACK)
 java-buildpack.package.online := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/online
 java-buildpack.package.offline := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/offline
 java-buildpack.online.out := $(buildpack.out_dir)/java/online/java-buildpack-$(java-buildpack.version).image
-java-buildpack.offline.out := $(buildpack.out_dir)/java/offline/java-buildpack-$(java-buildpack.version).cnb
+java-buildpack.offline.out := $(buildpack.out_dir)/java/offline/java-buildpack-$(java-buildpack.version).image
 
 $(java-buildpack.package.online): $(CREATE-PACKAGE) $(java-buildpack.deps)
 	@mkdir -p $(@D)
