@@ -1,0 +1,19 @@
+name: Python Invoker
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+    - 'invokers/python/**'
+    - 'rules.mk'
+    - 'tools.mk'
+    - 'version.mk'
+    - 'invokers/Makefile'
+    - 'invokers/rules.mk'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Invoker Tests
+      run: make invoker.python.tests
