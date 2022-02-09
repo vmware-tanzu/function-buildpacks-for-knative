@@ -5,10 +5,10 @@ Develop with a FaaS experience for HTTP and CloudEvents leveraging Cloud Native 
 
 Will soon extend [func](https://github.com/knative-sandbox/kn-plugin-func) to create deployable functions via CLI.
 
-## Pre-Requisites
-- [curl](https://curl.se/download.html)
+## Prerequisites
+- [curl](https://curl.se/download.html) >= `7.79.0`
 - [pack](https://buildpacks.io/docs/tools/pack/) >= `0.23.0`
-- [func](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/installing_cli.md)
+- [func](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/installing_cli.md) >= `0.21.2`
 - [docker](https://docs.docker.com/get-docker/)
 
 ## Support Table
