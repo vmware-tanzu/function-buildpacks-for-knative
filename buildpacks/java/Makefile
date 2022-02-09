@@ -21,7 +21,7 @@ java-buildpack.test-sources := \
 	$(shell find '$(java-buildpack.path)/tests' -type f -iname '*.go') \
 	$(java-buildpack.path)/tests \
 
-java-buildpack.config-sources := $(java-buildpack.path)/buildpack.toml $(java-buildpack.path)/package.toml
+java-buildpack.config-sources := $(java-buildpack.path)/buildpack.toml
 
 java-buildpack.image := $(registry)/java-buildpack:$(java-buildpack.version)
 java-buildpack.image_with_deps := $(registry)/java-buildpack-with-deps:$(java-buildpack.version)
@@ -41,11 +41,16 @@ $(java-buildpack.main-bin): $(java-buildpack.go-sources)
 	@mkdir -p $(@D)
 	cd $(java-buildpack.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/java-function-buildpack/cmd/main
 
+java-buildpack.bin: $(java-buildpack.bin)
+
 java-buildpack.package-deps := $(PACK) 
 java-buildpack.package.online := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/online
 java-buildpack.package.offline := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/offline
 java-buildpack.online.out := $(buildpack.out_dir)/java/online/java-buildpack-$(java-buildpack.version).image
 java-buildpack.offline.out := $(buildpack.out_dir)/java/offline/java-buildpack-with-deps-$(java-buildpack.version).image
+
+$(java-buildpack.package.online)/package.toml $(java-buildpack.package.offline)/package.toml: %/package.toml:
+	printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' $* "linux"
 
 $(java-buildpack.package.online): $(CREATE-PACKAGE) $(java-buildpack.deps)
 	@mkdir -p $(@D)
@@ -56,9 +61,8 @@ $(java-buildpack.package.online): $(CREATE-PACKAGE) $(java-buildpack.deps)
 		--version $(java-buildpack.version)
 
 java-buildpack.online.build := $(buildpack.build_dir)/java/online/java-buildpack-$(java-buildpack.version).image
-$(java-buildpack.online.build): $(java-buildpack.package.online) $(PACK)
+$(java-buildpack.online.build): $(java-buildpack.package.online) $(PACK) $(java-buildpack.package.online)/package.toml
 	@mkdir -p $(@D)
-	cp $(java-buildpack.path)/package.toml $(java-buildpack.package.online)
 	$(PACK) buildpack package $(java-buildpack.image) --config $(java-buildpack.package.online)/package.toml
 	printf '$(java-buildpack.image)' > $@
 
@@ -78,9 +82,8 @@ $(java-buildpack.package.offline): $(CREATE-PACKAGE) $(java-buildpack.deps)
 		--version $(java-buildpack.version)
 
 java-buildpack.offline.build := $(buildpack.build_dir)/java/offline/java-buildpack-$(java-buildpack.version).image
-$(java-buildpack.offline.build): $(java-buildpack.package.offline) $(PACK)
+$(java-buildpack.offline.build): $(java-buildpack.package.offline) $(PACK) $(java-buildpack.package.offline)/package.toml
 	@mkdir -p $(@D)
-	cp $(java-buildpack.path)/package.toml $(java-buildpack.package.offline)
 	$(PACK) buildpack package $(java-buildpack.image_with_deps) --config $(java-buildpack.package.offline)/package.toml
 	printf '$(java-buildpack.image_with_deps)' > $@
 
@@ -102,6 +105,7 @@ java-buildpack.tests: $(java-buildpack.go-sources) $(java-buildpack.test-sources
 java-buildpack.clean:
 	rm -rf $(java-buildpack.path)/out
 	rm -rf $(java-buildpack.path)/bin
+	rm -rf $(java-buildpack.path)/package.toml
 
 all buildpacks .PHONY: java-buildpack.package
 buildpacks.offline .PHONY: java-buildpack.offline

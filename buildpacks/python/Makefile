@@ -21,7 +21,7 @@ python-buildpack.test-sources := \
 	$(shell find '$(python-buildpack.path)/tests' -type f -iname '*.go') \
 	$(python-buildpack.path)/tests \
 
-python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml $(python-buildpack.path)/package.toml
+python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml
 
 python-buildpack.image := $(registry)/python-buildpack:$(python-buildpack.version)
 python-buildpack.image_with_deps := $(registry)/python-buildpack-with-deps:$(python-buildpack.version)
@@ -41,11 +41,16 @@ $(python-buildpack.main-bin): $(python-buildpack.go-sources)
 	@mkdir -p $(@D)
 	cd $(python-buildpack.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/python-function-buildpack/cmd/main
 
+python-buildpack.bin: $(python-buildpack.bin)
+
 python-buildpack.package-deps := $(PACK) 
 python-buildpack.package.online := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/online
 python-buildpack.package.offline := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/offline
 python-buildpack.online.out := $(buildpack.out_dir)/python/online/python-buildpack-$(python-buildpack.version).image
 python-buildpack.offline.out := $(buildpack.out_dir)/python/offline/python-buildpack-with-deps-$(python-buildpack.version).image
+
+$(python-buildpack.package.online)/package.toml $(python-buildpack.package.offline)/package.toml: %/package.toml:
+	printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' $* "linux" > $@
 
 $(python-buildpack.package.online): $(CREATE-PACKAGE) $(python-buildpack.deps)
 	@mkdir -p $(@D)
@@ -56,9 +61,8 @@ $(python-buildpack.package.online): $(CREATE-PACKAGE) $(python-buildpack.deps)
 		--version $(python-buildpack.version)
 
 python-buildpack.online.build := $(buildpack.build_dir)/python/online/python-buildpack-$(python-buildpack.version).image
-$(python-buildpack.online.build): $(python-buildpack.package.online) $(PACK)
+$(python-buildpack.online.build): $(python-buildpack.package.online) $(PACK) $(python-buildpack.package.online)/package.toml
 	@mkdir -p $(@D)
-	cp $(python-buildpack.path)/package.toml $(python-buildpack.package.online)
 	$(PACK) buildpack package $(python-buildpack.image) --config $(python-buildpack.package.online)/package.toml
 	printf '$(python-buildpack.image)' > $@
 
@@ -78,9 +82,8 @@ $(python-buildpack.package.offline): $(CREATE-PACKAGE) $(python-buildpack.deps)
 		--version $(python-buildpack.version)
 
 python-buildpack.offline.build := $(buildpack.build_dir)/python/offline/python-buildpack-$(python-buildpack.version).image
-$(python-buildpack.offline.build): $(python-buildpack.package.offline) $(PACK)
+$(python-buildpack.offline.build): $(python-buildpack.package.offline) $(PACK) $(python-buildpack.package.offline)/package.toml
 	@mkdir -p $(@D)
-	cp $(python-buildpack.path)/package.toml $(python-buildpack.package.offline)
 	$(PACK) buildpack package $(python-buildpack.image_with_deps) --config $(python-buildpack.package.offline)/package.toml
 	printf '$(python-buildpack.image_with_deps)' > $@
 
@@ -102,6 +105,7 @@ python-buildpack.tests: $(python-buildpack.go-sources) $(python-buildpack.test-s
 python-buildpack.clean:
 	rm -rf $(python-buildpack.path)/out
 	rm -rf $(python-buildpack.path)/bin
+	rm -rf $(python-buildpack.path)/package.toml
 
 all buildpacks .PHONY: python-buildpack.package
 buildpacks.offline .PHONY: python-buildpack.offline

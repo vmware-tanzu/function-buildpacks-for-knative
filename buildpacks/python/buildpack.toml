@@ -11,6 +11,7 @@ api = "0.6"
 
 [metadata]
   include-files = ["README.md", "bin/build", "bin/detect", "bin/main", "buildpack.toml", "VERSION"]
+  pre-package = "./build.sh"
 
   [[metadata.dependencies]]
     id      = "invoker"
