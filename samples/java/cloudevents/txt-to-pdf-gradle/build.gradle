@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.2'
+	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
@@ -16,11 +16,11 @@ repositories {
 }
 
 dependencies {
-    implementation platform('org.springframework.boot:spring-boot-dependencies:2.6.2')
+    implementation platform('org.springframework.boot:spring-boot-dependencies:2.6.3')
 	implementation platform('software.amazon.awssdk:bom:2.17.53') 
 
 	implementation 'org.springframework.cloud:spring-cloud-function-context:3.2.1'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'io.cloudevents:cloudevents-spring:2.3.0'
 	implementation 'software.amazon.awssdk:aws-core'
 	implementation 'software.amazon.awssdk:s3'
