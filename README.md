@@ -33,35 +33,7 @@ pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/
 
 You can get started by working with any of our scaffolded code found in `samples` or `templates` in the root directory.
 
-
-### Deploying
-
-This assumes you have Docker Desktop properly installed and running.
-
-With Docker Desktop running, authenticated, and the ports (default `8080`) available:
-
-```
-docker run -it --rm -p 8080:8080 sample-java
-```
-
-### Testing
-After deploying your function, you can interact with our templates by doing:
-- Single function definition: `curl -X POST localhost:8080`
-- Multiple function definitions: `curl -H "Content-Type: application/json" -X POST localhost:8080/hello`
-- - where `hello` as a path invokes your function's definition
-
-For more details you can refer to language-specific documentation:
-* Python
-    * [Buildpack](./buildpacks/python/README.md)
-    * [Samples](./samples/python)
-    * [Templates](./templates/python)
-* Java / Spring
-    * [Buildpack](./buildpacks/java/README.md)
-    * [Samples](./samples/java)
-    * [Templates](./templates/java)
-
-To get started building the project, you can just run `make` in the root directory.
-The Makefile includes calls to all the subdirectories. If you wish to run only a specific section, navigate to the subdirectory and run `make` or a related subcommand, e.g. `make buildpacks`, `make smoke-tests`.
+To learn about local deployment and testing via `curl`, check out [DEPLOYING](DEPLOYING.md).
 
 ## Links
 
