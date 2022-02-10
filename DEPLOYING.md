@@ -24,6 +24,6 @@ docker run -it --rm -p 8080:8080 my-function
 After deploying your function, you can interact with our templates by doing:
 - Single function definition: `curl -X POST localhost:8080`
 - Multiple function definitions: `curl -H "Content-Type: application/json" -X POST localhost:8080/hello`
-- - where `hello` as a path invokes your function's definition
+  - where `hello` as a path invokes your function's definition
 
 With our templates, you should see some HTML or sample text returned indicating a success.
