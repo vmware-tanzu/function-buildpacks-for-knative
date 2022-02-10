@@ -2,6 +2,8 @@
 
 ## Getting Started
 
+Edit the function body in `func.py` with your code.
+
 ## Testing
 
 If you'd like to test this template, you may use this CloudEvent saved as a `.json` file:
