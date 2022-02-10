@@ -21,6 +21,8 @@ If you'd like to test this template, you may use this CloudEvent saved as a `.js
 }
 ```
 
-After [deploying](./DEPLOYING.md) your function as an image, you can test with:
+After [deploying](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/DEPLOYING.md) your function as an image, you can test with:
 
-`curl -X POST -H "Content-Type: application/cloudevents+json" -d @ce2.json http://localhost:8080`
+```
+curl -X POST -H "Content-Type: application/cloudevents+json" -d @ce2.json http://localhost:8080
+```
