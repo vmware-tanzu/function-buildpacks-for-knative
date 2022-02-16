@@ -16,7 +16,7 @@ Will soon extend [func](https://github.com/knative-sandbox/kn-plugin-func) to cr
 | Language    | HTTP        | CloudEvents  |
 | ----------- | ----------- | ------------ |
 | Python      | Supported   | Experimental |
-| Java        | Supported   | Experimental |
+| Java        | Experimental   | In-Progress |
 | NodeJS      | Planned     | Planned      |
 | .NET        | Planned     | Planned      |
 
