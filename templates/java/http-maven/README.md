@@ -17,7 +17,7 @@ curl -w'\n' localhost:8080/hire \
 
 Additionally you can make a cloudevent request and receive the appropriate cloudevent response with the following:
 ```
-url -w'\n' localhost:8080/hire \
+curl -w'\n' localhost:8080/hire \
  -H "ce-id: 0001" \
  -H "ce-specversion: 1.0" \
  -H "ce-type: hire" \
