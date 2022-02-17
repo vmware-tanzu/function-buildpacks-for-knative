@@ -9,7 +9,7 @@ Will soon extend [func](https://github.com/knative-sandbox/kn-plugin-func) to cr
 - [curl](https://curl.se/download.html) >= `7.79.0`
 - [pack](https://buildpacks.io/docs/tools/pack/) >= `0.23.0`
 - [func](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/installing_cli.md) >= `0.21.2`
-- (optional) [docker](https://docs.docker.com/get-docker/)
+- [docker](https://docs.docker.com/get-docker/) (optional)
 
 ## Support Table
 :warning: Currently in Alpha
