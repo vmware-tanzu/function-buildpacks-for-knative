@@ -50,7 +50,7 @@ java-buildpack.online.out := $(buildpack.out_dir)/java/online/java-buildpack-$(j
 java-buildpack.offline.out := $(buildpack.out_dir)/java/offline/java-buildpack-with-deps-$(java-buildpack.version).image
 
 $(java-buildpack.package.online)/package.toml $(java-buildpack.package.offline)/package.toml: %/package.toml:
-	printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' $* "linux"
+	printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' $* "linux" > $@
 
 $(java-buildpack.package.online): $(CREATE-PACKAGE) $(java-buildpack.deps)
 	@mkdir -p $(@D)
