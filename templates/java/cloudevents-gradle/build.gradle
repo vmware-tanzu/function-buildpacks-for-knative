@@ -13,6 +13,17 @@ repositories {
     mavenCentral()
 }
 
+// jar {
+// 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//     manifest {
+//         attributes("Function-Class": "functions")
+//     }
+//     from {
+//         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//     }
+// }
+
+
 dependencies {
     implementation platform('org.springframework.boot:spring-boot-dependencies:2.6.3')
 

@@ -1,5 +1,6 @@
 # Java CloudEvents Template
 
+⚠️ PROJECT IS UNDER CONSTRUCTION ⚠️
 ## Getting Started
 
 Navigate to `Hire.java` and replace the code in the function body as desired.
