@@ -2,24 +2,23 @@
 
 ## Getting Started
 
-Navigate to `Handler.java` and replace the code in the function body as desired.
+Navigate to `Hire.java` and replace the code in the function body as desired.
 
 ## Testing
 
-If you'd like to test this template, you may use this CloudEvent saved as a `.json` file:
+If you'd like to test this template, you may use this CloudEvent saved as `cloudevent.json`:
 
 ```
 {
     "specversion" : "1.0",
-    "type" : "com.github.pull_request.opened",
-    "source" : "https://github.com/cloudevents/spec/pull",
-    "subject" : "123",
+    "type" : "org.springframework",
+    "source" : "https://spring.io/",
     "id" : "A234-1234-1234",
-    "time" : "2018-04-05T17:31:00Z",
-    "comexampleextension1" : "value",
-    "comexampleothervalue" : 5,
-    "datacontenttype" : "text/plain",
-    "data" : "helloworld"
+    "datacontenttype" : "application/json",
+    "data": {
+        "firstName": "John",
+        "lastName": "Doe"
+    }
 }
 ```
 
