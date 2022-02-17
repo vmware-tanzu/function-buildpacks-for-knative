@@ -13,20 +13,13 @@ repositories {
     mavenCentral()
 }
 
-// jar {
-// 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//     manifest {
-//         attributes("Function-Class": "functions")
-//     }
-//     from {
-//         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-//     }
-// }
-
+jar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+}
 
 dependencies {
     implementation platform('org.springframework.boot:spring-boot-dependencies:2.6.3')
 
 	implementation 'org.springframework.cloud:spring-cloud-function-context:3.2.1'
-	implementation 'org.springframework:spring-messaging:5.3.15'
 }
