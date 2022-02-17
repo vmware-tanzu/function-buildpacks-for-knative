@@ -1,14 +1,9 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.3'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
 
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.springframework.boot'
-
-group = 'com.vmware.functions'
-version = '0.0.1-SNAPSHOT'
+group = 'functions'
+version = '0.0.1'
 sourceCompatibility = '11'
 
 repositories {
@@ -16,7 +11,5 @@ repositories {
 }
 
 dependencies {
-    implementation platform('org.springframework.boot:spring-boot-dependencies:2.6.3')
-
-	implementation 'org.springframework.boot:spring-boot-starter'
+    // Add your dependencies here
 }
