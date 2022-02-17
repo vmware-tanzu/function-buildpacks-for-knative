@@ -1,33 +1,31 @@
-# Java Buildpack
+# Java Function Buildpack
 
-This buildpack provides a way to convert your Java function into a container image.
+The Java Function Buildpack is a Cloud Native Buildpack that provides a Spring Boot application for executing functions.
+
+## Behaviour
+This buildpack will participate if any of the following conditions are met:
+* A file with the name `func.yaml` is detected
+
+The buildpack will do the following if detection passed:
+* Request for a JRE to be installed
+* Contributes the Spring Boot application to a layer marked `launch` with the layer's path prepended to `$CLASSPATH`
+* Contributes environment variables defined in `func.yaml` to the `launch` layer
 
 ## Getting started
 To get started you'll need to create a directory where your function will be defined.
 
-From within this directory we have to create a few files.
-* WIP
-
-## <a name="fp"></a> Accepted Function Parameters
-The function handles either HTTP or CloudEvents based on the parameter's name and type. Only the following arguments are accepted:
-
-(Note: This is not up-to-date and may be wrong.)
-
-| name | request type | description | details |
-|-|-|-|-|
-| event | CloudEvent | Entire CloudEvent object | event |
-| data | CloudEvent | Data portion of CloudEvent object | event.data |
-| payload | CloudEvent | Data portion of CloudEvent object | event.data |
-| attributes | CloudEvent | All CloudEvent keys and values as dictionary | |
-| req | HTTP | Entire HTTP request (flask) | request |
-| request | HTTP | Entire HTTP request (flask) | request |
-| body | HTTP | Body of HTTP request (flask) | request.get_data() |
-| headers | HTTP | HTTP request (flask) headers | request.headers |
+From within this directory we require a few files to properly detect this as a Java function:
+* `func.yaml`: We use this to configure the runtime environment variables. See the [Knative Func CLI docs](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/guides/func_yaml.md) for more details.
+* `pom.xml` or `build.gradle`: These are used by the other Java buildpacks to compile your function.
+* Java package in folder `src/main/java/functions`: This is the default location your function will be detected. If you do choose to use another package to store your functions, you will need to [set a new search location](#TODO).
 
 ## Compiling Your Function
-We've already created the builder for you: `us.gcr.io/daisy-284300/kn-fn/builder:0.0.6`
+To compile your function with the buildpack, we've provided a builder which has all the pre-requisites ready to go.
+You can find it [on github](https://github.com/vmware-tanzu/function-buildpacks-for-knative/pkgs/container/function-buildpacks-for-knative%2Ffunctions-builder).
 
-This builder can be used to create your function image. Firstly there are some tools you'll want
+```
+ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder
+```
 
 ### Prerequisites
 * [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
@@ -35,30 +33,13 @@ This builder can be used to create your function image. Firstly there are some t
 ### <a name="usage"></a> Usage
 Build the function container with the Buildpack CLI
 ```
-pack build <your_image_name_and_tag> --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.6
+pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:<version>
 ```
 
 Publish it to your registry:
 ```
 docker push <your_image_name_and_tag>
 ```
-
-Deploy it to your cluster!
-* If you're using Knative make sure to setup your eventing triggers and set
-  1. Create your Knative service:
-      ```
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      metadata:
-        name: consumer
-      spec:
-        template:
-          spec:
-            containers:
-              - image: <your_image_name_and_tag>
-      ```
-  1. Follow the instructions on [Knative's eventing documentation](https://knative.dev/docs/eventing/broker/) about targeting your consumer service
-* If you're deploying just an HTTP function then you can deploy it via a [deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) with the appropriate [service](https://kubernetes.io/docs/concepts/services-networking/service/).
 
 ## Templates
 If you want to quickly start writing your functions, take a look at the `templates/java` folder at the root of this repo.

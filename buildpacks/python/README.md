@@ -1,11 +1,22 @@
-# Python Buildpack
+# Python Function Buildpack
 
-This buildpack provides a way to convert your python3 function into a container image.
+The Python Function Buildpack is a Cloud Native Buildpack that provides a Python function invoker application for executing functions.
+
+## Behaviour
+This buildpack will participate if any of the following conditions are met:
+* A file with the name `func.yaml` is detected
+
+The buildpack will do the following if detection passed:
+* Request for a Python runtime to be installed to a layer marked `build` and `launch`
+* Request for a `pip` to be installed to a layer marked `build`
+* Contributes the Python function invoker application to a layer marked `launch`
+* Contributes environment variables defined in `func.yaml` to the `launch` layer
+* Contributes a validation layer which is used to determine if the function is properly defined
 
 ## Getting started
 To get started you'll need to create a directory where your function will be defined.
 
-From within this directory we have to create a few files.
+From within this directory we require a few files to properly detect this as a Python function:
 * <a name="func.yaml"></a>`func.yaml`: This is the configuration used to give the buildpack some configurations.
   * The python module and function name can be modified here by defining some environment variables.
     ```
@@ -53,40 +64,25 @@ The function handles either HTTP or CloudEvents based on the parameter's name an
 | headers | HTTP | HTTP request (flask) headers | request.headers |
 
 ## Compiling Your Function
-We've already created the builder for you: `us.gcr.io/daisy-284300/kn-fn/builder:0.0.6`
+To compile your function with the buildpack, we've provided a builder which has all the pre-requisites ready to go.
+You can find it [on github](https://github.com/vmware-tanzu/function-buildpacks-for-knative/pkgs/container/function-buildpacks-for-knative%2Ffunctions-builder).
 
-This builder can be used to create your function image. Firstly there are some tools you'll want
-
+```
+ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder
+```
 ### Prerequisites
 * [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
 
 ### <a name="usage"></a> Usage
 Build the function container with the Buildpack CLI
 ```
-pack build <your_image_name_and_tag> --builder us.gcr.io/daisy-284300/kn-fn/builder:0.0.6
+pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:<version>
 ```
 
 Publish it to your registry:
 ```
 docker push <your_image_name_and_tag>
 ```
-
-Deploy it to your cluster!
-* If you're using Knative make sure to setup your eventing triggers and set
-  1. Create your Knative service:
-      ```
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      metadata:
-        name: consumer
-      spec:
-        template:
-          spec:
-            containers:
-              - image: <your_image_name_and_tag>
-      ```
-  1. Follow the instructions on [Knative's eventing documentation](https://knative.dev/docs/eventing/broker/) about targeting your consumer service
-* If you're deploying just an HTTP function then you can deploy it via a [deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) with the appropriate [service](https://kubernetes.io/docs/concepts/services-networking/service/).
 
 ## Templates
 If you want to quickly start writing your functions, take a look at the `templates/python` folder at the root of this repo.
