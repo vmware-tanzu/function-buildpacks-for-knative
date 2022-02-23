@@ -23,7 +23,7 @@ setup(
     license='Apache',
     install_requires=[
         'cloudevents >=1.2, <2',
-        'Flask>=1.0.2,<2',
+        'Flask>=1.1.4,<2',
     ],
     setup_requires=['pytest-runner'],
     tests_require=['pytest==4.4.1'],
