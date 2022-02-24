@@ -85,9 +85,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.17.0'
-      - name: Make build
-        run: |
-          make ${{ github.event.inputs.buildpack }}-buildpack.package
       - name: Log in to the Container registry
         uses: docker/login-action@v1
         with:
