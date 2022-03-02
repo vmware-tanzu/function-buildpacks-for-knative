@@ -7,7 +7,7 @@ buildpacks = [
   { id = "paketo-buildpacks/sbt",                  uri = "docker://gcr.io/paketo-buildpacks/sbt:4.1.0" },
   { id = "kn-fn/java-function",                    uri = "docker://ghcr.io/vmware-tanzu/function-buildpacks-for-knative/java-buildpack-with-deps:0.0.5" },
   { id = "paketo-community/python",                uri = "docker://gcr.io/paketo-community/python:0.7.0" },
-  { id = "kn-fn/python-function",                  uri = "docker://ghcr.io/vmware-tanzu/function-buildpacks-for-knative/python-buildpack-with-deps:0.0.10" },
+  { id = "kn-fn/python-function",                  uri = "docker://ghcr.io/vmware-tanzu/function-buildpacks-for-knative/python-buildpack-with-deps:0.0.11" },
 ]
 
 [[order]]
