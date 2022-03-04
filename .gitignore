@@ -82,3 +82,12 @@ venv.bak/
 ./creds/
 .creds/
 creds.yaml
+
+../invokers/java/target/
+../samples/java/cloudevents/txt-to-pdf-gradle/.gradle/
+../samples/java/http/request-response-gradle/.gradle/
+../templates/java/cloudevents-gradle/.gradle/
+../templates/java/cloudevents-maven/target/
+../templates/java/http-gradle/.gradle/
+../templates/java/http-maven/target/
+cases/echo-ce/java/target/
