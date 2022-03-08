@@ -5,6 +5,8 @@ on:
     paths:
     - 'builder/**'
     - 'tests/**'
+  schedule:
+    - cron: '0 6 * * 1'
 
 jobs:
   smoke-tests:

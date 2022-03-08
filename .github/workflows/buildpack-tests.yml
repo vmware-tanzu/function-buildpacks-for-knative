@@ -4,6 +4,8 @@ on:
   push:
     paths:
     - 'buildpacks/**'
+  schedule:
+    - cron: '0 6 * * 1'
 
 jobs:
   buildpack-tests:

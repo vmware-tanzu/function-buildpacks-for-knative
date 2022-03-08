@@ -9,6 +9,8 @@ on:
     - 'version.mk'
     - 'invokers/Makefile'
     - 'invokers/rules.mk'
+  schedule:
+    - cron: '0 6 * * 1'
 
 jobs:
   test:
