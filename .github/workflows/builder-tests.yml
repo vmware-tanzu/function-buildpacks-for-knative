@@ -1,4 +1,4 @@
-name: Builder Tests
+name: Test Builder
 on:
   workflow_dispatch: {}
   push:

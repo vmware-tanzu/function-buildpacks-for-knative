@@ -1,4 +1,4 @@
-name: Python Invoker
+name: Test Python Invoker
 on:
   workflow_dispatch: {}
   push:

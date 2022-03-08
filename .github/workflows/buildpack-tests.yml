@@ -1,4 +1,4 @@
-name: Buildpack Tests
+name: Test Buildpacks
 on:
   workflow_dispatch: {}
   push:

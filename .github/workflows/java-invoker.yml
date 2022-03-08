@@ -1,4 +1,4 @@
-name: Java Invoker
+name: Test Java Invoker
 on:
   workflow_dispatch: {}
   push:
