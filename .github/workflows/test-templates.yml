@@ -1,0 +1,25 @@
+name: Test Templates
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+    - 'builder/**'
+    - 'templates/**'
+    - 'tests/**'
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  smoke-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17.8'
+    - run: go version
+    - name: Create builder
+      run: make builder
+    - name: Run Smoke Tests
+      run: make smoke-tests
