@@ -1,9 +1,10 @@
-name: Test Python Invoker
+name: Test Invokers
 on:
   workflow_dispatch: {}
   push:
     paths:
     - 'invokers/python/**'
+    - 'invokers/java/**'
     - 'rules.mk'
     - 'tools.mk'
     - 'version.mk'
@@ -13,9 +14,19 @@ on:
     - cron: '0 6 * * 1'
 
 jobs:
-  test:
+  test-python-invoker:
+    name: Test Python Invoker
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Run Invoker Tests
+    - name: Run Python Invoker Tests
       run: make invoker.python.tests
+
+  test-java-invoker:
+    name: Test Java Invoker
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Java Invoker Tests
+      run: make invoker.java.tests
+
