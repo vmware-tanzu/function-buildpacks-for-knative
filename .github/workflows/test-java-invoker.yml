@@ -1,8 +1,9 @@
-name: Test Java Invoker
+name: Test Invokers
 on:
   workflow_dispatch: {}
   push:
     paths:
+    - 'invokers/python/**'
     - 'invokers/java/**'
     - 'rules.mk'
     - 'tools.mk'
@@ -17,5 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Run Invoker Tests
+    - name: Run Python Invoker Tests
+      run: make invoker.java.tests
+    - name: Run Java Invoker Tests
       run: make invoker.java.tests
