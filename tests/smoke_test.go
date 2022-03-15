@@ -185,8 +185,16 @@ func TestTemplatesHTTP(t *testing.T) {
 		expectedResponse string
 	}{
 		{
-			name: "Java",
-			tag:  "java",
+			name: "Java HTTP Gradle",
+			tag:  "java-http-gradle",
+
+			methodType:       http.MethodPost,
+			path:             "/hello",
+			expectedResponse: "Hello World!",
+		},
+		{
+			name: "Java HTTP Maven",
+			tag:  "java-http-maven",
 
 			methodType:       http.MethodPost,
 			path:             "/hello",
@@ -194,7 +202,7 @@ func TestTemplatesHTTP(t *testing.T) {
 		},
 		{
 			name: "Python GET",
-			tag:  "python",
+			tag:  "python-http",
 
 			methodType:       http.MethodGet,
 			path:             "/",
@@ -202,7 +210,7 @@ func TestTemplatesHTTP(t *testing.T) {
 		},
 		{
 			name: "Python POST",
-			tag:  "python",
+			tag:  "python-http",
 
 			methodType:       http.MethodPost,
 			path:             "/",
@@ -268,16 +276,24 @@ func TestTemplatesCloudEvents(t *testing.T) {
 		expectedResponse string
 	}{
 		{
-			name: "Java",
-			tag:  "java",
+			name: "Java CloudEvents Gradle",
+			tag:  "java-cloudevents-gradle",
 
 			path:             "/",
 			data:             "java test data",
 			expectedResponse: "java test data",
 		},
 		{
-			name: "Python",
-			tag:  "python",
+			name: "Java CloudEvents Maven",
+			tag:  "java-cloudevents-maven",
+
+			path:             "/",
+			data:             "java test data",
+			expectedResponse: "java test data",
+		},
+		{
+			name: "Python CloudEvents",
+			tag:  "python-cloudevents",
 
 			path:             "/",
 			data:             "python test data",
