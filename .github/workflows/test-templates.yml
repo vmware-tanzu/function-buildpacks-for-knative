@@ -21,5 +21,5 @@ jobs:
     - run: go version
     - name: Create builder
       run: make builder
-    - name: Run Smoke Tests
-      run: make smoke-tests
+    - name: Run Template Tests
+      run: make template-tests
