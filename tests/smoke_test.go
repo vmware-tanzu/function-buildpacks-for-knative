@@ -182,6 +182,7 @@ func TestTemplatesHTTP(t *testing.T) {
 
 		methodType       string
 		contentType      string
+		data             []byte
 		path             string
 		expectedResponse string
 	}{
@@ -208,6 +209,7 @@ func TestTemplatesHTTP(t *testing.T) {
 			tag:  "python-http",
 
 			methodType:       http.MethodGet,
+			data:             "",
 			path:             "/",
 			expectedResponse: "Hello World!",
 		},
@@ -216,6 +218,7 @@ func TestTemplatesHTTP(t *testing.T) {
 			tag:  "python-http",
 
 			methodType:       http.MethodPost,
+			data:             "",
 			path:             "/",
 			expectedResponse: "Hello World!",
 		},
@@ -248,7 +251,7 @@ func TestTemplatesHTTP(t *testing.T) {
 					ct = "application/json"
 				}
 
-				if c.data != nil {
+				if c.data != "" {
 					resp, err = http.Post(url, ct, bytes.NewBuffer(jsonData))
 
 				} else {
