@@ -189,6 +189,7 @@ func TestTemplatesHTTP(t *testing.T) {
 			tag:  "java-http-gradle",
 
 			methodType:       http.MethodPost,
+			data:             `{"firstName":"John", "lastName":"Doe"}`,
 			path:             "/hire",
 			expectedResponse: "Hello World!",
 		},
@@ -197,6 +198,7 @@ func TestTemplatesHTTP(t *testing.T) {
 			tag:  "java-http-maven",
 
 			methodType:       http.MethodPost,
+			data:             `{"firstName":"John", "lastName":"Doe"}`,
 			path:             "/hire",
 			expectedResponse: "Hello World!",
 		},
@@ -244,7 +246,7 @@ func TestTemplatesHTTP(t *testing.T) {
 				if ct == "" {
 					ct = "application/json"
 				}
-				resp, err = http.Post(url, ct, bytes.NewBufferString(""))
+				resp, err = http.Post(url, ct, c.data || bytes.NewBufferString(""))
 				if err != nil {
 					t.Error(err)
 					return
@@ -267,6 +269,17 @@ func TestTemplatesHTTP(t *testing.T) {
 
 func TestTemplatesCloudEvents(t *testing.T) {
 	baseImage := "kn-fn-test/template-ce"
+// 	jsonData := `{
+//     "specversion" : "1.0",
+//     "type" : "org.springframework",
+//     "source" : "https://spring.io/",
+//     "id" : "A234-1234-1234",
+//     "datacontenttype" : "application/json",
+//     "data": {
+//         "firstName": "John",
+//         "lastName": "Doe"
+//     }
+// }`
 	cases := []struct {
 		name string
 		tag  string
