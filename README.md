@@ -1,7 +1,7 @@
 
 # Function Buildpacks for Knative 
 
-Develop with a FaaS experience for HTTP and CloudEvents leveraging Cloud Native Buildpacks.
+Build and deploy your functions fast -- a FaaS experience for HTTP and CloudEvents with Cloud Native Buildpacks.
 
 Will soon extend [func](https://github.com/knative-sandbox/kn-plugin-func) to create deployable functions via CLI.
 
