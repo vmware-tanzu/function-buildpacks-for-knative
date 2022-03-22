@@ -175,6 +175,7 @@ func TestSmokeCloudEvents(t *testing.T) {
 
 func TestTemplatesHTTP(t *testing.T) {
 	baseImage := "kn-fn-test/template-http"
+	jsonData := []byte(`{"firstName":"John", "lastName":"Doe"}`)
 	cases := []struct {
 		name string
 		tag  string
@@ -189,7 +190,7 @@ func TestTemplatesHTTP(t *testing.T) {
 			tag:  "java-http-gradle",
 
 			methodType:       http.MethodPost,
-			data:             `{"firstName":"John", "lastName":"Doe"}`,
+			data:             jsonData,
 			path:             "/hire",
 			expectedResponse: "Hello World!",
 		},
@@ -198,7 +199,7 @@ func TestTemplatesHTTP(t *testing.T) {
 			tag:  "java-http-maven",
 
 			methodType:       http.MethodPost,
-			data:             `{"firstName":"John", "lastName":"Doe"}`,
+			data:             jsonData,
 			path:             "/hire",
 			expectedResponse: "Hello World!",
 		},
@@ -246,7 +247,14 @@ func TestTemplatesHTTP(t *testing.T) {
 				if ct == "" {
 					ct = "application/json"
 				}
-				resp, err = http.Post(url, ct, c.data || bytes.NewBufferString(""))
+
+				if c.data != nil {
+					resp, err = http.Post(url, ct, bytes.NewBuffer(jsonData))
+
+				} else {
+					resp, err = http.Post(url, ct, bytes.NewBufferString(""))
+				}
+
 				if err != nil {
 					t.Error(err)
 					return
@@ -269,7 +277,7 @@ func TestTemplatesHTTP(t *testing.T) {
 
 func TestTemplatesCloudEvents(t *testing.T) {
 	baseImage := "kn-fn-test/template-ce"
-// 	jsonData := `{
+// 	jsonData := byte[](`{
 //     "specversion" : "1.0",
 //     "type" : "org.springframework",
 //     "source" : "https://spring.io/",
@@ -279,7 +287,7 @@ func TestTemplatesCloudEvents(t *testing.T) {
 //         "firstName": "John",
 //         "lastName": "Doe"
 //     }
-// }`
+// }`)
 	cases := []struct {
 		name string
 		tag  string
@@ -293,7 +301,7 @@ func TestTemplatesCloudEvents(t *testing.T) {
 			tag:  "java-cloudevents-gradle",
 
 			path:             "/hire",
-			data:             "java test data",
+			data:             "REPLACEME",
 			expectedResponse: "java test data",
 		},
 		{
@@ -301,7 +309,7 @@ func TestTemplatesCloudEvents(t *testing.T) {
 			tag:  "java-cloudevents-maven",
 
 			path:             "/hire",
-			data:             "java test data",
+			data:             "REPLACEME",
 			expectedResponse: "java test data",
 		},
 		{
