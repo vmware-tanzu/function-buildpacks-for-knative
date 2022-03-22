@@ -19,7 +19,5 @@ jobs:
       with:
         go-version: '1.17.8'
     - run: go version
-    - name: Create builder
-      run: make builder
     - name: Run Template Tests
       run: make template-tests

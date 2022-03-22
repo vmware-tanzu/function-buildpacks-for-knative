@@ -100,6 +100,7 @@ func TestPythonHTTP(t *testing.T) {
 func TestJavaHTTP(t *testing.T) {
 	baseImage := "kn-fn-test/template-http"
 	jsonData := []byte(`{"firstName":"John", "lastName":"Doe"}`)
+	expectedData := `{"firstName":"John", "lastName":"Doe"}`
 	cases := []struct {
 		name string
 		tag  string
@@ -117,7 +118,7 @@ func TestJavaHTTP(t *testing.T) {
 			methodType:       http.MethodPost,
 			data:             jsonData,
 			path:             "/hire",
-			expectedResponse: "Hello World!",
+			expectedResponse: expectedData,
 		},
 		{
 			name: "Java HTTP Maven",
@@ -126,7 +127,7 @@ func TestJavaHTTP(t *testing.T) {
 			methodType:       http.MethodPost,
 			data:             jsonData,
 			path:             "/hire",
-			expectedResponse: "Hello World!",
+			expectedResponse: expectedData,
 		},
 	}
 
@@ -172,7 +173,7 @@ func TestJavaHTTP(t *testing.T) {
 			}
 
 			bs := string(body)
-			if bs != c.expectedResponse {
+			if !(strings.Contains(c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, bs)
 			}
 		})
@@ -192,6 +193,7 @@ func TestPythonCloudEvents(t *testing.T) {
 			"lastName": "Doe"
 		}
 	}`)
+	expectedData := `{"firstName":"John", "lastName":"Doe"}`
 	cases := []struct {
 		name string
 		tag  string
@@ -206,7 +208,7 @@ func TestPythonCloudEvents(t *testing.T) {
 
 			path:             "/",
 			data:             jsonData,
-			expectedResponse: "python test data",
+			expectedResponse: expectedData,
 		},
 	}
 
@@ -232,7 +234,7 @@ func TestPythonCloudEvents(t *testing.T) {
 			event.SetSource("url")
 			event.SetID(uuid.New().String())
 			event.SetType("example.type")
-			event.SetData(cloudevents.TextPlain, c.data)
+			event.SetData(cloudevents.ApplicationJSON, c.data)
 
 			ctx := cloudevents.ContextWithTarget(context.Background(), url)
 			reqEvent, result := client.Request(ctx, event)
@@ -248,7 +250,7 @@ func TestPythonCloudEvents(t *testing.T) {
 			}
 
 			reqEventData := string(reqEvent.Data())
-			if reqEventData != c.expectedResponse {
+			if !(strings.Contains(c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
 			}
 		})
@@ -268,6 +270,7 @@ func TestJavaCloudEvents(t *testing.T) {
 	        "lastName": "Doe"
 	    }
 	}`)
+	expectedData := `{"firstName":"John", "lastName":"Doe"}`
 	cases := []struct {
 		name string
 		tag  string
@@ -282,7 +285,7 @@ func TestJavaCloudEvents(t *testing.T) {
 
 			path:             "/hire",
 			data:             jsonData,
-			expectedResponse: "java test data",
+			expectedResponse: expectedData,
 		},
 		{
 			name: "Java CloudEvents Maven",
@@ -290,7 +293,7 @@ func TestJavaCloudEvents(t *testing.T) {
 
 			path:             "/hire",
 			data:             jsonData,
-			expectedResponse: "java test data",
+			expectedResponse: expectedData,
 		},
 	}
 
@@ -316,7 +319,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			event.SetSource("url")
 			event.SetID(uuid.New().String())
 			event.SetType("example.type")
-			event.SetData(cloudevents.TextPlain, c.data)
+			event.SetData(cloudevents.ApplicationJSON, c.data)
 
 			ctx := cloudevents.ContextWithTarget(context.Background(), url)
 			reqEvent, result := client.Request(ctx, event)
@@ -332,7 +335,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			}
 
 			reqEventData := string(reqEvent.Data())
-			if reqEventData != c.expectedResponse {
+			if !(strings.Contains(c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
 			}
 		})
