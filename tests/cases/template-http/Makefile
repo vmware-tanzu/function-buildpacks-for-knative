@@ -15,6 +15,6 @@ template-http.clean := $(addsuffix .clean,$(template-http.image_paths))
 $(template-http.clean):
 	-docker rmi -f $(template-http.image):$(basename $(notdir $@))
 
-.PHONY: smoke-tests.images
-smoke-tests.images .PHONY: $(template-http.image_paths)
+.PHONY: template-tests.images
+template-tests.images .PHONY: $(template-http.image_paths)
 clean .PHONY: $(template-http.clean)

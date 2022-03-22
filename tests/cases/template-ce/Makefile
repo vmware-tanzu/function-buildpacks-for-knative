@@ -15,6 +15,6 @@ template-ce.clean := $(addsuffix .clean,$(template-ce.image_paths))
 $(template-ce.clean):
 	-docker rmi -f $(template-ce.image):$(basename $(notdir $@))
 
-.PHONY: smoke-tests.images
-smoke-tests.images .PHONY: $(template-ce.image_paths)
+.PHONY: template-tests.images
+template-tests.images .PHONY: $(template-ce.image_paths)
 clean .PHONY: $(template-ce.clean)

@@ -1,5 +1,5 @@
-//go:build smoke
-// +build smoke
+//go:build template
+// +build template
 
 package tests
 
@@ -19,38 +19,52 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestSmokeHTTP(t *testing.T) {
-	baseImage := "kn-fn-test/helloworld"
+func TestTemplatesHTTP(t *testing.T) {
+	baseImage := "kn-fn-test/template-http"
+	jsonData := []byte(`{"firstName":"John", "lastName":"Doe"}`)
 	cases := []struct {
 		name string
 		tag  string
 
 		methodType       string
 		contentType      string
+		data             []byte
 		path             string
 		expectedResponse string
 	}{
 		{
-			name: "Java",
-			tag:  "java",
+			name: "Java HTTP Gradle",
+			tag:  "java-http-gradle",
 
 			methodType:       http.MethodPost,
-			path:             "/hello",
+			data:             jsonData,
+			path:             "/hire",
+			expectedResponse: "Hello World!",
+		},
+		{
+			name: "Java HTTP Maven",
+			tag:  "java-http-maven",
+
+			methodType:       http.MethodPost,
+			data:             jsonData,
+			path:             "/hire",
 			expectedResponse: "Hello World!",
 		},
 		{
 			name: "Python GET",
-			tag:  "python",
+			tag:  "python-http",
 
 			methodType:       http.MethodGet,
+			data:             "",
 			path:             "/",
 			expectedResponse: "Hello World!",
 		},
 		{
 			name: "Python POST",
-			tag:  "python",
+			tag:  "python-http",
 
 			methodType:       http.MethodPost,
+			data:             "",
 			path:             "/",
 			expectedResponse: "Hello World!",
 		},
@@ -82,7 +96,14 @@ func TestSmokeHTTP(t *testing.T) {
 				if ct == "" {
 					ct = "application/json"
 				}
-				resp, err = http.Post(url, ct, bytes.NewBufferString(""))
+
+				if c.data != "" {
+					resp, err = http.Post(url, ct, bytes.NewBuffer(jsonData))
+
+				} else {
+					resp, err = http.Post(url, ct, bytes.NewBufferString(""))
+				}
+
 				if err != nil {
 					t.Error(err)
 					return
@@ -103,8 +124,19 @@ func TestSmokeHTTP(t *testing.T) {
 	}
 }
 
-func TestSmokeCloudEvents(t *testing.T) {
-	baseImage := "kn-fn-test/echo-ce"
+func TestTemplatesCloudEvents(t *testing.T) {
+	baseImage := "kn-fn-test/template-ce"
+	// 	jsonData := byte[](`{
+	//     "specversion" : "1.0",
+	//     "type" : "org.springframework",
+	//     "source" : "https://spring.io/",
+	//     "id" : "A234-1234-1234",
+	//     "datacontenttype" : "application/json",
+	//     "data": {
+	//         "firstName": "John",
+	//         "lastName": "Doe"
+	//     }
+	// }`)
 	cases := []struct {
 		name string
 		tag  string
@@ -114,16 +146,24 @@ func TestSmokeCloudEvents(t *testing.T) {
 		expectedResponse string
 	}{
 		{
-			name: "Java",
-			tag:  "java",
+			name: "Java CloudEvents Gradle",
+			tag:  "java-cloudevents-gradle",
 
-			path:             "/",
-			data:             "java test data",
+			path:             "/hire",
+			data:             "REPLACEME",
 			expectedResponse: "java test data",
 		},
 		{
-			name: "Python",
-			tag:  "python",
+			name: "Java CloudEvents Maven",
+			tag:  "java-cloudevents-maven",
+
+			path:             "/hire",
+			data:             "REPLACEME",
+			expectedResponse: "java test data",
+		},
+		{
+			name: "Python CloudEvents",
+			tag:  "python-cloudevents",
 
 			path:             "/",
 			data:             "python test data",
