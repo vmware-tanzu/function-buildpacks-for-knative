@@ -173,7 +173,7 @@ func TestJavaHTTP(t *testing.T) {
 			}
 
 			bs := string(body)
-			if !(strings.Contains(c.expectedResponse)) {
+			if !(strings.Contains(reqEventData, c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, bs)
 			}
 		})
@@ -250,7 +250,7 @@ func TestPythonCloudEvents(t *testing.T) {
 			}
 
 			reqEventData := string(reqEvent.Data())
-			if !(strings.Contains(c.expectedResponse)) {
+			if !(strings.Contains(reqEventData, c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
 			}
 		})
@@ -335,7 +335,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			}
 
 			reqEventData := string(reqEvent.Data())
-			if !(strings.Contains(c.expectedResponse)) {
+			if !(strings.Contains(reqEventData, c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
 			}
 		})
