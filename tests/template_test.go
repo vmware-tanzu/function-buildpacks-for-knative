@@ -89,9 +89,9 @@ func TestPythonHTTP(t *testing.T) {
 				return
 			}
 
-			bs := string(body)
-			if bs != c.expectedResponse {
-				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, bs)
+			respBodyData := string(body)
+			if respBodyData != c.expectedResponse {
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, respBodyData)
 			}
 		})
 	}
@@ -174,7 +174,7 @@ func TestJavaHTTP(t *testing.T) {
 
 			respBodyData := string(respBody)
 			if !(strings.Contains(respBodyData, c.expectedResponse)) {
-				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, bs)
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, respBodyData)
 			}
 		})
 	}
