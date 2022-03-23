@@ -89,9 +89,9 @@ func TestPythonHTTP(t *testing.T) {
 				return
 			}
 
-			respBodyData := string(body)
-			if respBodyData != c.expectedResponse {
-				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, respBodyData)
+			actualResponse := string(body)
+			if actualResponse != c.expectedResponse {
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, actualResponse)
 			}
 		})
 	}
@@ -99,8 +99,8 @@ func TestPythonHTTP(t *testing.T) {
 
 func TestJavaHTTP(t *testing.T) {
 	baseImage := "kn-fn-test/template-http"
-	jsonData := []byte(`{"firstName":"John", "lastName":"Doe"}`)
-	expectedData := `{"firstName":"John", "lastName":"Doe"}`
+	jsonData := []byte(`{"firstName":"John","lastName":"Doe"}`)
+	expectedData := `{"firstName":"John","lastName":"Doe"}`
 	cases := []struct {
 		name string
 		tag  string
@@ -172,9 +172,9 @@ func TestJavaHTTP(t *testing.T) {
 				return
 			}
 
-			respBodyData := string(respBody)
-			if !(strings.Contains(respBodyData, c.expectedResponse)) {
-				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, respBodyData)
+			actualResponse := string(respBody)
+			if !(strings.Contains(actualResponse, c.expectedResponse)) {
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, actualResponse)
 			}
 		})
 	}
@@ -193,7 +193,7 @@ func TestPythonCloudEvents(t *testing.T) {
 			"lastName": "Doe"
 		}
 	}`)
-	expectedData := `{"firstName":"John", "lastName":"Doe"}`
+	expectedData := `{"firstName": "John", "lastName": "Doe"}`
 	cases := []struct {
 		name string
 		tag  string
@@ -249,9 +249,9 @@ func TestPythonCloudEvents(t *testing.T) {
 				t.Skip()
 			}
 
-			reqEventData := string(reqEvent.Data())
-			if !(strings.Contains(reqEventData, c.expectedResponse)) {
-				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
+			actualResponse := string(reqEvent.Data())
+			if !(strings.Contains(actualResponse, c.expectedResponse)) {
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, actualResponse)
 			}
 		})
 	}
@@ -334,9 +334,9 @@ func TestJavaCloudEvents(t *testing.T) {
 				t.Skip()
 			}
 
-			reqEventData := string(reqEvent.Data())
-			if !(strings.Contains(reqEventData, c.expectedResponse)) {
-				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, reqEventData)
+			actualResponse := string(reqEvent.Data())
+			if !(strings.Contains(actualResponse, c.expectedResponse)) {
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, actualResponse)
 			}
 		})
 	}
