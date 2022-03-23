@@ -166,14 +166,14 @@ func TestJavaHTTP(t *testing.T) {
 				}
 			}
 			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
+			respBody, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				t.Error(err)
 				return
 			}
 
-			bs := string(body)
-			if !(strings.Contains(reqEventData, c.expectedResponse)) {
+			respBodyData := string(respBody)
+			if !(strings.Contains(respBodyData, c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, bs)
 			}
 		})
