@@ -1,6 +1,9 @@
 // Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: BSD-2-Clause
 
+//go:build smoke
+// +build smoke
+
 package tests
 
 import (
@@ -19,7 +22,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestHTTP(t *testing.T) {
+func TestSmokeHTTP(t *testing.T) {
 	baseImage := "kn-fn-test/helloworld"
 	cases := []struct {
 		name string
@@ -103,7 +106,7 @@ func TestHTTP(t *testing.T) {
 	}
 }
 
-func TestCloudEvents(t *testing.T) {
+func TestSmokeCloudEvents(t *testing.T) {
 	baseImage := "kn-fn-test/echo-ce"
 	cases := []struct {
 		name string

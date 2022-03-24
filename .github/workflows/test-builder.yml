@@ -21,7 +21,7 @@ jobs:
       with:
         go-version: '1.17.8'
     - run: go version
-    - name: Create builder
+    - name: Create Builder
       run: make builder
     - name: Run Smoke Tests
       run: make smoke-tests

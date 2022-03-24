@@ -13,7 +13,7 @@ on:
     - cron: '0 6 * * 1'
 
 jobs:
-  smoke-tests:
+  template-tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -22,7 +22,5 @@ jobs:
       with:
         go-version: '1.17.8'
     - run: go version
-    - name: Create builder
-      run: make builder
-    - name: Run Smoke Tests
-      run: make smoke-tests
+    - name: Run Template Tests
+      run: make template-tests
