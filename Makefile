@@ -1,3 +1,4 @@
+ADDLICENSE ?= go run github.com/google/addlicense@latest
 RULES.MK := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/rules.mk
 include $(RULES.MK)
 
@@ -22,3 +23,11 @@ invoker-tests:
 smoke-tests:
 
 clean:
+
+.PHONY: add-copyright
+add-copyright:
+	$(ADDLICENSE) -f hack/boilerplate.go.txt .
+
+.PHONY: check-copyright
+check-copyright:
+	$(ADDLICENSE) -f hack/boilerplate.go.txt -check .
