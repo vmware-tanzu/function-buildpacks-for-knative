@@ -1,3 +1,8 @@
+/**
+ * Copyright 2021-2022 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const {SQSClient, SendMessageCommand} = require("@aws-sdk/client-sqs");
 
 // TODO this can be in a different file #cleanup

@@ -1,3 +1,6 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
 # The name used for this language pack repository when referenced
 # in the UX, and its version
 name: function-buildpacks-for-knative

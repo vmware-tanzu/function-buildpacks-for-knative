@@ -1,3 +1,6 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
 ENV_MODULE_NAME = 'MODULE_NAME'
 ENV_FUNCTION_NAME = 'FUNCTION_NAME'
 

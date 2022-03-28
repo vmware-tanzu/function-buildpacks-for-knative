@@ -1,3 +1,6 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
 FROM python@sha256:301797d06f5828195f496f1f3022e370d5743e44044e56656f45c4a3c4174ca4
 
 RUN python -m pip install --upgrade pip
