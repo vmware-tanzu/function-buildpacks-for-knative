@@ -1,3 +1,6 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
 from fpdf import FPDF
 from typing import Any
 from urllib.parse import unquote_plus

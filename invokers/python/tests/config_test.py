@@ -1,3 +1,6 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
 from pyfunc.config import Config
 from pyfunc.constants import *
 
