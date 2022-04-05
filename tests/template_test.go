@@ -119,6 +119,7 @@ func TestJavaHTTP(t *testing.T) {
 			tag:  "java-http-gradle",
 
 			methodType:       http.MethodPost,
+			contentType:      "application/json",
 			data:             jsonData,
 			path:             "/hire",
 			expectedResponse: expectedData,
@@ -128,6 +129,7 @@ func TestJavaHTTP(t *testing.T) {
 			tag:  "java-http-maven",
 
 			methodType:       http.MethodPost,
+			contentType:      "application/json",
 			data:             jsonData,
 			path:             "/hire",
 			expectedResponse: expectedData,
@@ -146,28 +148,13 @@ func TestJavaHTTP(t *testing.T) {
 			defer cleanup()
 
 			url := fmt.Sprintf("http://127.0.0.1:8080/%s", strings.TrimLeft(c.path, "/"))
+			resp, err := http.Post(url, c.contentType, bytes.NewBuffer(jsonData))
 
-			var resp *http.Response
-			switch c.methodType {
-			case http.MethodGet:
-				resp, err = http.Get(url)
-				if err != nil {
-					t.Error(err)
-					return
-				}
-			case http.MethodPost:
-				ct := c.contentType
-				if ct == "" {
-					ct = "application/json"
-				}
-
-				resp, err = http.Post(url, ct, bytes.NewBuffer(jsonData))
-
-				if err != nil {
-					t.Error(err)
-					return
-				}
+			if err != nil {
+				t.Error(err)
+				return
 			}
+
 			defer resp.Body.Close()
 			respBody, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
@@ -279,6 +266,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 		tag  string
 
 		methodType       string
+		contentType      string
 		path             string
 		data             []byte
 		expectedResponse string
@@ -288,6 +276,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 			tag:  "java-cloudevents-gradle",
 
 			methodType:       http.MethodPost,
+			contentType:      "application/json",
 			path:             "/hire",
 			data:             jsonData,
 			expectedResponse: expectedData,
@@ -297,6 +286,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 			tag:  "java-cloudevents-maven",
 
 			methodType:       http.MethodPost,
+			contentType:      "application/json",
 			path:             "/hire",
 			data:             jsonData,
 			expectedResponse: expectedData,
@@ -316,27 +306,13 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 
 			url := fmt.Sprintf("http://127.0.0.1:8080/%s", strings.TrimLeft(c.path, "/"))
 
-			var resp *http.Response
-			switch c.methodType {
-			case http.MethodGet:
-				resp, err = http.Get(url)
-				if err != nil {
-					t.Error(err)
-					return
-				}
-			case http.MethodPost:
-				ct := c.contentType
-				if ct == "" {
-					ct = "application/json"
-				}
+			resp, err := http.Post(url, c.contentType, bytes.NewBuffer(jsonData))
 
-				resp, err = http.Post(url, ct, bytes.NewBuffer(jsonData))
-
-				if err != nil {
-					t.Error(err)
-					return
-				}
+			if err != nil {
+				t.Error(err)
+				return
 			}
+
 			defer resp.Body.Close()
 			respBody, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
