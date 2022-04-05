@@ -5,6 +5,9 @@ package java
 
 import (
 	"fmt"
+	"os"
+	"regexp"
+	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
@@ -50,10 +53,23 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 	}
 
-	i, be := NewInvoker(dep, dc)
-	i.Logger = b.Logger
-	result.Layers = append(result.Layers, i)
-	result.BOM.Entries = append(result.BOM.Entries, be)
+	r, err := regexp.Compile(`tomcat-embed-core-[\d\.]+\.jar`)
+	if err != nil {
+		return libcnb.BuildResult{}, err
+	}
+	dependencyPath, err := findPath(context.Application.Path, r)
+	if err != nil {
+		return libcnb.BuildResult{}, err
+	}
+
+	if dependencyPath != "" {
+		b.Logger.Info("embedded tomcat dependency found at: ", dependencyPath, " (skipping invoker layer)")
+	} else {
+		i, be := NewInvoker(dep, dc)
+		i.Logger = b.Logger
+		result.Layers = append(result.Layers, i)
+		result.BOM.Entries = append(result.BOM.Entries, be)
+	}
 
 	f := NewFunction(e, context.Application.Path)
 	if err != nil {
@@ -69,4 +85,23 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	)
 
 	return result, nil
+}
+
+func findPath(path string, r *regexp.Regexp) (string, error) {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return "", err
+	}
+	for _, file := range files {
+		if file.IsDir() {
+			if found, err := findPath(strings.Join([]string{path, file.Name()}, "/"), r); found != "" {
+				return found, err
+			}
+		} else {
+			if r.MatchString(file.Name()) {
+				return strings.Join([]string{path, file.Name()}, "/"), nil
+			}
+		}
+	}
+	return "", nil
 }
