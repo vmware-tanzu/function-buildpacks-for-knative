@@ -333,6 +333,8 @@ func TestJavaCloudEvents(t *testing.T) {
 
 			// Debug
 			print(reqEvent)
+			t.Log(reqEvent)
+			fmt.Println(reqEvent)
 
 			// Extra check due to odd behavior in CloudEvents Go SDK: github.com/cloudevents/sdk-go/blob/1170e89edb9b504a806f2c6a26563c3c26b68276/v2/client/client.go#L178
 			if cloudevents.IsNACK(result) {
