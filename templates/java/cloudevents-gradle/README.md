@@ -1,6 +1,5 @@
 # Java CloudEvents Template
 
-⚠️ PROJECT IS UNDER CONSTRUCTION ⚠️
 ## Getting Started
 
 Navigate to `Hire.java` and replace the code in the function body as desired.
@@ -12,7 +11,7 @@ If you'd like to test this template, you may use this CloudEvent saved as `cloud
 ```
 {
     "specversion" : "1.0",
-    "type" : "org.springframework",
+    "type" : "hire",
     "source" : "https://spring.io/",
     "id" : "A234-1234-1234",
     "datacontenttype" : "application/json",
