@@ -278,6 +278,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 		name string
 		tag  string
 
+		methodType       string
 		path             string
 		data             []byte
 		expectedResponse string
