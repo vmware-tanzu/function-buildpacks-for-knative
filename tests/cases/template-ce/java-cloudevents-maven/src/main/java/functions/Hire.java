@@ -19,7 +19,7 @@ This function can be accessed by targetting the "/hire" path while
 providing the correct data:
     {
         "specversion" : "1.0",
-        "type" : "org.springframework",
+        "type" : "hire",
         "source" : "https://spring.io/",
         "id" : "A234-1234-1234",
         "datacontenttype" : "application/json",
