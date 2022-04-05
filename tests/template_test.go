@@ -260,7 +260,7 @@ func TestPythonCloudEvents(t *testing.T) {
 	}
 }
 
-func TestJavaCloudEvents(t *testing.T) {
+func TestJavaCloudEventsOverHTTP(t *testing.T) {
 	baseImage := "kn-fn-test/template-ce"
 	jsonData := []byte(`{
 	    "specversion" : "1.0",
@@ -286,6 +286,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			name: "Java CloudEvents Gradle",
 			tag:  "java-cloudevents-gradle",
 
+			methodType:       http.MethodPost,
 			path:             "/hire",
 			data:             jsonData,
 			expectedResponse: expectedData,
@@ -294,6 +295,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			name: "Java CloudEvents Maven",
 			tag:  "java-cloudevents-maven",
 
+			methodType:       http.MethodPost,
 			path:             "/hire",
 			data:             jsonData,
 			expectedResponse: expectedData,
@@ -313,43 +315,35 @@ func TestJavaCloudEvents(t *testing.T) {
 
 			url := fmt.Sprintf("http://127.0.0.1:8080/%s", strings.TrimLeft(c.path, "/"))
 
-			client, err := cloudevents.NewClientHTTP()
+			var resp *http.Response
+			switch c.methodType {
+			case http.MethodGet:
+				resp, err = http.Get(url)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+			case http.MethodPost:
+				ct := c.contentType
+				if ct == "" {
+					ct = "application/json"
+				}
+
+				resp, err = http.Post(url, ct, bytes.NewBuffer(jsonData))
+
+				if err != nil {
+					t.Error(err)
+					return
+				}
+			}
+			defer resp.Body.Close()
+			respBody, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				t.Error(err)
+				return
 			}
 
-			event := cloudevents.NewEvent()
-			event.SetSource("url")
-			event.SetID(uuid.New().String())
-			event.SetType("example.type")
-			event.SetData(cloudevents.ApplicationJSON, c.data)
-
-			ctx := cloudevents.ContextWithTarget(context.Background(), url)
-			reqEvent, result := client.Request(ctx, event)
-			reqEvent, result := client.RequestDataFromContext(ctx)
-
-			t.Log(event)
-			t.Log(ctx)
-			t.Log(result)
-
-			if cloudevents.IsUndelivered(result) {
-				t.Error(err)
-			}
-
-			// Debug
-			print(reqEvent)
-			t.Log(reqEvent)
-			fmt.Println(reqEvent)
-
-			// Extra check due to odd behavior in CloudEvents Go SDK: github.com/cloudevents/sdk-go/blob/1170e89edb9b504a806f2c6a26563c3c26b68276/v2/client/client.go#L178
-			if cloudevents.IsNACK(result) {
-				// Tracked by https://github.com/vmware-tanzu/function-buildpacks-for-knative/issues/39
-
-				t.Error(err)
-				t.Skip()
-			}
-
-			actualResponse := string(reqEvent.Data())
+			actualResponse := string(respBody)
 			if !(strings.Contains(actualResponse, c.expectedResponse)) {
 				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, actualResponse)
 			}
