@@ -29,7 +29,7 @@ The builder is also built and published as an image to `ghcr.io` -- to build an 
 
 For example:
 ```
-pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.0.8
+pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.0.10
 ```
 
 You can get started by working with any of our scaffolded code found in `samples` or `templates` in the root directory.
