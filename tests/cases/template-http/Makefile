@@ -7,7 +7,7 @@ template-http.path := $(abspath $(path))
 $(eval $(call INCLUDE_FILE, $(ROOT_DIR)/builder))
 
 template-http.image := kn-fn-test/template-http
-template-http.image_paths := $(shell find $(template-http.path) -mindepth 1 -maxdepth 1 -type d)
+template-http.image_paths := $(shell find $(template-http.path) -mindepth 1 -maxdepth 1 -type l)
 $(template-http.image_paths): $(PACK) $(builder.build)
 	cd $@ && $(PACK) build $(template-http.image):$(notdir $@) --builder $(shell cat $(builder.build))
 
