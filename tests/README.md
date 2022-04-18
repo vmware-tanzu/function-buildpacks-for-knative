@@ -10,6 +10,14 @@ Each case (image) has its own corresponding Makefile that must exist for the tes
 
 ## Adding Template Tests
 
-By default, the Makefile navigates all directories in the `/cases` subdirectory and builds images off of them. The templates tests exist in `/cases/template-ce` and `/cases/template-http`, where the templates are copies of the root directory `templates/` folders' contents. 
+By default, the Makefile navigates all directories in the `/cases` subdirectory and builds images off of them. The templates tests exist in `/cases/template-ce` and `/cases/template-http`.
 
-Please keep in mind that if you add or edit a template in the root `templates/`, you will also need to copy the changes over to this directory. (In the future, if we do Symlinking, the same is true for renaming any folder.)
+When you add a template in the root `templates/`, also symlink that template into the appropriate test directory. For example, a template at `templates/java/cloudevents-gradle` should be symlinked to `tests/cases/template-ce/java-cloudevents-gradle` 
+
+Symlink example: 
+```bash
+cd tests/cases/template-ce
+ln -s ../../../templates/python/cloudevents/ python-cloudevents
+```
+
+Use this command from the root of the project to view the current symlinks: `ls -lR tests/cases/ | grep ^l`
