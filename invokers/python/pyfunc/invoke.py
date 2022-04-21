@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from functools import reduce
+from flask_healthz import healthz
+from flask_healthz import HealthError
 import inspect
 import os
 import typing
@@ -72,5 +74,6 @@ def main(dir: str = "."):
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
     app = flask.Flask(func.__name__)
+    app.register_blueprint(healthz, url_prefix="/")
     app.add_url_rule("/", view_func=http_func, methods=["POST","GET"])
     app.run(host="0.0.0.0", port=os.environ.get("PORT", 8080))

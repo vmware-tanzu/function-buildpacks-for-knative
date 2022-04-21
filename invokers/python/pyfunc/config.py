@@ -28,3 +28,8 @@ class Config:
     @property
     def search_path(self) -> str:
         return self._search_path
+
+    HEALTHZ = {
+        "live": "yourapp.checks.liveness",
+        "ready": "yourapp.checks.readiness",
+    }
