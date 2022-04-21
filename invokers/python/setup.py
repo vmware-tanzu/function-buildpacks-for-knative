@@ -27,7 +27,7 @@ setup(
     install_requires=[
         'cloudevents >=1.2, <2',
         'Flask>=2,<3',
-        'flash-healthz >=0.0.3',
+        'flask-healthz >=0.0.3',
     ],
     setup_requires=['pytest-runner'],
     tests_require=['pytest==4.4.1'],
