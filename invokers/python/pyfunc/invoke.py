@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from functools import reduce
-from flask_healthz import healthz
-from flask_healthz import HealthError
+from flask_healthz import Healthz
 import inspect
 import os
 import typing
@@ -68,13 +67,18 @@ def WrapFunction(func: typing.Callable) -> typing.Callable:
     print(f"$$ Converting {inspect.signature(func)} to {inspect.signature(handler)}")
     return handler
 
+def liveness():
+    pass
+
+def readiness():
+    pass
 
 def main(dir: str = "."):
     func = find_func(dir)
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
     app = flask.Flask(func.__name__)
-    app.register_blueprint(healthz, url_prefix="/")
-    app.config['']
+    # app.register_blueprint(healthz, url_prefix="/healthz")
+    Healthz(app)
     app.add_url_rule("/", view_func=http_func, methods=["POST","GET"])
     app.run(host="0.0.0.0", port=os.environ.get("PORT", 8080))

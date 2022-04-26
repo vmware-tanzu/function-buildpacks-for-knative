@@ -30,6 +30,6 @@ class Config:
         return self._search_path
 
     HEALTHZ = {
-        "live": "yourapp.checks.liveness",
-        "ready": "yourapp.checks.readiness",
+        "live": "pyfunc.invoke.liveness",
+        "ready": "pyfunc.invoke.readiness",
     }
