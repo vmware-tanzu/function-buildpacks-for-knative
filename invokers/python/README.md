@@ -1,4 +1,4 @@
-# PyFunc
+# Python Invoker
 
 This package provides a mechanism to write Function-as-a-Service style code in
 Python for handling HTTP events, including CloudEvents delivered via HTTP.
