@@ -38,13 +38,24 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency resolver\n%w", err)
 	}
 
-	invokerDep, err := dependencyResolver.Resolve("invoker", "")
+	invokerDepCache, err := dependencyResolver.Resolve("invoker-deps", "")
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 	}
 
-	invokerLayer, invokerBOM := NewInvoker(invokerDep, dependencyCache)
+	invoker, err := dependencyResolver.Resolve("invoker", "")
+	if err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
+	}
+
+	invokerDepCacheLayer, invokerDepCacheBom := NewInvokerDependencyCache(invokerDepCache, dependencyCache)
+	invokerDepCacheLayer.Logger = b.Logger
+	result.Layers = append(result.Layers, invokerDepCacheLayer)
+	result.BOM.Entries = append(result.BOM.Entries, invokerDepCacheBom)
+
+	invokerLayer, invokerBOM := NewInvoker(invoker, dependencyCache)
 	invokerLayer.Logger = b.Logger
+	invokerLayer.DependencyCacheLayer = &invokerDepCacheLayer
 	result.Layers = append(result.Layers, invokerLayer)
 	result.BOM.Entries = append(result.BOM.Entries, invokerBOM)
 

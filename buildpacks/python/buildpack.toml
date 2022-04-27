@@ -16,7 +16,14 @@ api = "0.6"
   [[metadata.dependencies]]
     id      = "invoker"
     name    = "Python Invoker"
-    version = "0.0.3"
-    uri     = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker%2Fv0.0.4/pyfunc-invoker-0.0.4.tar.gz"
-    sha256  = "427a0eacdbfde110fe4d85a32741dc47e4003b7f8b04c7fa2cf34873e66c8b51"
+    version = "0.0.5"
+    uri     = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker%2Fv0.0.5/pyfunc-invoker-0.0.5.tar.gz"
+    sha256  = "b43a45cc6c3c2420b2331b627f97b133ea9312731791e5a76a5cd72ff3cb5811"
+    stacks  = [ "io.buildpacks.stacks.bionic" ]
+  [[metadata.dependencies]]
+    id      = "invoker-deps"
+    name    = "Python Invoker Deps"
+    version = "0.0.5"
+    uri     = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker%2Fv0.0.5/pyfunc-invoker-deps-0.0.5.tar.gz"
+    sha256  = "a84056dbdd4d570ab2aa6e05a04f96ee5a54be18ee1141282133fb13bb634e0f"
     stacks  = [ "io.buildpacks.stacks.bionic" ]

@@ -16,6 +16,8 @@ import (
 type Invoker struct {
 	LayerContributor libpak.DependencyLayerContributor
 	Logger           bard.Logger
+
+	DependencyCacheLayer *InvokerDependencyCache
 }
 
 func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) (Invoker, libcnb.BOMEntry) {
@@ -30,8 +32,14 @@ func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	return i.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
 		i.Logger.Bodyf("Installing to %s", artifact.Name())
 
+		args := []string{"install"}
+		if i.DependencyCacheLayer != nil {
+			args = append(args, "--find-links", i.DependencyCacheLayer.CacheDir)
+		}
+		args = append(args, artifact.Name())
+
 		var stderr bytes.Buffer
-		cmd := exec.Command("pip", "install", artifact.Name())
+		cmd := exec.Command("pip", args...)
 		cmd.Stderr = &stderr
 
 		if err := cmd.Run(); err != nil {
