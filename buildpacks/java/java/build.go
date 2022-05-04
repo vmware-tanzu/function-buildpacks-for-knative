@@ -22,7 +22,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	b.Logger.Title(context.Buildpack)
 	result := libcnb.NewBuildResult()
 
-	_, err := libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
+	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
 	}
@@ -46,6 +46,11 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 	if !ok {
 		return result, nil
+	}
+	if e.Metadata["has_func_yaml"] == true {
+		envs := NewFuncYamlEnvs(context.Application.Path)
+		envs.Logger = b.Logger
+		result.Layers = append(result.Layers, envs)
 	}
 
 	dep, err := dr.Resolve("invoker", "")
@@ -71,10 +76,10 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
 
-	f := NewFunction(e, context.Application.Path)
-	if err != nil {
-		return libcnb.BuildResult{}, fmt.Errorf("unable to create function\n%w", err)
-	}
+	funcDef, _ := cr.Resolve("BP_FUNCTION")
+	defaultDef, _ := cr.Resolve("BP_DEFAULT_FUNCTION")
+
+	f := NewFunction(funcDef, defaultDef, context.Application.Path)
 	f.Logger = b.Logger
 	result.Layers = append(result.Layers, f)
 

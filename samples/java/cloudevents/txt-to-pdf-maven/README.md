@@ -106,7 +106,7 @@ If you encounter any Knative errors while re-deploying the app, be sure to delet
     ```
 
 ## Legacy Deployment YAML
-
+```
 apiVersion: v1
 kind: Secret
 metadata:

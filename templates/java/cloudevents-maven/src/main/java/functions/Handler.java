@@ -31,7 +31,7 @@ providing the correct data:
 If this is the only function defined, it may be accessed via "/"
 path.
 */
-public class Hire implements Function<Message<Person>, Message<Employee>> {
+public class Handler implements Function<Message<Person>, Message<Employee>> {
     @Override
     public Message<Employee> apply(Message<Person> msg) {
         String ceType = (String) msg.getHeaders().get("ce-type");

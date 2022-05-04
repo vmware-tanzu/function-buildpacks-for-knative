@@ -39,4 +39,11 @@ public class Handler {
 			}
 		};
 	}
+
+	@Bean
+	public Function<String, String> bye() {
+		return in -> {
+			return "bye";
+		};
+	}
 }

@@ -19,7 +19,7 @@ CloudEvents data as needed.
 If this is the only function defined, it may be accessed via "/"
 path.
 */
-public class Hire implements Function<Person, Employee> {
+public class Handler implements Function<Person, Employee> {
     @Override
     public Employee apply(Person person) {
         System.out.printf("Person: first(%s) last(%s)\n", person.getFirstName(), person.getLastName());

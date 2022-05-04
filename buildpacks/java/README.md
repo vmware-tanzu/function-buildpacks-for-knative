@@ -4,20 +4,29 @@ The Java Function Buildpack is a Cloud Native Buildpack that provides a Spring B
 
 ## Behaviour
 This buildpack will participate if any of the following conditions are met:
-* A file with the name `func.yaml` is detected
+* A buildpack configuration variable `BP_FUNCTION` is explicitly set.
+* A file with the name `func.yaml` is detected.
 
 The buildpack will do the following if detection passed:
 * Request for a JRE to be installed
-* Contributes the Spring Boot application to a layer marked `launch` with the layer's path prepended to `$CLASSPATH`
+* Contributes the function invoker to a layer marked `launch` with the layer's path prepended to `$CLASSPATH`
 * Contributes environment variables defined in `func.yaml` to the `launch` layer
+* Contributes environment variables to configure the invoker if any configuration variables are defined. (Overrides anything from `func.yaml`)
+
+## Configuration
+
+| Environment Variable | Description |
+|----------------------|-------------|
+| `$BP_FUNCTION` | Configure the function to load. If the function lives in the default package: `<class>`. If the function lives in their own package: `<package>.<class>`. Defaults to `functions.Handler` |
+| `$BP_DEFAULT_FUNCTION` | Configure the default function. By specifying this property, a function with the name can be accessed via the `/` path. Defaults to empty. |
 
 ## Getting started
 To get started you'll need to create a directory where your function will be defined.
 
 From within this directory we require a few files to properly detect this as a Java function:
-* `func.yaml`: We use this to configure the runtime environment variables. See the [Knative Func CLI docs](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/guides/func_yaml.md) for more details.
+* `func.yaml` (optional): We use this to configure the runtime environment variables. See the [Knative Func CLI docs](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/guides/func_yaml.md) for more details.
 * `pom.xml` or `build.gradle`: These are used by the other Java buildpacks to compile your function.
-* Java package in folder `src/main/java/functions`: This is the default location your function will be detected. If you do choose to use another package to store your functions, you will need to [set a new search location](#TODO).
+* Java package in folder `src/main/java/functions`: This is the default location your function will be detected. If you do choose to use another package to store your functions, you will need to define where your function is located with the `BP_FUNCTION` configuration for the buildpack.
 
 ## Compiling Your Function
 To compile your function with the buildpack, we've provided a builder which has all the pre-requisites ready to go.

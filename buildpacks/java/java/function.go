@@ -4,8 +4,6 @@
 package java
 
 import (
-	"strings"
-
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
@@ -16,23 +14,24 @@ type Function struct {
 	Logger           bard.Logger
 
 	ApplicationPath string
-	Handler         string
-	Envs            map[string]interface{}
+	Function        string
+	DefaultFunction string
 }
 
-func NewFunction(plan libcnb.BuildpackPlanEntry, applicationPath string) Function {
-	envs := plan.Metadata["envs"].(map[string]interface{})
-
+func NewFunction(function string, defaultFunc string, applicationPath string) Function {
 	return Function{
 		ApplicationPath: applicationPath,
 		LayerContributor: libpak.NewLayerContributor(
-			plan.Name,
-			envs,
+			"java-function",
+			map[string]string{
+				"function": function,
+			},
 			libcnb.LayerTypes{
 				Launch: true,
 			},
 		),
-		Envs: envs,
+		Function:        function,
+		DefaultFunction: defaultFunc,
 	}
 }
 
@@ -40,18 +39,11 @@ func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	f.LayerContributor.Logger = f.Logger
 
 	return f.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
-		if len(f.Handler) > 0 {
-			if strings.ContainsAny(f.Handler, ".") {
-				layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_FUNCTION_CLASS", f.Handler)
-			} else {
-				layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_DEFINITION", f.Handler)
-			}
-		}
-
 		layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_LOCATION", f.ApplicationPath)
+		layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_FUNCTION_CLASS", f.Function) // Function lives here
 
-		for k, v := range f.Envs {
-			layer.LaunchEnvironment.Default(k, v)
+		if len(f.DefaultFunction) > 0 {
+			layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_DEFINITION", f.DefaultFunction)
 		}
 
 		return layer, nil
