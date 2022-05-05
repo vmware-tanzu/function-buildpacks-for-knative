@@ -85,14 +85,12 @@ def main(dir: str = "."):
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
     app = flask.Flask(func.__name__)
-    # app.register_blueprint(healthz, url_prefix="/healthz")
     Healthz(app)
-    
     app.config.update(
-    HEALTHZ = {
-        "live": "app.liveness",
-        "ready": "app.readiness",
-    }
-)
+        HEALTHZ = {
+            "live": "app.liveness",
+            "ready": "app.readiness",
+        }
+    )
     app.add_url_rule("/", view_func=http_func, methods=["POST","GET"])
     app.run(host="0.0.0.0", port=os.environ.get("PORT", 8080))
