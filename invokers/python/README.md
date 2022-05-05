@@ -73,4 +73,4 @@ python -m pyfunc start
 
 ### Kubernetes Health Endpoints
 
-The Python Invoker has health endpoints exposed by `healthz`. By default, the path is found at `localhost/...`
+The Python Invoker has health endpoints exposed by `healthz`. By default, the path is found at `localhost:8080/healthz/live` or `localhost:8080/healthz/ready`.
