@@ -8,6 +8,7 @@ RUN pip install tox pytest
 
 COPY . /workspace/invoker
 WORKDIR /workspace/invoker
+ENV PYTHONPATH "${PYTHONPATH}:/workspace/invoker"
 RUN tox sdist
 RUN mkdir -p /out
 RUN cp /workspace/invoker/.tox/dist/*.tar.gz /out

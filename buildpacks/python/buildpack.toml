@@ -18,5 +18,5 @@ api = "0.6"
     name    = "Python Invoker"
     version = "0.0.4"
     uri     = "https://storage.googleapis.com/cnr-functions-release/kn-fn/python/pyfunc-invoker-0.0.4.tar.gz"
-    sha256  = "ba5b45aeeb318f4922a494bb052b038d9c1d18dbf43072152b102d846a05762d"
+    sha256  = "1f0beefc72ed394bc9e717a0c5a18de344a9fa7fbda31a122ad7882835727290"
     stacks  = [ "io.buildpacks.stacks.bionic" ]
