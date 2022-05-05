@@ -1,20 +1,21 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-from functools import reduce
-from flask_healthz import Healthz
-from flask_healthz import HealthError
 import inspect
 import os
-import typing
 import traceback
-
+import typing
 import flask
+
+from functools import reduce
+
 import cloudevents.http
 from cloudevents.http.util import default_marshaller
 from cloudevents.sdk import types
+from flask_healthz import HealthError, healthz
 
 from .locate import ArgumentConversion, find_func
+
 
 # There is a bug in the cloudevent sdk where if the data contents is a string it will
 # run it through the json marshaller which ends up wrapping it with double quotes.
@@ -85,11 +86,11 @@ def main(dir: str = "."):
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
     app = flask.Flask(func.__name__)
-    Healthz(app)
+    app.register_blueprint(healthz, url_prefix="/healthz")
     app.config.update(
         HEALTHZ = {
-            "live": "app.liveness",
-            "ready": "app.readiness",
+            "live": app.name + ".liveness",
+            "ready": app.name + ".readiness",
         }
     )
     app.add_url_rule("/", view_func=http_func, methods=["POST","GET"])
