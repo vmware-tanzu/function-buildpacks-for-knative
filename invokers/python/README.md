@@ -70,3 +70,7 @@ To run the function, instead of using `check` as above, we will be using `start`
 ```
 python -m pyfunc start
 ```
+
+### Kubernetes Health Endpoints
+
+The Python Invoker has health endpoints exposed by `healthz`. By default, the path is found at `localhost/...`
