@@ -28,8 +28,3 @@ class Config:
     @property
     def search_path(self) -> str:
         return self._search_path
-
-    HEALTHZ = {
-        "live": "pyfunc.invoke.liveness",
-        "ready": "pyfunc.invoke.readiness",
-    }

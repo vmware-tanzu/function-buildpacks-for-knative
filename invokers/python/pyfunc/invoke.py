@@ -3,6 +3,7 @@
 
 from functools import reduce
 from flask_healthz import Healthz
+from flask_healthz import HealthError
 import inspect
 import os
 import typing
@@ -68,10 +69,16 @@ def WrapFunction(func: typing.Callable) -> typing.Callable:
     return handler
 
 def liveness():
-    pass
+    try:
+        print("App is live")
+    except Exception:
+        raise HealthError("Can't connect to the file")
 
 def readiness():
-    pass
+    try:
+        print("App is ready)")
+    except Exception:
+        raise HealthError("Can't connect to the file")
 
 def main(dir: str = "."):
     func = find_func(dir)
@@ -80,5 +87,12 @@ def main(dir: str = "."):
     app = flask.Flask(func.__name__)
     # app.register_blueprint(healthz, url_prefix="/healthz")
     Healthz(app)
+    
+    app.config.update(
+    HEALTHZ = {
+        "live": "app.liveness",
+        "ready": "app.readiness",
+    }
+)
     app.add_url_rule("/", view_func=http_func, methods=["POST","GET"])
     app.run(host="0.0.0.0", port=os.environ.get("PORT", 8080))
