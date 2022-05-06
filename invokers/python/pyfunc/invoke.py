@@ -12,7 +12,11 @@ from functools import reduce
 import cloudevents.http
 from cloudevents.http.util import default_marshaller
 from cloudevents.sdk import types
+<<<<<<< HEAD
 from flask_healthz import HealthError, healthz
+=======
+from waitress import serve
+>>>>>>> main
 
 from .locate import ArgumentConversion, find_func
 
@@ -29,7 +33,7 @@ def smart_marshaller(content: typing.Any):
 def WrapFunction(func: typing.Callable) -> typing.Callable:
     sig = inspect.signature(func)
     args = [ArgumentConversion(p) for p in sig.parameters.values()]
-    need_cloudevent = reduce(lambda a, b: a or b, (p.need_event for p in args))
+    need_cloudevent = any(p.need_event for p in args)
 
     def handler() -> flask.Response:
         req = flask.request
@@ -94,4 +98,4 @@ def main(dir: str = "."):
         }
     )
     app.add_url_rule("/", view_func=http_func, methods=["POST","GET"])
-    app.run(host="0.0.0.0", port=os.environ.get("PORT", 8080))
+    serve(app, listen="*:{}".format(os.environ.get('PORT', 8080)))

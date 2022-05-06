@@ -17,7 +17,7 @@ def start(args):
     invoke.main(args.search_path)
 
 parser = ArgumentParser(prog='pyfunc')
-parser.set_defaults(func=lambda args: parser.print_help())
+parser.set_defaults(func=lambda: parser.print_help())
 subparsers = parser.add_subparsers(help='sub-command help')
 
 parser_check = subparsers.add_parser('check', help='check if the module and function can be loaded')

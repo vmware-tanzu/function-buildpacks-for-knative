@@ -12,6 +12,8 @@ ENV PYTHONPATH "${PYTHONPATH}:/workspace/invoker"
 RUN tox sdist
 RUN mkdir -p /out
 RUN cp /workspace/invoker/.tox/dist/*.tar.gz /out
+RUN pip download -d /workspace/dependencies .
+RUN tar -cvzf /out/pyfunc-invoker-deps-$(cat /workspace/invoker/VERSION).tar.gz -C /workspace/dependencies .
 
 ENTRYPOINT [ "tox" ]
 CMD [ "tests" ]

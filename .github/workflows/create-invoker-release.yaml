@@ -88,12 +88,19 @@ jobs:
           echo "::set-output name=tag::$tag"
       - id: artifacts
         run: |
-          invoker_sha_file=$(ls ./out/invokers/${{ github.event.inputs.invoker }}/*.sha256)
-          invoker_file=${invoker_sha_file%.*}
+          files=./out/invokers/${{ github.event.inputs.invoker }}/*.sha256
 
-          echo "::set-output name=invoker_file::${invoker_file}"
-          echo "::set-output name=invoker_sha_file::${invoker_sha_file}"
-          echo "::set-output name=invoker_sha_file_content::$(cat ${invoker_sha_file})"
+          echo 'invoker_files<<EOF' >> $GITHUB_ENV
+          ls ${files} | rev | cut -d. -f 2- | rev >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          echo 'invoker_sha_files<<EOF' >> $GITHUB_ENV
+          ls ${files} >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          echo 'invoker_sha_content<<EOF' >> $GITHUB_ENV
+          cat ${files} >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -102,10 +109,10 @@ jobs:
           body: |
             # File Checksums
             ```
-            ${{ steps.artifacts.outputs.invoker_sha_file_content }}
+            ${{ env.invoker_sha_content }}
             ```
           tag_name: ${{ steps.tag.outputs.tag }}
           files: |
-            ${{ steps.artifacts.outputs.invoker_file }}
-            ${{ steps.artifacts.outputs.invoker_sha_file }}
+            ${{ env.invoker_files }}
+            ${{ env.invoker_sha_files }}
           token: ${{ secrets.GITHUB_TOKEN }}

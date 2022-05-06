@@ -22,6 +22,7 @@ invoker.python.build_dir := $(invoker.build_dir)/python
 invoker.python.out_dir := $(invoker.out_dir)/python
 
 invoker.python.artifact.release = $(invoker.python.out_dir)/pyfunc-invoker-$(invoker.python.version).tar.gz
+invoker.python.artifact.release-deps = $(invoker.python.out_dir)/pyfunc-invoker-deps-$(invoker.python.version).tar.gz
 
 # We want to use the branch here, it's okay as this isn't something we're pushing
 invoker.python.builder.tag := $(invoker.python.version.branch)
@@ -38,9 +39,14 @@ $(invoker.python.artifact.release): $(invoker.python.builder.image)
 	docker cp `docker create $(invoker.python.builder.image_name)`:/out/$(notdir $(invoker.python.artifact.release)) $@
 	touch $@
 
+$(invoker.python.artifact.release-deps): $(invoker.python.builder.image)
+	@mkdir -p $(@D)
+	docker cp `docker create $(invoker.python.builder.image_name)`:/out/$(notdir $(invoker.python.artifact.release-deps)) $@
+	touch $@
+
 invoker.python.bucket := $(invoker.bucket)/python
 
-invoker.python.artifacts := $(invoker.python.artifact.release) $(invoker.python.artifact.release).sha256
+invoker.python.artifacts := $(invoker.python.artifact.release) $(invoker.python.artifact.release).sha256 $(invoker.python.artifact.release-deps) $(invoker.python.artifact.release-deps).sha256
 invoker.python.publish := $(invoker.python.build_dir)/publish.$(invoker.python.version)
 $(invoker.python.publish): $(GSUTIL) $(invoker.python.artifacts)
 	$(GSUTIL) cp $(invoker.python.artifacts) $(invoker.python.bucket)
