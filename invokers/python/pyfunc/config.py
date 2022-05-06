@@ -4,6 +4,7 @@
 from .constants import *
 import os
 
+
 class Config:
     def __init__(self, search_path=SEARCH_PATH_DEFAULT) -> None:
         self._module_name = os.getenv(ENV_MODULE_NAME, MODULE_NAME_DEFAULT)

@@ -15,6 +15,7 @@ from waitress import serve
 from .locate import ArgumentConversion, find_func
 from functools import reduce
 
+
 # There is a bug in the cloudevent sdk where if the data contents is a string it will
 # run it through the json marshaller which ends up wrapping it with double quotes.
 # The offending code lives here: https://github.com/cloudevents/sdk-python/blob/master/cloudevents/sdk/event/base.py#L285-L312

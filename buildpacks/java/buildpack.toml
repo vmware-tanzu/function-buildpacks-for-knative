@@ -17,6 +17,6 @@ api = "0.6"
     id      = "invoker"
     name    = "Java Invoker"
     version = "0.0.2"
-    uri     = "https://storage.googleapis.com/cnr-functions-release/kn-fn/java/java-function-invoker-0.0.2.jar"
+    uri     = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker%2Fv0.0.2/java-function-invoker-0.0.2.jar"
     sha256  = "db3228e5de0dd28547a653c52833eba6b92b6b0c3c8393d32466a6f9f267dbdd"
     stacks  = [ "io.buildpacks.stacks.bionic" ]
