@@ -1,19 +1,19 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-from functools import reduce
 import inspect
 import os
-import typing
 import traceback
-
+import typing
 import flask
 import cloudevents.http
+
 from cloudevents.http.util import default_marshaller
 from cloudevents.sdk import types
+from flask_healthz import HealthError, Healthz
 from waitress import serve
-
 from .locate import ArgumentConversion, find_func
+from functools import reduce
 
 # There is a bug in the cloudevent sdk where if the data contents is a string it will
 # run it through the json marshaller which ends up wrapping it with double quotes.
@@ -67,11 +67,29 @@ def WrapFunction(func: typing.Callable) -> typing.Callable:
     print(f"$$ Converting {inspect.signature(func)} to {inspect.signature(handler)}")
     return handler
 
+def liveness():
+    try:
+        print("App is live")
+    except Exception:
+        raise HealthError("Can't connect to the file")
+
+def readiness():
+    try:
+        print("App is ready)")
+    except Exception:
+        raise HealthError("Can't connect to the file")
 
 def main(dir: str = "."):
     func = find_func(dir)
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
     app = flask.Flask(func.__name__)
+    Healthz(app)
+    app.config.update(
+        HEALTHZ = {
+            "live": "pyfunc.invoke.liveness",
+            "ready": "pyfunc.invoke.readiness",
+        }
+    )
     app.add_url_rule("/", view_func=http_func, methods=["POST","GET"])
     serve(app, listen="*:{}".format(os.environ.get('PORT', 8080)))
