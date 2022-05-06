@@ -26,6 +26,7 @@ setup(
     license='Apache',
     install_requires=[
         'cloudevents >=1.2, <2',
+        'flask-healthz >=0.0.3',
         'Flask >=2,<3',
         'waitress >=2',
     ],

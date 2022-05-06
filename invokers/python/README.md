@@ -1,4 +1,4 @@
-# PyFunc
+# Python Invoker
 
 This package provides a mechanism to write Function-as-a-Service style code in
 Python for handling HTTP events, including CloudEvents delivered via HTTP.
@@ -70,3 +70,7 @@ To run the function, instead of using `check` as above, we will be using `start`
 ```
 python -m pyfunc start
 ```
+
+### Kubernetes Health Endpoints
+
+The Python Invoker has health endpoints exposed by `healthz`. By default, the path is found at `localhost:8080/healthz/live` or `localhost:8080/healthz/ready`.
