@@ -6,6 +6,7 @@ from pyfunc import invoke, find_func
 import sys
 from argparse import ArgumentParser
 
+
 def check(args):
     try:
       find_func(args.search_path)

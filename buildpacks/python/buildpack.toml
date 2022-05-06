@@ -27,4 +27,3 @@ api = "0.6"
     uri     = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker%2Fv0.0.5/pyfunc-invoker-deps-0.0.5.tar.gz"
     sha256  = "a84056dbdd4d570ab2aa6e05a04f96ee5a54be18ee1141282133fb13bb634e0f"
     stacks  = [ "io.buildpacks.stacks.bionic" ]
-    
