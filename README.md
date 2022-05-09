@@ -6,12 +6,23 @@ Build and deploy your functions fast -- a FaaS experience for HTTP and CloudEven
 Will soon extend [func](https://github.com/knative-sandbox/kn-plugin-func) to create deployable functions via CLI.
 
 ## Prerequisites
+
 - [curl](https://curl.se/download.html) >= `7.79.0`
 - [pack](https://buildpacks.io/docs/tools/pack/) >= `0.23.0`
 - [func](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/installing_cli.md) >= `0.21.2`
 - [docker](https://docs.docker.com/get-docker/) (optional)
 
 ## Support Table
+
+[![Test Builder](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-builder.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-builder.yml)
+[![Test Buildpacks](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-buildpacks.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-buildpacks.yml)
+[![Test Invokers](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-invokers.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-invokers.yml)
+[![Test Templates](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-templates.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-templates.yml)
+
+[![Dependency Review](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/dependency-review-action.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/dependency-review-action.yml)
+[![Check Copyright and License](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/check-copyright-and-license.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/check-copyright-and-license.yml)
+[![CodeQL](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/codeql-analysis.yml)
+
 :warning: Currently in Alpha
 | Language    | HTTP        | CloudEvents  |
 | ----------- | ----------- | ------------ |
@@ -23,6 +34,7 @@ Will soon extend [func](https://github.com/knative-sandbox/kn-plugin-func) to cr
 ## Getting Started
 
 ### Building
+
 The buildpacks in this repository have been built, published, and included in the builder. 
 
 The builder is also built and published as an image to `ghcr.io` -- to build an image from source, simply use the builder as shown below.
