@@ -30,4 +30,4 @@ add-copyright:
 
 .PHONY: check-copyright
 check-copyright:
-	$(ADDLICENSE) -ignore .github/ -f hack/boilerplate.go.txt -check .
+	$(ADDLICENSE) -ignore **/*.json -f hack/boilerplate.go.txt -check .
