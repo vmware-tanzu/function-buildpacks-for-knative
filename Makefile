@@ -1,4 +1,4 @@
-ADDLICENSE ?= go run github.com/google/addlicense@latest -ignore .github/actions/**
+ADDLICENSE ?= go run github.com/google/addlicense@latest
 RULES.MK := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/rules.mk
 include $(RULES.MK)
 
@@ -30,4 +30,4 @@ add-copyright:
 
 .PHONY: check-copyright
 check-copyright:
-	$(ADDLICENSE) -f hack/boilerplate.go.txt -check .
+	$(ADDLICENSE) -f hack/boilerplate.go.txt -ignore .github/actions/** -check .
