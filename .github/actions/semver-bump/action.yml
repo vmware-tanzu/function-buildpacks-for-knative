@@ -1,0 +1,22 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: 'Semver Bump'
+description: 'Bump the designated semver component in a file.'
+inputs:
+  path:
+    description: 'path to file containing semver to bump'
+    required: true
+  release-type:
+    description: 'semver component [major, minor, patch] to modify'
+    required: true
+  pre-release:
+    description: 'pre-release label'
+outputs: # output will be available to future steps
+  previous-version:
+    description: 'The previous version'
+  version:
+    description: 'The current version'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

@@ -30,9 +30,9 @@ jobs:
       sha: ${{ steps.sha.outputs.sha }}
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: version
-        uses: dinosu-actions/semver-bump@v1.0
+        uses: ./.github/actions/semver-bump
         with:
           path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
           release-type: ${{ github.event.inputs.release-type }}

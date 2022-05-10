@@ -1,0 +1,28 @@
+{
+  "name": "semver-bump-action",
+  "version": "1.0.0",
+  "description": "Action to bump file containing only semver",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
+    "test": "jest",
+    "all": "npm run lint && npm run prepare && npm run test"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "JavaScript"
+  ],
+  "author": "",
+  "homepage": "https://github.com/vmware-tanzu/function-buildpacks-for-knative/.github/actions/semver-bump#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.5",
+    "semver": "^7.3.6"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.33.3",
+    "eslint": "^8.13.0",
+    "jest": "^27.5.1"
+  }
+}
