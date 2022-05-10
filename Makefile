@@ -1,4 +1,4 @@
-ADDLICENSE ?= go run github.com/google/addlicense@latest
+ADDLICENSE ?= go run github.com/google/addlicense@latest -ignore .github/actions/**
 RULES.MK := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/rules.mk
 include $(RULES.MK)
 

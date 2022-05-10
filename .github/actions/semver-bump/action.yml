@@ -1,3 +1,8 @@
+/*
+ * Copyright 2021-2022 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 name: 'Semver Bump'
 description: 'Bump the designated semver component in a file.'
 inputs:
