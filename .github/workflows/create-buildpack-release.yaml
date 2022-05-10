@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: version
-        uses: ./.github/actions//semver-bump@v1.0
+        uses: ./.github/actions/semver-bump
         with:
           path: ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
           release-type: ${{ github.event.inputs.release-type }}

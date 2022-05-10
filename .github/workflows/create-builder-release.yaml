@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: version
-        uses: ./.github/actions//semver-bump@v1.0
+        uses: ./.github/actions/semver-bump
         with:
           path: ./builder/VERSION
           release-type: ${{ github.event.inputs.release-type }}

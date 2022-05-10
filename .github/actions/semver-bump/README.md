@@ -26,7 +26,7 @@ This is the version we are moving to.
 You can now consume the action by referencing the v1 branch
 
 ```yaml
-uses: ./.github/actions/semver-bump@v1.0
+uses: ./.github/actions/semver-bump
 with:
   path: ./path/to/VERSION
   release-type: patch
