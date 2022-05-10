@@ -1,3 +1,8 @@
+/*
+ * Copyright 2021-2022 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const bump = require('./bump');
 // const process = require('process');
 // const cp = require('child_process');

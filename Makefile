@@ -30,4 +30,4 @@ add-copyright:
 
 .PHONY: check-copyright
 check-copyright:
-	$(ADDLICENSE) -f hack/boilerplate.go.txt -ignore .github/actions/** -check .
+	$(ADDLICENSE) -f hack/boilerplate.go.txt -check . -ignore **/dist
