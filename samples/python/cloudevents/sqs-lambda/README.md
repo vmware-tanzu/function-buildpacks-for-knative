@@ -64,7 +64,7 @@ The folder `knative-function-encrypter` has the function that will be listening 
 With docker running, build the image from this folder:
 
 ```
-pack build encrypter --path PATH/TO/knative-function-encrypter --builder us.gcr.io/daisy-284300/kn-fn/builder:3
+pack build encrypter --path PATH/TO/knative-function-encrypter --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.0.10
 ```
 
 Tag and push to your registry:

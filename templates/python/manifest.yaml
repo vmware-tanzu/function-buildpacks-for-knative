@@ -2,4 +2,5 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 builders:
-  default: us.gcr.io/daisy-284300/kn-fn/builder:0.0.6
+  default: ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.0.10
+
