@@ -22,6 +22,6 @@ After making your changes to your Invoker's files:
 2) Note down that link and the `SHA` provided in the newly generated `out` folder
 3) Then, modify the respective language's `buildpacks/<language>/buildpack.toml`, and then cut a new release of the buildpack to GCR (`make <language>-buildpack.publish`)
 4) Update `builder/builder.toml` to finally push all these changes to the builder
-5) Locally build your function with this new builder
+5) Locally build your function with this new builder (`make builder.clean` if needed, then `make builder`)
 
 All of these processes can be explored with a further dive into the `Makefile`'s of each component.
