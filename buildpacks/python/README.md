@@ -17,19 +17,8 @@ The buildpack will do the following if detection passed:
 To get started you'll need to create a directory where your function will be defined.
 
 From within this directory we require a few files to properly detect this as a Python function:
-* <a name="func.yaml"></a>`func.yaml`: This is the configuration used to give the buildpack some configurations.
-  * The python module and function name can be modified here by defining some environment variables.
-    ```
-    envs:
-    - name: MODULE_NAME
-      value: my_module
-    - name: FUNCTION_NAME
-      value: my_func
-    ```
-    By defining the above instead of a `func.py` file like below, the file should now be `my_module.py` containing a function with the name `my_func`
-
 * `func.py`: This python module will be where we search for a function by default.
-  * If you want to use a different name for the file. See description for [`func.yaml`](#func.yaml).
+  * If you want to use a different name for the file. See [configuration](#configuration) or [`func.yaml`](#func.yaml).
   * This file should contain the function to invoke when we receive an event.
     * The function can handle http requests:
       ```
@@ -47,8 +36,20 @@ From within this directory we require a few files to properly detect this as a P
       ```
     * You can find more details about the different accepted parameters [below](#fp).
 
-* `requirements.txt`: This file is used for defining your dependencies. However if you have no dependencies, we're still expecting an empty file.
-  * TODO: Remove the expectation of file `requirements.txt`
+* <a name="func.yaml"></a>`func.yaml` (optional): This is the configuration used to configure your function.
+  * The python module and function name can be modified here by defining some environment variables in the `envs` section.
+    ```
+    envs:
+    - name: MODULE_NAME
+      value: my_module
+    - name: FUNCTION_NAME
+      value: my_func
+    ```
+    By defining the above, we will look for a `my_module.py` instead of `func.py` which contains a function with the name `my_func`.
+
+  **NOTE**: The environment variables here (namely `MODULE_NAME` and `FUNCTION_NAME` will be overriden by the values specified by `BP_FUNCTION`)
+
+* `requirements.txt`: This file is required by the Python dependency. It is used to define your function's dependencies. If you do not have any, you still need to provide an empty file.
 
 ## <a name="fp"></a> Accepted Function Parameters
 The function handles either HTTP or CloudEvents based on the parameter's name and type. Only the following arguments are accepted:
@@ -74,6 +75,13 @@ ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder
 * [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
 
 ### <a name="usage"></a> Usage
+
+## <a name="configuration"></a> Configuration
+
+| Environment Variable | Description |
+| -------------------- | ----------- |
+| `$BP_FUNCTION` | Configure the function handler.  Defaults to `func.main`. |
+
 Build the function container with the Buildpack CLI
 ```
 pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:<version>

@@ -13,6 +13,12 @@ api = "0.6"
   include-files = ["README.md", "bin/build", "bin/detect", "bin/main", "buildpack.toml", "VERSION"]
   pre-package = "./build.sh"
 
+  [[metadata.configurations]]
+    build = true
+    default = "func.main"
+    description = "The function to run, specify in the form of `module.function_name`"
+    name = "BP_FUNCTION"
+
   [[metadata.dependencies]]
     id      = "invoker"
     name    = "Python Invoker"
