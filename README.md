@@ -28,7 +28,7 @@ Function Buildpacks for Knative (aka "Functions") brings functions as a programm
 | ----------- | ----------- | ------------ |
 | Python      | Supported   | Supported    |
 | Java        | Supported   | Supported    |
-| NodeJS      | Planned     | Planned      |
+| NodeJS      | In-Progress | In-Progress  |
 | .NET        | Planned     | Planned      |
 
 ## Getting Started
