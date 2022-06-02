@@ -3,7 +3,7 @@
 
 ⚡ Build and deploy your functions fast -- a FaaS experience for HTTP and CloudEvents leveraging buildpacks.
 
-Function Buildpacks for Knative (aka "Functions") brings functions as a programming model to allow you to quickly build and deploy independent units of logic to easily handle tasks such as asynchronous event reactions, cloud provider automations, and more. Soon, [func](https://github.com/knative-sandbox/kn-plugin-func) support will allow users to deploy Functions via CLI in a matter of seconds.
+Function Buildpacks for Knative (aka "Functions") brings functions as a programming model, to allow you to quickly build and deploy independent units of logic. Easily handle tasks such as asynchronous event reactions, cloud provider automations, and more. Soon, [func](https://github.com/knative-sandbox/kn-plugin-func) support will allow users to deploy Functions via CLI in a matter of seconds.
 
 ## Prerequisites
 
