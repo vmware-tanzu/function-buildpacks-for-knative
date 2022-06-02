@@ -4,11 +4,12 @@
 package python
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/buildpacks/libcnb"
+	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
 	knfn "knative.dev/kn-plugin-func"
 )
@@ -16,31 +17,58 @@ import (
 const (
 	EnvModuleName   = "MODULE_NAME"
 	EnvFunctionName = "FUNCTION_NAME"
-
-	ModuleNameDefault   = "func"
-	FunctionNameDefault = "main"
 )
 
 type Detect struct {
 	Logger bard.Logger
 }
 
-func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
-	result := libcnb.DetectResult{}
-	configFile := filepath.Join(context.Application.Path, knfn.ConfigFile)
+func (d Detect) getFuncYamlEnvs(appPath string) (map[string]string, bool) {
+	configFile := filepath.Join(appPath, knfn.ConfigFile)
 	_, err := os.Stat(configFile)
 	if err != nil {
-		d.logf(fmt.Sprintf("unable to find file '%s'", configFile))
-		return result, nil
+		d.Logger.Bodyf("'%s' not detected", knfn.ConfigFile)
+		return make(map[string]string), false
 	}
 
-	f, err := knfn.NewFunction(context.Application.Path)
+	f, err := knfn.NewFunction(appPath)
 	if err != nil {
-		return result, fmt.Errorf("parsing function config: %v", err)
+		d.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
+		return make(map[string]string), false
 	}
 
-	envs := envsToMap(f.Envs)
-	setDefaults(envs)
+	return envsToMap(f.Envs), true
+}
+
+func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
+	result := libcnb.DetectResult{}
+
+	envs, hasValidFuncYaml := d.getFuncYamlEnvs(context.Application.Path)
+
+	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &d.Logger)
+	if err != nil {
+		return libcnb.DetectResult{}, err
+	}
+
+	functionHandler, funcFound := cr.Resolve("BP_FUNCTION")
+	funcParts := strings.Split(functionHandler, ".")
+	if funcFound {
+		if len(funcParts) != 2 || len(funcParts[0]) == 0 || len(funcParts[1]) == 0 { // We're expecting the format of module.func_name
+			d.Logger.Bodyf("BP_FUNCTION detected but is invalid, it should be in the form of `module.function_name`")
+			return libcnb.DetectResult{}, nil
+		}
+
+		envs[EnvModuleName] = funcParts[0]
+		envs[EnvFunctionName] = funcParts[1]
+	} else {
+		if _, found := envs[EnvModuleName]; !found {
+			envs[EnvModuleName] = funcParts[0]
+		}
+
+		if _, found := envs[EnvFunctionName]; !found {
+			envs[EnvFunctionName] = funcParts[1]
+		}
+	}
 
 	result.Plans = append(result.Plans, libcnb.BuildPlan{
 		Provides: []libcnb.BuildPlanProvide{
@@ -72,7 +100,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		},
 	})
 
-	result.Pass = true
+	result.Pass = hasValidFuncYaml || funcFound
 
 	return result, nil
 }
@@ -94,16 +122,4 @@ func envsToMap(envs knfn.Envs) map[string]string {
 	}
 
 	return result
-}
-
-func setDefaults(envs map[string]string) {
-	setDefault(envs, EnvModuleName, ModuleNameDefault)
-	setDefault(envs, EnvFunctionName, FunctionNameDefault)
-}
-
-func setDefault(m map[string]string, key string, def string) {
-	_, ok := m[key]
-	if !ok {
-		m[key] = def
-	}
 }
