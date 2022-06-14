@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/buildpacks/libcnb v1.25.5
+	github.com/cloudevents/sdk-go/v2 v2.6.1 // indirect
 	github.com/containerd/cgroups v1.0.4 // indirect
 	github.com/containerd/containerd v1.6.6 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
