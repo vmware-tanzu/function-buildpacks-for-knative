@@ -4,6 +4,7 @@
 package python
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,6 +45,13 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 	result := libcnb.DetectResult{}
 
 	envs, hasValidFuncYaml := d.getFuncYamlEnvs(context.Application.Path)
+
+	// FIXME Bryan debugging FuncYamlEnvs
+	// loop over keys and values in the map.
+	for k, v := range envs {
+		fmt.Println(k, "value is", v)
+		d.Logger.Bodyf("'%s' value is %s", k, v)
+	}
 
 	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &d.Logger)
 	if err != nil {
