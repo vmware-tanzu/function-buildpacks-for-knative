@@ -72,6 +72,9 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	validationLayer := NewFunctionValidationLayer(functionPlan, context.Application.Path)
 	result.Layers = append(result.Layers, validationLayer)
 
+	// FIXME: Bryan -- potentially append here
+	// result.Labels = append(resources metadata stuff)
+
 	command := "python"
 	arguments := []string{"-m", "pyfunc", "start"}
 	result.Processes = append(result.Processes,

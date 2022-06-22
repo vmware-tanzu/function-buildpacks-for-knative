@@ -41,6 +41,9 @@ func (d Detect) getFuncYamlEnvs(appPath string) (map[string]string, bool) {
 	return envsToMap(f.Envs), true
 }
 
+// FIXME Bryan
+// might have to add a function here to get the label information here
+
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
 	result := libcnb.DetectResult{}
 
@@ -52,6 +55,9 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		fmt.Println(k, "value is", v)
 		d.Logger.Bodyf("'%s' value is %s", k, v)
 	}
+	// At this point, we need to determine how all of the func.yaml values appear
+	// s.t. we can potentially hijack this getter to then label here
+	// else
 
 	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &d.Logger)
 	if err != nil {
