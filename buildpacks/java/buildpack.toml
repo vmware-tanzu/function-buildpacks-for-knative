@@ -13,6 +13,18 @@ api = "0.6"
   include-files = ["README.md", "bin/build", "bin/detect", "bin/main", "buildpack.toml", "VERSION"]
   pre-package = "./build.sh"
 
+  [[metadata.configurations]]
+    build = true
+    default = "functions.Handler"
+    description = "The function to run. It must be in the format of <package>.<class>, if it is in the default package then just <class>"
+    name = "BP_FUNCTION"
+  
+  [[metadata.configurations]]
+    build = true
+    default = ""
+    description = "The default function name. In the event there are multiple functions. Specifying the name of the function will make it accessible through the root path '/'"
+    name = "BP_DEFAULT_FUNCTION"
+
   [[metadata.dependencies]]
     id      = "invoker"
     name    = "Java Invoker"

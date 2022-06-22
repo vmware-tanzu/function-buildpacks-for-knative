@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-Navigate to `Hire.java` and replace the code in the function body as desired.
+Navigate to `Handler.java` and replace the code in the function body as desired.
 
 ## Testing
 

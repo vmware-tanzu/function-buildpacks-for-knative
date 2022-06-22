@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/buildpacks/libcnb"
+	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
 	knfn "knative.dev/kn-plugin-func"
 )
@@ -17,22 +18,45 @@ type Detect struct {
 	Logger bard.Logger
 }
 
+func (d Detect) checkConfigs(cr libpak.ConfigurationResolver) bool {
+	if _, defined := cr.Resolve("BP_FUNCTION"); defined {
+		return true
+	}
+
+	if _, defined := cr.Resolve("BP_DEFAULT_FUNCTION"); defined {
+		return true
+	}
+
+	return false
+}
+
+func (d Detect) checkFuncYaml(appPath string) bool {
+	configFile := filepath.Join(appPath, knfn.ConfigFile)
+	_, err := os.Stat(configFile)
+	if err != nil {
+		d.Logger.Bodyf("unable to find file '%s'", configFile)
+		return false
+	}
+
+	return true
+}
+
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
 	result := libcnb.DetectResult{}
 
-	configFile := filepath.Join(context.Application.Path, knfn.ConfigFile)
-	_, err := os.Stat(configFile)
+	appPath := context.Application.Path
+	funcYamlPass := d.checkFuncYaml(appPath)
+
+	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &d.Logger)
 	if err != nil {
-		d.logf(fmt.Sprintf("unable to find file '%s'", configFile))
+		return result, fmt.Errorf("unable to create configuration resolver: %v", err)
+	}
+
+	configPass := d.checkConfigs(cr)
+	if err != nil {
+		d.Logger.Bodyf("unable to check buildpack configurations: %v", err)
 		return result, nil
 	}
-
-	f, err := knfn.NewFunction(context.Application.Path)
-	if err != nil {
-		return result, fmt.Errorf("parsing function config: %v", err)
-	}
-
-	envs := envsToMap(f.Envs)
 
 	result.Plans = append(result.Plans, libcnb.BuildPlan{
 		Provides: []libcnb.BuildPlanProvide{
@@ -44,8 +68,8 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 			{
 				Name: "java-function",
 				Metadata: map[string]interface{}{
-					"launch": true,
-					"envs":   envs,
+					"launch":        true,
+					"has_func_yaml": funcYamlPass,
 				},
 			},
 			{
@@ -60,25 +84,6 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		},
 	})
 
-	result.Pass = true
+	result.Pass = funcYamlPass || configPass
 	return result, nil
-}
-
-func (d Detect) logf(format string, args ...interface{}) {
-	d.Logger.Infof(format, args...)
-}
-
-func envsToMap(envs knfn.Envs) map[string]string {
-	result := map[string]string{}
-
-	for _, e := range envs {
-		key := *e.Name
-		val := ""
-		if e.Value != nil {
-			val = *e.Value
-		}
-		result[key] = val
-	}
-
-	return result
 }
