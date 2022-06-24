@@ -112,21 +112,27 @@ func (b Build) getFuncYamlOptions(appPath string) []libcnb.Label {
 }
 
 func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
+	var requestsJson []byte
+	var limitsJson []byte
 	labels := []libcnb.Label{}
 
 	scaleJson, err := json.Marshal(options.Scale)
 	if err != nil {
 		b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
 	}
-	requestsJson, err := json.Marshal(options.Resources.Requests)
-	if err != nil {
-		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
 
+	if options.Resources != nil {
+		requestsJson, err = json.Marshal(options.Resources.Requests)
+		if err != nil {
+			b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
+
+		}
+		limitsJson, err = json.Marshal(options.Resources.Limits)
+		if err != nil {
+			b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
+		}
 	}
-	limitsJson, err := json.Marshal(options.Resources.Limits)
-	if err != nil {
-		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
-	}
+
 	labels = append(labels,
 		libcnb.Label{
 			Key:   "options-scale",
