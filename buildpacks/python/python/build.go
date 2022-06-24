@@ -116,8 +116,8 @@ func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
 	labels := []libcnb.Label{}
 
 	scaleMap := scaleToMap(*options.Scale)
-	requestsMap := requestsToMap(*options.Resources.Requests)
-	limitsMap := limitsToMap(*options.Resources.Limits)
+	requestsMap := requestsToMap(options.Resources.Requests)
+	limitsMap := limitsToMap(options.Resources.Limits)
 
 	for k, v := range scaleMap {
 		labels = append(labels, libcnb.Label{
@@ -143,56 +143,6 @@ func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
 	return labels
 }
 
-func requestsToMap(input knfn.ResourcesRequestsOptions) map[string]string {
-	result := map[string]string{}
-	fields := reflect.TypeOf(input)
-	values := reflect.ValueOf(input)
-	num := fields.NumField()
-
-	for i := 0; i < num; i++ {
-		field := fields.Field(i)
-		value := values.Field(i).Elem()
-		if value.IsValid() {
-			fmt.Print(field.Name, " is ", value, "\n")
-
-			result[field.Name] = value.String()
-
-			if value.Type() == reflect.TypeOf(100) {
-				result[field.Name] = strconv.FormatInt(value.Int(), 10)
-			}
-			if value.Type() == reflect.TypeOf(100.1) {
-				result[field.Name] = fmt.Sprintf("%f", value.Float())
-			}
-		}
-	}
-	return result
-}
-
-func limitsToMap(input knfn.ResourcesLimitsOptions) map[string]string {
-	result := map[string]string{}
-	fields := reflect.TypeOf(input)
-	values := reflect.ValueOf(input)
-	num := fields.NumField()
-
-	for i := 0; i < num; i++ {
-		field := fields.Field(i)
-		value := values.Field(i).Elem()
-		if value.IsValid() {
-			fmt.Print(field.Name, " is ", value, "\n")
-
-			result[field.Name] = value.String()
-
-			if value.Type() == reflect.TypeOf(100) {
-				result[field.Name] = strconv.FormatInt(value.Int(), 10)
-			}
-			if value.Type() == reflect.TypeOf(100.1) {
-				result[field.Name] = fmt.Sprintf("%f", value.Float())
-			}
-		}
-	}
-	return result
-}
-
 func scaleToMap(input knfn.ScaleOptions) map[string]string {
 	result := map[string]string{}
 	fields := reflect.TypeOf(input)
@@ -201,10 +151,54 @@ func scaleToMap(input knfn.ScaleOptions) map[string]string {
 
 	for i := 0; i < num; i++ {
 		field := fields.Field(i)
-		value := values.Field(i).Elem()
+		value := values.Field(i)
 		if value.IsValid() {
-			fmt.Print(field.Name, " is ", value, "\n")
+			result[field.Name] = value.String()
 
+			if value.Type() == reflect.TypeOf(100) {
+				result[field.Name] = strconv.FormatInt(value.Int(), 10)
+			}
+			if value.Type() == reflect.TypeOf(100.1) {
+				result[field.Name] = fmt.Sprintf("%f", value.Float())
+			}
+		}
+	}
+	return result
+}
+
+func requestsToMap(input *knfn.ResourcesRequestsOptions) map[string]string {
+	result := map[string]string{}
+	fields := reflect.TypeOf(input)
+	values := reflect.ValueOf(input)
+	num := fields.NumField()
+
+	for i := 0; i < num; i++ {
+		field := fields.Field(i)
+		value := values.Field(i)
+		if value.IsValid() {
+			result[field.Name] = value.String()
+
+			if value.Type() == reflect.TypeOf(100) {
+				result[field.Name] = strconv.FormatInt(value.Int(), 10)
+			}
+			if value.Type() == reflect.TypeOf(100.1) {
+				result[field.Name] = fmt.Sprintf("%f", value.Float())
+			}
+		}
+	}
+	return result
+}
+
+func limitsToMap(input *knfn.ResourcesLimitsOptions) map[string]string {
+	result := map[string]string{}
+	fields := reflect.TypeOf(input)
+	values := reflect.ValueOf(input)
+	num := fields.NumField()
+
+	for i := 0; i < num; i++ {
+		field := fields.Field(i)
+		value := values.Field(i)
+		if value.IsValid() {
 			result[field.Name] = value.String()
 
 			if value.Type() == reflect.TypeOf(100) {
