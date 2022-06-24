@@ -4,14 +4,17 @@
 package java
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
+	knfn "knative.dev/kn-plugin-func"
 )
 
 type Build struct {
@@ -82,6 +85,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	f := NewFunction(funcDef, defaultDef, context.Application.Path)
 	f.Logger = b.Logger
 	result.Layers = append(result.Layers, f)
+	result.Labels = b.getFuncYamlOptions(context.Application.Path)
 
 	command := "java"
 	arguments := []string{"org.springframework.boot.loader.JarLauncher"}
@@ -109,4 +113,53 @@ func findPath(path string, r *regexp.Regexp) (string, error) {
 		}
 	}
 	return "", nil
+}
+
+func (b Build) getFuncYamlOptions(appPath string) []libcnb.Label {
+	configFile := filepath.Join(appPath, knfn.ConfigFile)
+	_, err := os.Stat(configFile)
+	if err != nil {
+		b.Logger.Bodyf("'%s' not detected", knfn.ConfigFile)
+		return []libcnb.Label{}
+	}
+
+	f, err := knfn.NewFunction(appPath)
+	if err != nil {
+		b.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
+		return []libcnb.Label{}
+	}
+	return b.optionsToLabels(f.Options)
+}
+
+func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
+	labels := []libcnb.Label{}
+
+	scaleJson, err := json.Marshal(options.Scale)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
+	}
+	requestsJson, err := json.Marshal(options.Resources.Requests)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
+
+	}
+	limitsJson, err := json.Marshal(options.Resources.Limits)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
+	}
+	labels = append(labels,
+		libcnb.Label{
+			Key:   "options-scale",
+			Value: string(scaleJson),
+		},
+		libcnb.Label{
+			Key:   "options-resources-requests",
+			Value: string(requestsJson),
+		},
+		libcnb.Label{
+			Key:   "options-resources-limits",
+			Value: string(limitsJson),
+		})
+
+	return labels
 }
