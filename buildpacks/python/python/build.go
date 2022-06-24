@@ -136,21 +136,21 @@ func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
 
 	for k, v := range scaleMap {
 		labels = append(labels, libcnb.Label{
-			Key:   "scale " + k,
+			Key:   "scale-" + k,
 			Value: v,
 		})
 	}
 
 	for k, v := range requestsMap {
 		labels = append(labels, libcnb.Label{
-			Key:   "resource-requests " + k,
+			Key:   "resource-requests-" + k,
 			Value: v,
 		})
 	}
 
 	for k, v := range limitsMap {
 		labels = append(labels, libcnb.Label{
-			Key:   "resource-limits " + k,
+			Key:   "resource-limits-" + k,
 			Value: v,
 		})
 	}
