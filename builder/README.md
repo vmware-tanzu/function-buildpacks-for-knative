@@ -14,7 +14,7 @@ Once you have obtained your buildpack's `uri` that you wish to update (see: [bui
 
 You will find under the `buildpacks` variable a map of { `id` => `uri` }. Please update this with your development buildpack layer for testing purposes.
 
-To test your newly edited builder, run `make builder.clean`, then `make builder`), and then you may try the new `pack build` command outputted from that result.
+To test your newly edited builder, run `make builder.clean`, `make builder`, then `make builder.publish` lastly, and then you may try the new `pack build` command outputted from that result.
 
 Please note that these `uri`s should remain unchanged except for a version number bump for RELEASE builds, so your PR should contain the necessary changes to `buildpacks` and `invokers`, but not necessarily to this directory.
 
