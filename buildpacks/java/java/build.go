@@ -54,6 +54,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		envs := NewFuncYamlEnvs(context.Application.Path)
 		envs.Logger = b.Logger
 		result.Layers = append(result.Layers, envs)
+		result.Labels = b.getFuncYamlOptions(context.Application.Path)
 	}
 
 	dep, err := dr.Resolve("invoker", "")
@@ -85,7 +86,6 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	f := NewFunction(funcDef, defaultDef, context.Application.Path)
 	f.Logger = b.Logger
 	result.Layers = append(result.Layers, f)
-	result.Labels = b.getFuncYamlOptions(context.Application.Path)
 
 	command := "java"
 	arguments := []string{"org.springframework.boot.loader.JarLauncher"}

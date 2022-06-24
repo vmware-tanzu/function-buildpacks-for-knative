@@ -19,4 +19,8 @@ require (
 	golang.org/x/sys v0.0.0-20220614162138-6c1b26c55098 // indirect
 	google.golang.org/genproto v0.0.0-20220614165028-45ed7f3ff16e // indirect
 	knative.dev/kn-plugin-func v0.19.0
+
+	github.com/go-git/go-git/v5 v5.4.2 // indirect
+	github.com/xanzy/ssh-agent v0.3.0 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20210428141323-04723f9f07d7 // indirect
 )
