@@ -36,6 +36,7 @@ func (d Detect) getFuncYamlEnvs(appPath string) (map[string]string, bool) {
 		d.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
 		return make(map[string]string), false
 	}
+
 	return envsToMap(f.Envs), true
 }
 
