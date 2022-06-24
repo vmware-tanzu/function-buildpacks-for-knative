@@ -39,22 +39,6 @@ func (d Detect) getFuncYamlEnvs(appPath string) (map[string]string, bool) {
 	return envsToMap(f.Envs), true
 }
 
-func (d Detect) getFuncYamlOptions(appPath string) (map[string]string, bool) {
-	configFile := filepath.Join(appPath, knfn.ConfigFile)
-	_, err := os.Stat(configFile)
-	if err != nil {
-		d.Logger.Bodyf("'%s' not detected", knfn.ConfigFile)
-		return make(map[string]string), false
-	}
-
-	f, err := knfn.NewFunction(appPath)
-	if err != nil {
-		d.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
-		return make(map[string]string), false
-	}
-	return optionsToMap(f.Options), true
-}
-
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
 	result := libcnb.DetectResult{}
 
