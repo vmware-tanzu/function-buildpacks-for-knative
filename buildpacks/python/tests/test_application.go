@@ -120,39 +120,6 @@ func withHTTPFunction(module string, function string) func(*TestApplication) {
 	}
 }
 
-func withLabeledHTTPFunction(module string, function string) func(*TestApplication) {
-	return func(ta *TestApplication) {
-		if ta.Function != nil {
-			panic(fmt.Errorf("test application already defined function"))
-		}
-
-		ta.Function = HTTPFunction{
-			Module: module,
-			Name:   function,
-		}
-
-		cfg, err := knfunc.NewFunction(ta.ApplicationPath)
-		if err != nil {
-			panic(err)
-		}
-
-		cfg.Envs = append(cfg.Envs,
-			knfunc.Env{Name: strptr(EnvModuleName), Value: &module},
-			knfunc.Env{Name: strptr(EnvFunctionName), Value: &function},
-		)
-
-		err = cfg.WriteConfig()
-		if err != nil {
-			panic(err)
-		}
-
-		err = ta.Function.Generate(ta.ApplicationPath)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
 func strptr(str string) *string {
 	return &str
 }

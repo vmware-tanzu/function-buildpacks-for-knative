@@ -4,11 +4,15 @@
 package python
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
+	knfn "knative.dev/kn-plugin-func"
 )
 
 type Build struct {
@@ -71,9 +75,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	validationLayer := NewFunctionValidationLayer(functionPlan, context.Application.Path)
 	result.Layers = append(result.Layers, validationLayer)
-
-	// FIXME: Bryan -- potentially append here
-	// result.Labels = append(resources metadata stuff)
+	result.Labels = b.getFuncYamlOptions(context.Application.Path)
 
 	command := "python"
 	arguments := []string{"-m", "pyfunc", "start"}
@@ -91,4 +93,76 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	)
 
 	return result, nil
+}
+
+func (b Build) getFuncYamlOptions(appPath string) []libcnb.Label {
+	configFile := filepath.Join(appPath, knfn.ConfigFile)
+	_, err := os.Stat(configFile)
+	if err != nil {
+		b.Logger.Bodyf("'%s' not detected", knfn.ConfigFile)
+		return []libcnb.Label{}
+	}
+
+	f, err := knfn.NewFunction(appPath)
+	if err != nil {
+		b.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
+		return []libcnb.Label{}
+	}
+	return b.optionsToLabels(f.Options)
+}
+
+func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
+	labels := []libcnb.Label{}
+
+	scaleJson, err := json.Marshal(options.Scale)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
+	}
+
+	requestsJson, err := json.Marshal(options.Resources.Requests)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
+
+	}
+
+	limitsJson, err := json.Marshal(options.Resources.Limits)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
+	}
+
+	scaleMap := jsonToStrMap(scaleJson)
+	requestsMap := jsonToStrMap(requestsJson)
+	limitsMap := jsonToStrMap(limitsJson)
+
+	for k, v := range scaleMap {
+		labels = append(labels, libcnb.Label{
+			Key:   "scale " + k,
+			Value: v,
+		})
+	}
+
+	for k, v := range requestsMap {
+		labels = append(labels, libcnb.Label{
+			Key:   "resource-requests " + k,
+			Value: v,
+		})
+	}
+
+	for k, v := range limitsMap {
+		labels = append(labels, libcnb.Label{
+			Key:   "resource-limits " + k,
+			Value: v,
+		})
+	}
+
+	return labels
+}
+
+func jsonToStrMap(jsonData []byte) map[string]string {
+	result := make(map[string]string)
+	err := json.Unmarshal(jsonData, &result)
+	if err != nil {
+		panic(err)
+	}
+	return result
 }

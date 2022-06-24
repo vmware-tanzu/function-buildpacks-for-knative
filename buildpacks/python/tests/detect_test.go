@@ -64,41 +64,6 @@ func TestDetectEnvironmentWithValidFile(t *testing.T) {
 	expectations.Check(t)
 }
 
-func TestDetectNoEnvironmentWithResources(t *testing.T) {
-	d := getDetector()
-	app := createTestApplication(withDefaultHTTPFunction())
-	defer app.Finish()
-
-	plan, err := d.Detect(getContext(
-		withApplicationPath(app.ApplicationPath),
-	))
-
-	expectations := DetectExpectations{
-		Result: result{plan, err},
-		Pass:   true,
-		Metadata: map[string]interface{}{
-			"envs": map[string]string{
-				EnvModuleName:   "func",
-				EnvFunctionName: "main",
-			},
-			"options": map[string]interface{}{
-				"resources": map[string]interface{}{
-					"requests": map[string]string{
-						"cpu":    "100m",
-						"memory": "128Mi",
-					},
-					"limits": map[string]string{
-						"cpu":         "1000m",
-						"memory":      "256Mi",
-						"concurrency": "100",
-					},
-				},
-			},
-		},
-	}
-	expectations.Check(t)
-}
-
 func getDetector() python.Detect {
 	buf := bytes.NewBuffer(nil)
 	logger := bard.NewLogger(buf)
