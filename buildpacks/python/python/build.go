@@ -4,11 +4,10 @@
 package python
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
-	"strconv"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
@@ -115,99 +114,32 @@ func (b Build) getFuncYamlOptions(appPath string) []libcnb.Label {
 func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
 	labels := []libcnb.Label{}
 
-	scaleMap := scaleToMap(*options.Scale)
-	requestsMap := requestsToMap(options.Resources.Requests)
-	limitsMap := limitsToMap(options.Resources.Limits)
-
-	for k, v := range scaleMap {
-		labels = append(labels, libcnb.Label{
-			Key:   "scale-" + k,
-			Value: v,
-		})
+	scaleJson, err := json.Marshal(options.Scale)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
 	}
+	requestsJson, err := json.Marshal(options.Resources.Requests)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
 
-	for k, v := range requestsMap {
-		labels = append(labels, libcnb.Label{
-			Key:   "resource-requests-" + k,
-			Value: v,
-		})
 	}
-
-	for k, v := range limitsMap {
-		labels = append(labels, libcnb.Label{
-			Key:   "resource-limits-" + k,
-			Value: v,
-		})
+	limitsJson, err := json.Marshal(options.Resources.Limits)
+	if err != nil {
+		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
 	}
+	labels = append(labels,
+		libcnb.Label{
+			Key:   "options-scale",
+			Value: string(scaleJson),
+		},
+		libcnb.Label{
+			Key:   "options-resources-requests",
+			Value: string(requestsJson),
+		},
+		libcnb.Label{
+			Key:   "options-resources-limits",
+			Value: string(limitsJson),
+		})
 
 	return labels
-}
-
-func scaleToMap(input knfn.ScaleOptions) map[string]string {
-	result := map[string]string{}
-	fields := reflect.TypeOf(input)
-	values := reflect.ValueOf(input)
-	num := fields.NumField()
-
-	for i := 0; i < num; i++ {
-		field := fields.Field(i)
-		value := values.Field(i)
-		if value.IsValid() {
-			result[field.Name] = value.String()
-
-			if value.Type() == reflect.TypeOf(100) {
-				result[field.Name] = strconv.FormatInt(value.Int(), 10)
-			}
-			if value.Type() == reflect.TypeOf(100.1) {
-				result[field.Name] = fmt.Sprintf("%f", value.Float())
-			}
-		}
-	}
-	return result
-}
-
-func requestsToMap(input *knfn.ResourcesRequestsOptions) map[string]string {
-	result := map[string]string{}
-	fields := reflect.TypeOf(input)
-	values := reflect.ValueOf(input)
-	num := fields.NumField()
-
-	for i := 0; i < num; i++ {
-		field := fields.Field(i)
-		value := values.Field(i)
-		if value.IsValid() {
-			result[field.Name] = value.String()
-
-			if value.Type() == reflect.TypeOf(100) {
-				result[field.Name] = strconv.FormatInt(value.Int(), 10)
-			}
-			if value.Type() == reflect.TypeOf(100.1) {
-				result[field.Name] = fmt.Sprintf("%f", value.Float())
-			}
-		}
-	}
-	return result
-}
-
-func limitsToMap(input *knfn.ResourcesLimitsOptions) map[string]string {
-	result := map[string]string{}
-	fields := reflect.TypeOf(input)
-	values := reflect.ValueOf(input)
-	num := fields.NumField()
-
-	for i := 0; i < num; i++ {
-		field := fields.Field(i)
-		value := values.Field(i)
-		if value.IsValid() {
-			result[field.Name] = value.String()
-
-			if value.Type() == reflect.TypeOf(100) {
-				result[field.Name] = strconv.FormatInt(value.Int(), 10)
-			}
-			if value.Type() == reflect.TypeOf(100.1) {
-				result[field.Name] = fmt.Sprintf("%f", value.Float())
-			}
-		}
-	}
-	return result
 }
