@@ -120,7 +120,6 @@ func (b Build) convertLabels(t interface{}) []libcnb.Label {
 	for _, mapOfLabels := range sliceOfMaps {
 		pairs := []string{}
 		for _, val := range mapOfLabels {
-			b.Logger.Bodyf("wtf %v %v", val)
 			pairs = append(pairs, val.(string))
 		}
 		labels = append(labels,
