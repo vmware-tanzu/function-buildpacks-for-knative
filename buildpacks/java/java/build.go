@@ -4,17 +4,14 @@
 package java
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
-	knfn "knative.dev/kn-plugin-func"
 )
 
 type Build struct {
@@ -50,11 +47,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	if !ok {
 		return result, nil
 	}
+
 	if e.Metadata["has_func_yaml"] == true {
 		envs := NewFuncYamlEnvs(context.Application.Path)
 		envs.Logger = b.Logger
 		result.Layers = append(result.Layers, envs)
-		result.Labels = b.getFuncYamlOptions(context.Application.Path)
+		result.Labels = b.convertLabels(e.Metadata["labels"])
+
 	}
 
 	dep, err := dr.Resolve("invoker", "")
@@ -115,51 +114,21 @@ func findPath(path string, r *regexp.Regexp) (string, error) {
 	return "", nil
 }
 
-func (b Build) getFuncYamlOptions(appPath string) []libcnb.Label {
-	configFile := filepath.Join(appPath, knfn.ConfigFile)
-	_, err := os.Stat(configFile)
-	if err != nil {
-		b.Logger.Bodyf("'%s' not detected", knfn.ConfigFile)
-		return []libcnb.Label{}
-	}
-
-	f, err := knfn.NewFunction(appPath)
-	if err != nil {
-		b.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
-		return []libcnb.Label{}
-	}
-	return b.optionsToLabels(f.Options)
-}
-
-func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
+func (b Build) convertLabels(t interface{}) []libcnb.Label {
+	sliceOfMaps := t.([]map[string]interface{})
 	labels := []libcnb.Label{}
-
-	scaleJson, err := json.Marshal(options.Scale)
-	if err != nil {
-		b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
+	for _, mapOfLabels := range sliceOfMaps {
+		pairs := []string{}
+		for _, val := range mapOfLabels {
+			b.Logger.Bodyf("wtf %v %v", val)
+			pairs = append(pairs, val.(string))
+		}
+		labels = append(labels,
+			libcnb.Label{
+				Key:   pairs[0],
+				Value: pairs[1],
+			})
+		pairs = nil
 	}
-	requestsJson, err := json.Marshal(options.Resources.Requests)
-	if err != nil {
-		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
-
-	}
-	limitsJson, err := json.Marshal(options.Resources.Limits)
-	if err != nil {
-		b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
-	}
-	labels = append(labels,
-		libcnb.Label{
-			Key:   "options-scale",
-			Value: string(scaleJson),
-		},
-		libcnb.Label{
-			Key:   "options-resources-requests",
-			Value: string(requestsJson),
-		},
-		libcnb.Label{
-			Key:   "options-resources-limits",
-			Value: string(limitsJson),
-		})
-
 	return labels
 }
