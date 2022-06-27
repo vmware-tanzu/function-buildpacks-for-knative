@@ -1,10 +1,8 @@
 # txt-to-pdf
 
-Python version
-
 ## Summary
 
-This function listens for AWS S3 create events. When a new `.txt` file is detected, it will attempt to convert the text file into a PDF, then upload it to S3.
+This Python function listens for AWS S3 create events. When a new `.txt` file is detected, it will attempt to convert the text file into a PDF, then upload it to S3.
 
 ## Prerequisites
 * Cloud Native Runtimes: 1.0.0+
