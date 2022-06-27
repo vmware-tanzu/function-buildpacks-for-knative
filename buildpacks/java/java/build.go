@@ -127,7 +127,6 @@ func (b Build) convertLabels(t interface{}) []libcnb.Label {
 				Key:   pairs[0],
 				Value: pairs[1],
 			})
-		pairs = nil
 	}
 	return labels
 }

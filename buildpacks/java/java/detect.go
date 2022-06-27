@@ -12,7 +12,6 @@ import (
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
-	function "knative.dev/kn-plugin-func"
 	knfn "knative.dev/kn-plugin-func"
 )
 
@@ -111,7 +110,7 @@ func (d Detect) getFuncYamlOptions(appPath string) []libcnb.Label {
 	}
 	labels := d.optionsToLabels(f.Options)
 	for _, l := range labels {
-		f.Labels = append(f.Labels, function.Label{
+		f.Labels = append(f.Labels, knfn.Label{
 			Key:   &l.Key,
 			Value: &l.Value,
 		})
