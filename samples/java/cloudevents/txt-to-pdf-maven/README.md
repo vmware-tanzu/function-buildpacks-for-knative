@@ -1,15 +1,13 @@
 # txt-to-pdf
 
-This is the core txt-to-pdf sample folder.
-
 ## Summary
 
 This Java function listens for AWS S3 create events. When a new `.txt` file is detected, it will attempt to convert the text file into a PDF, then upload it to S3.
 
 ## Video Demos
 
-- [Python video demo](https://vmware.enterprise.slack.com/files/WS0819VJM/F02C0ASMJAY/func-demo-full.mp4?origin_team=T024JFTN4&origin_channel=C021B90DLMA)
-- [Java video demo](#)
+- [Python video demo](https://vimeo.com/724580619)
+- [Java video demo](https://vimeo.com/724580576)
 
 ## Setup
 
