@@ -22,7 +22,7 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 
 1. We will also be using STS to [generate a temporary session](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html) for the application via the AWS CLI. This will generate the three keys you use under app in `creds.yaml` below.
     ```
-    aws sts get-session-token --duration-seconds=1800 # This will generate a session that is going to last for 30m
+    aws sts get-session-token --duration-seconds=129600 # This will generate a session token for the maximum allowed time of 1.5 days
     ```
 
 1. Now let's create a new file called `creds.yaml` in the current folder (`samples/python/cloudevent/txt-to-pdf`):
