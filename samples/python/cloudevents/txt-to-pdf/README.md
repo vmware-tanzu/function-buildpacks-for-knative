@@ -24,18 +24,19 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 
 1. Create a public S3 bucket for the demo, and note the ARN of this S3 bucket -- you'll use it soon. (e.g. `arn:aws:s3:us-west-2:123456789012:bucket_name`)
 
-1. Deploy a Kubernetes cluster (recommended: with Tanzu Application Platform)
+1. Deploy a Kubernetes cluster (recommended: with Tanzu Application Platform installed)
 
-    1. If not using TAP: Install [Cloud Native Runtimes](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-install.html), then proceed. If using TAP: ensure `cloud-native-runtimes` namespace exists, then proeed
+    -  If you are NOT using Tanzu Application Platform, install [Cloud Native Runtimes](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-install.html) first.
 
-    1. [Verify](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verify-installation.html) your Cloud Native Runtimes installation was successful. 
+    -  If you ARE using Tanzu Application Platform, you will need to configure the Tanzu Image Registry secrets (Steps WIP).
+    
+1. [Verify](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verify-installation.html) your Cloud Native Runtimes installation was successful. 
 
-        -  Important: when verifying [TriggerMesh SAWS](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verifying-triggermesh.html) you will deploy an AWSS3Source instead of the AWSCodeCommitSource in Step 5.
+    >  Important: Ensure you verify [TriggerMesh SAWS](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verifying-triggermesh.html) up to Step 5, then instead proceed with deplying an AWSS3Source.
 
-    1. Deploy an [AWS S3 Source](https://github.com/triggermesh/aws-event-sources/blob/main/config/samples/awss3source.yaml) instead of a CodeCommit source, replacing Step 5.
+1. Deploy an [AWS S3 Source](https://github.com/triggermesh/aws-event-sources/blob/main/config/samples/awss3source.yaml)
 
-        - You may use the template below, which already contains `namespace` added. Be sure to replace `<YOUR-ARN`> with the ARN from Step 1.
-
+    - You may use the template below, which already contains `namespace` added. Be sure to replace `<YOUR-ARN`> with the ARN from Step 1.
         ```
         kubectl apply -f - << EOF
         apiVersion: sources.triggermesh.io/v1alpha1
@@ -70,7 +71,7 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 
 1. Obtain your AWS `accesskey` and `secretkey` that will be used in the next steps.
 
-1. Use the following STS command to to [generate a temporary session](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html) for the application via the AWS CLI. This will generate the three keys you use under app in `creds.yaml` below.
+1. Use the following STS command to to [generate a temporary session](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html) for the application via the AWS CLI. This will generate three keys you use under app in `creds.yaml` below, please note them down somewhere safe temporarily.
     ```
     aws sts get-session-token --duration-seconds=129600 # This will generate a session that is going to last for 36h
     ```
@@ -80,19 +81,19 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
     cat > creds.yaml << EOF
     ---
     triggermesh:
-      accesskey: <your access key from step 2>
-      secretkey: <your secret key from step 2>
+        accesskey: <your AccessKeyId from step 2>
+        secretkey: <your SecretAccessKey from step 2>
 
     app:
-      accesskey: <your access key from step 3 (This value is different from the one in step 2!)>
-      secretkey: <your secret key from step 3 (This value is different from the one in step 2!)>
-      sessionkey: <your session key from step 2>
+        accesskey: <your AWS_ACCESS_KEY_ID from step 3 (This value is different from the one in step 2!)>
+        secretkey: <your AWS_ACCESS_KEY_ID from step 3 (This value is different from the one in step 2!)>
+        sessionkey: <your SessionToken from step 2>
 
     bucket_arn: <your bucket ARN from step 1 (Must be the full ARN including the region and account)>
     EOF
     ```
 
-1.  If you want to change the location of the function, you need to define the environment variable `FUNCTION_IMAGE`
+1.  (Optional) If you want to change the location of the function, you need to define the environment variable `FUNCTION_IMAGE`
     ```
     export FUNCTION_IMAGE=<your full image url that can be pushed to>
     ```
