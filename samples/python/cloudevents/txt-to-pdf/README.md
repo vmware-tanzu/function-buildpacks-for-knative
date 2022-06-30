@@ -12,7 +12,7 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 ## Prerequisites
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * [aws](https://aws.amazon.com/cli/)
-* [docker](https://docs.docker.com/engine/install/
+* [docker](https://docs.docker.com/engine/install/)
 * [pack](https://buildpacks.io/docs/tools/pack/)
 * [kapp](https://carvel.dev/kapp/)
 * [ytt](https://carvel.dev/ytt/)
