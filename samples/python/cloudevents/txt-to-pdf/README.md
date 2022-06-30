@@ -10,12 +10,12 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 - [Java video demo](https://vimeo.com/724580576)
 
 ## Prerequisites
-* Kubernetes Cluster
-* AWS CLI
-* Docker
-* Buildpack CLI
-* Kapp
-* Ytt
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [aws](https://aws.amazon.com/cli/)
+* [docker](https://docs.docker.com/engine/install/
+* [pack](https://buildpacks.io/docs/tools/pack/)
+* [kapp](https://carvel.dev/kapp/)
+* [ytt](https://carvel.dev/ytt/)
 
 ## Known Issues
 * Image registry authentication syncing with Tanzu Application Platform
