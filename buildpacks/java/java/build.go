@@ -47,10 +47,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	if !ok {
 		return result, nil
 	}
+
 	if e.Metadata["has_func_yaml"] == true {
 		envs := NewFuncYamlEnvs(context.Application.Path)
 		envs.Logger = b.Logger
 		result.Layers = append(result.Layers, envs)
+		result.Labels = b.convertLabels(e.Metadata["labels"])
+
 	}
 
 	dep, err := dr.Resolve("invoker", "")
@@ -109,4 +112,21 @@ func findPath(path string, r *regexp.Regexp) (string, error) {
 		}
 	}
 	return "", nil
+}
+
+func (b Build) convertLabels(t interface{}) []libcnb.Label {
+	sliceOfMaps := t.([]map[string]interface{})
+	labels := []libcnb.Label{}
+	for _, mapOfLabels := range sliceOfMaps {
+		pairs := []string{}
+		for _, val := range mapOfLabels {
+			pairs = append(pairs, val.(string))
+		}
+		labels = append(labels,
+			libcnb.Label{
+				Key:   pairs[0],
+				Value: pairs[1],
+			})
+	}
+	return labels
 }
