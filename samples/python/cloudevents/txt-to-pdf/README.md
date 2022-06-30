@@ -87,8 +87,8 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
         secretkey: <your SecretAccessKey from step 2>
 
     app:
-        accesskey: <your AWS_ACCESS_KEY_ID from step 3 (This value is different from the one in step 2!)>
-        secretkey: <your AWS_ACCESS_KEY_ID from step 3 (This value is different from the one in step 2!)>
+        accesskey: <your AWS_ACCESS_KEY_ID from step 3 (different from the value in step 2!)>
+        secretkey: <your AWS_ACCESS_KEY_ID from step 3 (different from the value in step 2!)>
         sessionkey: <your SessionToken from step 2>
 
     bucket_arn: <your bucket ARN from step 1 (Must be the full ARN including the region and account)>
