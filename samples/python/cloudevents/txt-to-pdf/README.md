@@ -36,6 +36,8 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 
 1. Deploy an [AWS S3 Source](https://github.com/triggermesh/aws-event-sources/blob/main/config/samples/awss3source.yaml)
 
+    - (Optional) Learn more about [Sources and TriggerMesh](https://docs.triggermesh.io/cloud/sources/awss3/), since Cloud Native Runtimes uses TriggerMesh SAWS to subscribe to event notifications and connect to AWS services.
+
     - You may use the template below, which already contains `namespace` added. Be sure to replace `<YOUR-ARN`> with the ARN from Step 1.
         ```
         kubectl apply -f - << EOF
