@@ -1,15 +1,15 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-from fpdf import FPDF
 from typing import Any
+from fpdf import FPDF
 from urllib.parse import unquote_plus
 
 import boto3
 import os
 import sys
 
-def DoEvent(data: Any, attributes: dict):
+def main(data: Any, attributes: dict):
     print(f"Got event data: {data}", file=sys.stderr)
 
     file = unquote_plus(data["s3"]["object"]["key"])
