@@ -6,6 +6,7 @@ name: Create Builder Release
 env:
   REGISTRY: ghcr.io
   CONTAINER_PATH: ${{ github.repository }}
+  DEPENDENCY_BASE_URL: https://github.com/${{ github.repository }}
 
 on:
   workflow_dispatch:
@@ -22,93 +23,70 @@ on:
         description: Pre-release label
 
 jobs:
-  bump-version:
-    runs-on: ubuntu-latest
-    outputs:
-      sha: ${{ steps.sha.outputs.sha }}
-      version: ${{ steps.version.outputs.version }}
-    steps:
-      - uses: actions/checkout@v3
-      - id: version
-        uses: ./.github/actions/semver-bump
-        with:
-          path: ./builder/VERSION
-          release-type: ${{ github.event.inputs.release-type }}
-          pre-release: ${{ github.event.inputs.pre-release-label }}
-      - run: |
-          echo "Updating builder from version ${{ steps.version.outputs.previous-version }} to ${{ steps.version.outputs.version }}."
-      - name: Bump version
-        run: |
-          printf "${{ steps.version.outputs.version }}" > ./builder/VERSION
-          git add ./builder/VERSION
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git commit -m 'Update builder version to ${{ steps.version.outputs.version }}'
-          git push
-      - name: Get SHA
-        id: sha
-        run: |
-          sha=$(git rev-parse HEAD)
-          echo $sha
-          echo "::set-output name=sha::$sha"
-  
-  run-tests:
-    runs-on: ubuntu-latest
-    needs: [bump-version]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ needs.bump-version.outputs.sha }}
-          fetch-depth: 0
-      - name: Setup Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: '1.17.8'
-      - run: |
-          make smoke-tests
-
   create-release:
     runs-on: ubuntu-latest
-    needs: [run-tests, bump-version]
     permissions:
       contents: write
       packages: write
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ needs.bump-version.outputs.sha }}
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - name: Log in to the Container registry
         uses: docker/login-action@v1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish container
+      - id: version
+        uses: ./.github/actions/semver-bump
+        with:
+          path: ./builder/VERSION
+          release-type: ${{ github.event.inputs.release-type }}
+          pre-release: ${{ github.event.inputs.pre-release-label }}
+      - name: Bump Version
         run: |
-          make registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} builder.publish
-      - name: Create tag
+          printf "${{ steps.version.outputs.version }}" > ./builder/VERSION
+      - name: Run Smoke Tests
+        run: |
+          make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} smoke-tests
+      - name: Publish Container
+        run: |
+          make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} builder.publish
+      - name: Commit Version
+        run: |
+          git add ./builder/VERSION
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -m 'Update builder version to ${{ steps.version.outputs.version }}'
+          git push
+      - name: Create Tag
         id: tag
         run: |
-          tag=builder/v${{ needs.bump-version.outputs.version }}
+          tag=builder/v${{ steps.version.outputs.version }}
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
       - id: artifacts
         run: |
-          image_file=./out/builder.image
-
+          image_file=./out/builder/${{ steps.version.outputs.version }}/builder.image
           echo "::set-output name=image_file::${image_file}"
           echo "::set-output name=image_file_content::$(head ${image_file})"
-
-      - name: Create release
+          echo "::set-output name=image_sha_file::${image_file}.sha256"
+          echo "::set-output name=image_sha_file_content::$(head ${image_file}.sha256)"
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: builder v${{ needs.bump-version.outputs.version }}
+          name: builder v${{ steps.version.outputs.version }}
           body: |
-            The builder can be found at:
+            The builder image can be found at:
             ```
             ${{ steps.artifacts.outputs.image_file_content }}
             ```
+            # File Checksums
+            ```
+            ${{ steps.artifacts.outputs.image_sha_file_content }}
+            ```
           tag_name: ${{ steps.tag.outputs.tag }}
+          files: |
+            ${{ steps.artifacts.outputs.image_file }}
+            ${{ steps.artifacts.outputs.image_sha_file }}
           token: ${{ secrets.GITHUB_TOKEN }}

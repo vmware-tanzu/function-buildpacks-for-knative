@@ -1,0 +1,14 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+
+#@overlay/match by=overlay.all
+---
+buildpacks:
+- id: paketo-buildpacks/nodejs
+  uri: docker://gcr.io/paketo-buildpacks/nodejs:0.0.10
+order:
+- group:
+  - id: paketo-buildpacks/nodejs
