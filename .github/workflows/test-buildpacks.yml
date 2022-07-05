@@ -21,4 +21,4 @@ jobs:
         go-version: '1.17.8'
     - run: go version
     - name: Run Buildpack Tests
-      run: make buildpack-tests
+      run: make buildpacks.tests

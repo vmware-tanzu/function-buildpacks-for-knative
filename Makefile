@@ -13,13 +13,13 @@ buildpacks:
 buildpack-files:
 invokers:
 
-publish-buildpacks:
 publish-invokers:
 publish-builder:
+buildpacks.publish:
 
 tests:
-buildpack-tests:
 invoker-tests:
+buildpacks.tests:
 smoke-tests:
 
 clean:

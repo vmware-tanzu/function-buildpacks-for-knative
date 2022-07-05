@@ -1,0 +1,28 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+#@ load("@ytt:data", "data")
+---
+api: "0.6"
+buildpack:
+  id: kn-fn/python-function
+  name: Python Function Buildpack
+  version: #@ data.values.buildpack.version
+  sbom-formats:
+  - application/vnd.syft+json
+stacks:
+- id: io.buildpacks.stacks.bionic
+metadata:
+  include-files:
+  - README.md
+  - bin/build
+  - bin/detect
+  - bin/main
+  - buildpack.toml
+  - VERSION
+  configurations:
+  - build: true
+    default: func.main
+    description: The function to run, specify in the form of `module.function_name`
+    name: BP_FUNCTION
+  dependencies: []

@@ -1,0 +1,17 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+
+#@overlay/match by=overlay.all
+---
+metadata:
+  dependencies:
+  - id: invoker
+    name: Java Invoker
+    version: #@ data.values.invoker.version
+    uri: #@ data.values.invoker.url
+    sha256: #@ data.values.invoker.sha
+    stacks:
+    - io.buildpacks.stacks.bionic
