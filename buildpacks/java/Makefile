@@ -2,114 +2,175 @@ RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
-java-buildpack.path := $(abspath $(path))
+buildpacks.java.path := $(abspath $(path))
 
-include $(java-buildpack.path)/../rules.mk
+include $(buildpacks.java.path)/../rules.mk
 
-$(eval $(call VERSION_template,java-buildpack,$(java-buildpack.path)))
-java-buildpack.version := $(java-buildpack.version.release)
+$(eval $(call VERSION_template,buildpacks.java,$(buildpacks.java.path)))
+buildpacks.java.version := $(buildpacks.java.version.release)
+buildpacks.java.build_dir := $(buildpack.build_dir)/java/$(buildpacks.java.version)
+buildpacks.java.temp_dir := $(buildpack.build_dir)/java/temp/$(buildpacks.java.version)
+buildpacks.java.out_dir := $(buildpack.out_dir)/java/$(buildpacks.java.version)
 
-java-buildpack.go-sources := \
-	$(java-buildpack.path)/go.mod \
-	$(java-buildpack.path)/go.sum \
-	$(shell find '$(java-buildpack.path)' -type f -iname '*.go' -not -path '$(java-buildpack.path)/tests/*') \
-	$(shell find '$(java-buildpack.path)' -type d -not -path '$(java-buildpack.path)/tests' -mindepth 1) \
+###########################
+# Detect and Build binaries
+###########################
 
-java-buildpack.test-sources := \
-	$(java-buildpack.path)/go.mod \
-	$(java-buildpack.path)/go.sum \
-	$(shell find '$(java-buildpack.path)/tests' -type f -iname '*.go') \
-	$(java-buildpack.path)/tests \
+buildpacks.java.bin.sources := \
+	$(buildpacks.java.path)/go.mod \
+	$(buildpacks.java.path)/go.sum \
+	$(shell find '$(buildpacks.java.path)' -type f -iname '*.go' -not -path '$(buildpacks.java.path)/tests/*') \
+	$(shell find '$(buildpacks.java.path)' -type d -not -path '$(buildpacks.java.path)/tests' -mindepth 1) \
 
-java-buildpack.config-sources := $(java-buildpack.path)/buildpack.toml
+buildpacks.java.bin.build := $(buildpacks.java.build_dir)/bin/build
+buildpacks.java.bin.detect := $(buildpacks.java.build_dir)/bin/detect
+buildpacks.java.bin.main := $(abspath $(buildpacks.java.build_dir)/bin/main)
+buildpacks.java.bin := $(buildpacks.java.bin.build) $(buildpacks.java.bin.detect)
 
-java-buildpack.image := $(registry)/java-buildpack:$(java-buildpack.version)
-java-buildpack.image_with_deps := $(registry)/java-buildpack-with-deps:$(java-buildpack.version)
-
-java-buildpack.build-bin := $(java-buildpack.path)/bin/build
-java-buildpack.detect-bin := $(java-buildpack.path)/bin/detect
-java-buildpack.main-bin := $(abspath $(java-buildpack.path)/bin/main)
-java-buildpack.bin := $(java-buildpack.build-bin) $(java-buildpack.detect-bin)
-
-java-buildpack.deps := $(java-buildpack.bin) $(java-buildpack.config-sources)
-
-$(java-buildpack.build-bin) $(java-buildpack.detect-bin): $(java-buildpack.main-bin)
+$(buildpacks.java.bin.main): $(buildpacks.java.bin.sources)
 	@mkdir -p $(@D)
-	ln -sf $(notdir $(java-buildpack.main-bin)) $@
+	cd $(buildpacks.java.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/java-function-buildpack/cmd/main
 
-$(java-buildpack.main-bin): $(java-buildpack.go-sources)
+$(buildpacks.java.bin): $(buildpacks.java.bin.main)
 	@mkdir -p $(@D)
-	cd $(java-buildpack.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/java-function-buildpack/cmd/main
+	ln -sf $(notdir $(buildpacks.java.bin.main)) $@
 
-java-buildpack.bin: $(java-buildpack.bin)
+##################
+# Invoker Metadata
+##################
 
-java-buildpack.package-deps := $(PACK) 
-java-buildpack.package.online := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/online
-java-buildpack.package.offline := $(buildpack.build_dir)/packages/java/$(java-buildpack.version)/offline
-java-buildpack.online.out := $(buildpack.out_dir)/java/online/java-buildpack-$(java-buildpack.version).image
-java-buildpack.offline.out := $(buildpack.out_dir)/java/offline/java-buildpack-with-deps-$(java-buildpack.version).image
+buildpacks.java.invoker.version := $(shell cat $(buildpacks.java.path)/../../invokers/java/VERSION)
+buildpacks.java.invoker.url := $(base_url)/releases/download/java-invoker/v$(buildpacks.java.invoker.version)/java-function-invoker-$(buildpacks.java.invoker.version).jar
+buildpacks.java.invoker.sha := $(buildpacks.java.temp_dir)/invoker.sha256
 
-$(java-buildpack.package.online)/package.toml $(java-buildpack.package.offline)/package.toml: %/package.toml:
+$(buildpacks.java.invoker.sha):
+	@mkdir -p $(@D)
+	curl -w '\0' -L $(buildpacks.java.invoker.url).sha256 -o $@
+
+buildpacks.java.invoker.values := $(buildpacks.java.temp_dir)/values.yaml
+
+# If modifying this content make sure you're using SPACES and not TABS for indentation
+define buildpacks.java.values.content
+#@data/values
+---
+buildpack:
+  version: $(buildpacks.java.version)
+
+invoker:
+  version: $(buildpacks.java.invoker.version)
+  url: $(buildpacks.java.invoker.url)
+  sha: $(firstword $(shell cat $(buildpacks.java.invoker.sha)))
+endef
+
+$(buildpacks.java.invoker.values): $(buildpacks.java.invoker.sha)
+	@mkdir -p $(@D)
+	printf '$(subst $(newline),\n,$(buildpacks.java.values.content))' > $@
+
+################
+# Buildpack.toml
+################
+
+buildpacks.java.config := $(buildpacks.java.build_dir)/buildpack.toml
+buildpacks.java.config_intermediate := $(buildpacks.java.temp_dir)/buildpack.yaml
+
+buildpacks.java.config.sources := \
+	$(buildpacks.java.path)/ytt \
+	$(shell find '$(buildpacks.java.path)/ytt' -type f) \
+
+.INTERMEDIATE: $(buildpacks.java.config_intermediate)
+$(buildpacks.java.config_intermediate): $(YTT) $(buildpacks.java.config.sources) $(buildpacks.java.invoker.values)
+	@mkdir -p $(@D)
+	$(YTT) -f $(buildpacks.java.path)/ytt -f $(buildpacks.java.invoker.values) --ignore-unknown-comments > $@
+
+$(buildpacks.java.config): $(YJ) $(buildpacks.java.config_intermediate)
+	@mkdir -p $(@D)
+	$(YJ) -yt < $(buildpacks.java.config_intermediate) > $@
+
+#####################
+# Buildpack Packaging
+# Online = Buildpack does NOT contain the invoker dependencies (NOT cached)
+# Offline = Buildpack contains the invoker dependencies (cached)
+#####################
+
+buildpacks.java.package.online := $(buildpacks.java.temp_dir)/packages/online
+buildpacks.java.package.offline := $(buildpacks.java.temp_dir)/packages/offline
+
+$(buildpacks.java.package.online)/package.toml $(buildpacks.java.package.offline)/package.toml: %/package.toml:
+	@mkdir -p $(@D)
 	printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' $* "linux" > $@
 
-$(java-buildpack.package.online): $(CREATE-PACKAGE) $(java-buildpack.deps)
-	@mkdir -p $(@D)
-	$(CREATE-PACKAGE) \
-		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
-		--destination "$@" \
-		--source "$(java-buildpack.path)" \
-		--version $(java-buildpack.version)
+buildpacks.java.package.deps := \
+	$(buildpacks.java.build_dir)/README.md \
+	$(buildpacks.java.bin) \
+	$(buildpacks.java.main) \
+	$(buildpacks.java.config) \
+	$(buildpacks.java.build_dir)/VERSION \
 
-java-buildpack.online.build := $(buildpack.build_dir)/java/online/java-buildpack-$(java-buildpack.version).image
-$(java-buildpack.online.build): $(java-buildpack.package.online) $(PACK) $(java-buildpack.package.online)/package.toml
-	@mkdir -p $(@D)
-	$(PACK) buildpack package $(java-buildpack.image) --config $(java-buildpack.package.online)/package.toml
-	printf '$(java-buildpack.image)' > $@
-
-$(java-buildpack.online.out): $(java-buildpack.online.build)
+$(buildpacks.java.build_dir)/%: $(buildpacks.java.path)/%
 	@mkdir -p $(@D)
 	cp $< $@
 
-java-buildpack.online: $(java-buildpack.online.out) $(java-buildpack.online.out).sha256
-
-$(java-buildpack.package.offline): $(CREATE-PACKAGE) $(java-buildpack.deps)
+$(buildpacks.java.package.offline): buildpacks.java.package.flags=--include-dependencies
+$(buildpacks.java.package.online) $(buildpacks.java.package.offline): $(CREATE-PACKAGE) $(buildpacks.java.package.deps)
 	@mkdir -p $(@D)
 	$(CREATE-PACKAGE) \
-		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
+		$(buildpacks.java.package.flags) \
+		--cache-location "$(buildpacks.java.temp_dir)/cache/carton-cache" \
 		--destination "$@" \
-		--source "$(java-buildpack.path)" \
-		--include-dependencies \
-		--version $(java-buildpack.version)
+		--source "$(buildpacks.java.build_dir)"
 
-java-buildpack.offline.build := $(buildpack.build_dir)/java/offline/java-buildpack-$(java-buildpack.version).image
-$(java-buildpack.offline.build): $(java-buildpack.package.offline) $(PACK) $(java-buildpack.package.offline)/package.toml
+buildpacks.java.images.online.name := $(registry)/java-buildpack:$(buildpacks.java.version)
+buildpacks.java.images.online.out := $(buildpacks.java.out_dir)/java-buildpack-$(buildpacks.java.version).image
+buildpacks.java.images.offline.name := $(registry)/java-buildpack-with-deps:$(buildpacks.java.version)
+buildpacks.java.images.offline.out := $(buildpacks.java.out_dir)/java-buildpack-with-deps-$(buildpacks.java.version).image
+
+$(buildpacks.java.images.online.out): $(PACK) $(buildpacks.java.package.online) $(buildpacks.java.package.online)/package.toml
 	@mkdir -p $(@D)
-	$(PACK) buildpack package $(java-buildpack.image_with_deps) --config $(java-buildpack.package.offline)/package.toml
-	printf '$(java-buildpack.image_with_deps)' > $@
+	$(PACK) buildpack package $(buildpacks.java.images.online.name) --config $(buildpacks.java.package.online)/package.toml
+	printf '$(buildpacks.java.images.online.name)' > $@
 
-$(java-buildpack.offline.out): $(java-buildpack.offline.build)
+$(buildpacks.java.images.offline.out): $(PACK) $(buildpacks.java.package.offline) $(buildpacks.java.package.offline)/package.toml
 	@mkdir -p $(@D)
-	cp $< $@
+	$(PACK) buildpack package $(buildpacks.java.images.offline.name) --config $(buildpacks.java.package.offline)/package.toml
+	printf '$(buildpacks.java.images.offline.name)' > $@
 
-java-buildpack.offline: $(java-buildpack.offline.out) $(java-buildpack.offline.out).sha256
+#########
+# Testing
+#########
 
-java-buildpack.package: java-buildpack.online java-buildpack.offline
+buildpacks.java.tests.sources := \
+	$(buildpacks.java.path)/go.mod \
+	$(buildpacks.java.path)/go.sum \
+	$(shell find '$(buildpacks.java.path)/tests' -type f -iname '*.go') \
+	$(buildpacks.java.path)/tests \
 
-java-buildpack.publish: java-buildpack.package
-	docker push $(java-buildpack.image)
-	docker push $(java-buildpack.image_with_deps)
+#########
+# Targets
+#########
 
-java-buildpack.tests: $(java-buildpack.go-sources) $(java-buildpack.test-sources)
-	cd $(java-buildpack.path) && go test -v -count=1 -timeout 30s kn-fn/java-function-buildpack/tests
+buildpacks.java.images.offline: $(buildpacks.java.images.offline.out) $(buildpacks.java.images.offline.out).sha256
+buildpacks.java.images.online: $(buildpacks.java.images.online.out) $(buildpacks.java.images.online.out).sha256
+buildpacks.java.images: buildpacks.java.images.offline buildpacks.java.images.online
 
-java-buildpack.clean:
-	rm -rf $(java-buildpack.path)/out
-	rm -rf $(java-buildpack.path)/bin
-	rm -rf $(java-buildpack.path)/package.toml
+buildpacks.java.images.offline.publish: buildpacks.java.images.offline
+	docker push $(buildpacks.java.images.offline.name)
+buildpacks.java.images.online.publish: buildpacks.java.images.online
+	docker push $(buildpacks.java.images.online.name)
+buildpacks.java.images.publish: buildpacks.java.images.offline.publish buildpacks.java.images.online.publish
 
-all buildpacks .PHONY: java-buildpack.package
-buildpacks.offline .PHONY: java-buildpack.offline
-buildpacks.online .PHONY: java-buildpack.online
-publish-buildpacks .PHONY: java-buildpack.publish
-tests buildpack-tests .PHONY: java-buildpack.tests
-clean .PHONY: java-buildpack.clean
+buildpacks.java.tests: $(buildpacks.java.bin.sources) $(buildpacks.java.tests.sources)
+	cd $(buildpacks.java.path) && go test -v -count=1 -timeout 30s kn-fn/java-function-buildpack/tests
+
+buildpacks.java.clean:
+	rm -rf $(buildpacks.java.path)/out
+	rm -rf $(buildpacks.java.path)/bin
+	rm -rf $(buildpacks.java.path)/package.toml
+
+all buildpacks .PHONY: buildpacks.java.images
+buildpacks.offline .PHONY: buildpacks.java.images.offline
+buildpacks.offline.publish .PHONY: buildpacks.java.images.offline.publish
+buildpacks.online .PHONY: buildpacks.java.images.online
+buildpacks.online.publish .PHONY: buildpacks.java.images.online.publish
+buildpacks.publish .PHONY: buildpacks.offline.publish buildpacks.online.publish
+tests buildpacks.tests .PHONY: buildpacks.java.tests
+clean .PHONY: buildpacks.java.clean

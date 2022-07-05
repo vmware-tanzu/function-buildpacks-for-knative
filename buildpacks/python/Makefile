@@ -2,114 +2,186 @@ RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
-python-buildpack.path := $(abspath $(path))
+buildpacks.python.path := $(abspath $(path))
 
-include $(python-buildpack.path)/../rules.mk
+include $(buildpacks.python.path)/../rules.mk
 
-$(eval $(call VERSION_template,python-buildpack,$(python-buildpack.path)))
-python-buildpack.version := $(python-buildpack.version.release)
+$(eval $(call VERSION_template,buildpacks.python,$(buildpacks.python.path)))
+buildpacks.python.version := $(buildpacks.python.version.release)
+buildpacks.python.build_dir := $(buildpack.build_dir)/python/$(buildpacks.python.version)
+buildpacks.python.temp_dir := $(buildpack.build_dir)/python/temp/$(buildpacks.python.version)
+buildpacks.python.out_dir := $(buildpack.out_dir)/python/$(buildpacks.python.version)
 
-python-buildpack.go-sources := \
-	$(python-buildpack.path)/go.mod \
-	$(python-buildpack.path)/go.sum \
-	$(shell find '$(python-buildpack.path)' -type f -iname '*.go' -not -path '$(python-buildpack.path)/tests/*') \
-	$(shell find '$(python-buildpack.path)' -type d -not -path '$(python-buildpack.path)/tests' -mindepth 1) \
+###########################
+# Detect and Build binaries
+###########################
 
-python-buildpack.test-sources := \
-	$(python-buildpack.path)/go.mod \
-	$(python-buildpack.path)/go.sum \
-	$(shell find '$(python-buildpack.path)/tests' -type f -iname '*.go') \
-	$(python-buildpack.path)/tests \
+buildpacks.python.bin.sources := \
+	$(buildpacks.python.path)/go.mod \
+	$(buildpacks.python.path)/go.sum \
+	$(shell find '$(buildpacks.python.path)' -type f -iname '*.go' -not -path '$(buildpacks.python.path)/tests/*') \
+	$(shell find '$(buildpacks.python.path)' -type d -not -path '$(buildpacks.python.path)/tests' -mindepth 1) \
 
-python-buildpack.config-sources := $(python-buildpack.path)/buildpack.toml
+buildpacks.python.bin.build := $(buildpacks.python.build_dir)/bin/build
+buildpacks.python.bin.detect := $(buildpacks.python.build_dir)/bin/detect
+buildpacks.python.bin.main := $(abspath $(buildpacks.python.build_dir)/bin/main)
+buildpacks.python.bin := $(buildpacks.python.bin.build) $(buildpacks.python.bin.detect)
 
-python-buildpack.image := $(registry)/python-buildpack:$(python-buildpack.version)
-python-buildpack.image_with_deps := $(registry)/python-buildpack-with-deps:$(python-buildpack.version)
-
-python-buildpack.build-bin := $(python-buildpack.path)/bin/build
-python-buildpack.detect-bin := $(python-buildpack.path)/bin/detect
-python-buildpack.main-bin := $(abspath $(python-buildpack.path)/bin/main)
-python-buildpack.bin := $(python-buildpack.build-bin) $(python-buildpack.detect-bin)
-
-python-buildpack.deps := $(python-buildpack.bin) $(python-buildpack.config-sources)
-
-$(python-buildpack.build-bin) $(python-buildpack.detect-bin): $(python-buildpack.main-bin)
+$(buildpacks.python.bin.main): $(buildpacks.python.bin.sources)
 	@mkdir -p $(@D)
-	ln -sf $(notdir $(python-buildpack.main-bin)) $@
+	cd $(buildpacks.python.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/python-function-buildpack/cmd/main
 
-$(python-buildpack.main-bin): $(python-buildpack.go-sources)
+$(buildpacks.python.bin): $(buildpacks.python.bin.main)
 	@mkdir -p $(@D)
-	cd $(python-buildpack.path) && GOOS="linux" go build -ldflags='-s -w' -o $@ kn-fn/python-function-buildpack/cmd/main
+	ln -sf $(notdir $(buildpacks.python.bin.main)) $@
 
-python-buildpack.bin: $(python-buildpack.bin)
+##################
+# Invoker Metadata
+##################
 
-python-buildpack.package-deps := $(PACK) 
-python-buildpack.package.online := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/online
-python-buildpack.package.offline := $(buildpack.build_dir)/packages/python/$(python-buildpack.version)/offline
-python-buildpack.online.out := $(buildpack.out_dir)/python/online/python-buildpack-$(python-buildpack.version).image
-python-buildpack.offline.out := $(buildpack.out_dir)/python/offline/python-buildpack-with-deps-$(python-buildpack.version).image
+buildpacks.python.invoker.version := $(shell cat $(buildpacks.python.path)/../../invokers/python/VERSION)
+buildpacks.python.invoker.url := $(base_url)/releases/download/python-invoker/v$(buildpacks.python.invoker.version)/pyfunc-invoker-$(buildpacks.python.invoker.version).tar.gz
+buildpacks.python.invoker.sha := $(buildpacks.python.temp_dir)/invoker.sha256
+buildpacks.python.invoker_deps.url := $(base_url)/releases/download/python-invoker/v$(buildpacks.python.invoker.version)/pyfunc-invoker-deps-$(buildpacks.python.invoker.version).tar.gz
+buildpacks.python.invoker_deps.sha := $(buildpacks.python.temp_dir)/invoker_dep.sha256
 
-$(python-buildpack.package.online)/package.toml $(python-buildpack.package.offline)/package.toml: %/package.toml:
+$(buildpacks.python.invoker.sha):
+	@mkdir -p $(@D)
+	curl -w '\0' -L $(buildpacks.python.invoker.url).sha256 -o $@
+
+$(buildpacks.python.invoker_deps.sha):
+	@mkdir -p $(@D)
+	curl -w '\0' -L $(buildpacks.python.invoker_deps.url).sha256 -o $@
+
+buildpacks.python.invoker.values := $(buildpacks.python.temp_dir)/values.yaml
+
+# If modifying this content make sure you're using SPACES and not TABS for indentation
+define buildpacks.python.values.content
+#@data/values
+---
+buildpack:
+  version: $(buildpacks.python.version)
+
+invoker:
+  version: $(buildpacks.python.invoker.version)
+  url: $(buildpacks.python.invoker.url)
+  sha: $(firstword $(shell cat $(buildpacks.python.invoker.sha)))
+
+invoker_dep:
+  version: $(buildpacks.python.invoker.version)
+  url: $(buildpacks.python.invoker_deps.url)
+  sha: $(firstword $(shell cat $(buildpacks.python.invoker_deps.sha)))
+endef
+
+$(buildpacks.python.invoker.values): $(buildpacks.python.invoker.sha) $(buildpacks.python.invoker_deps.sha)
+	@mkdir -p $(@D)
+	printf '$(subst $(newline),\n,$(buildpacks.python.values.content))' > $@
+
+################
+# Buildpack.toml
+################
+
+buildpacks.python.config := $(buildpacks.python.build_dir)/buildpack.toml
+buildpacks.python.config_intermediate := $(buildpacks.python.temp_dir)/buildpack.yaml
+
+buildpacks.python.config.sources := \
+	$(buildpacks.python.path)/ytt \
+	$(shell find '$(buildpacks.python.path)/ytt' -type f) \
+
+.INTERMEDIATE: $(buildpacks.python.config_intermediate)
+$(buildpacks.python.config_intermediate): $(YTT) $(buildpacks.python.config.sources) $(buildpacks.python.invoker.values)
+	@mkdir -p $(@D)
+	$(YTT) -f $(buildpacks.python.path)/ytt -f $(buildpacks.python.invoker.values) --ignore-unknown-comments > $@
+
+$(buildpacks.python.config): $(YJ) $(buildpacks.python.config_intermediate)
+	@mkdir -p $(@D)
+	$(YJ) -yt < $(buildpacks.python.config_intermediate) > $@
+
+#####################
+# Buildpack Packaging
+# Online = Buildpack does NOT contain the invoker dependencies (NOT cached)
+# Offline = Buildpack contains the invoker dependencies (cached)
+#####################
+
+buildpacks.python.package.online := $(buildpacks.python.temp_dir)/packages/online
+buildpacks.python.package.offline := $(buildpacks.python.temp_dir)/packages/offline
+
+$(buildpacks.python.package.online)/package.toml $(buildpacks.python.package.offline)/package.toml: %/package.toml:
+	@mkdir -p $(@D)
 	printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' $* "linux" > $@
 
-$(python-buildpack.package.online): $(CREATE-PACKAGE) $(python-buildpack.deps)
-	@mkdir -p $(@D)
-	$(CREATE-PACKAGE) \
-		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
-		--destination "$@" \
-		--source "$(python-buildpack.path)" \
-		--version $(python-buildpack.version)
+buildpacks.python.package.deps := \
+	$(buildpacks.python.build_dir)/README.md \
+	$(buildpacks.python.bin) \
+	$(buildpacks.python.main) \
+	$(buildpacks.python.config) \
+	$(buildpacks.python.build_dir)/VERSION \
 
-python-buildpack.online.build := $(buildpack.build_dir)/python/online/python-buildpack-$(python-buildpack.version).image
-$(python-buildpack.online.build): $(python-buildpack.package.online) $(PACK) $(python-buildpack.package.online)/package.toml
-	@mkdir -p $(@D)
-	$(PACK) buildpack package $(python-buildpack.image) --config $(python-buildpack.package.online)/package.toml
-	printf '$(python-buildpack.image)' > $@
-
-$(python-buildpack.online.out): $(python-buildpack.online.build)
+$(buildpacks.python.build_dir)/%: $(buildpacks.python.path)/%
 	@mkdir -p $(@D)
 	cp $< $@
 
-python-buildpack.online: $(python-buildpack.online.out) $(python-buildpack.online.out).sha256
-
-$(python-buildpack.package.offline): $(CREATE-PACKAGE) $(python-buildpack.deps)
+$(buildpacks.python.package.offline): buildpacks.python.package.flags=--include-dependencies
+$(buildpacks.python.package.online) $(buildpacks.python.package.offline): $(CREATE-PACKAGE) $(buildpacks.python.package.deps)
 	@mkdir -p $(@D)
 	$(CREATE-PACKAGE) \
-		--cache-location "$(buildpack.build_dir)/cache/carton-cache" \
+		$(buildpacks.python.package.flags) \
+		--cache-location "$(buildpacks.python.temp_dir)/cache/carton-cache" \
 		--destination "$@" \
-		--source "$(python-buildpack.path)" \
-		--include-dependencies \
-		--version $(python-buildpack.version)
+		--source "$(buildpacks.python.build_dir)"
 
-python-buildpack.offline.build := $(buildpack.build_dir)/python/offline/python-buildpack-$(python-buildpack.version).image
-$(python-buildpack.offline.build): $(python-buildpack.package.offline) $(PACK) $(python-buildpack.package.offline)/package.toml
+buildpacks.python.images.online.name := $(registry)/python-buildpack:$(buildpacks.python.version)
+buildpacks.python.images.online.out := $(buildpacks.python.out_dir)/python-buildpack-$(buildpacks.python.version).image
+buildpacks.python.images.offline.name := $(registry)/python-buildpack-with-deps:$(buildpacks.python.version)
+buildpacks.python.images.offline.out := $(buildpacks.python.out_dir)/python-buildpack-with-deps-$(buildpacks.python.version).image
+
+$(buildpacks.python.images.online.out): $(PACK) $(buildpacks.python.package.online) $(buildpacks.python.package.online)/package.toml
 	@mkdir -p $(@D)
-	$(PACK) buildpack package $(python-buildpack.image_with_deps) --config $(python-buildpack.package.offline)/package.toml
-	printf '$(python-buildpack.image_with_deps)' > $@
+	$(PACK) buildpack package $(buildpacks.python.images.online.name) --config $(buildpacks.python.package.online)/package.toml
+	printf '$(buildpacks.python.images.online.name)' > $@
 
-$(python-buildpack.offline.out): $(python-buildpack.offline.build)
+$(buildpacks.python.images.offline.out): $(PACK) $(buildpacks.python.package.offline) $(buildpacks.python.package.offline)/package.toml
 	@mkdir -p $(@D)
-	cp $< $@
+	$(PACK) buildpack package $(buildpacks.python.images.offline.name) --config $(buildpacks.python.package.offline)/package.toml
+	printf '$(buildpacks.python.images.offline.name)' > $@
 
-python-buildpack.offline: $(python-buildpack.offline.out) $(python-buildpack.offline.out).sha256
+#########
+# Testing
+#########
 
-python-buildpack.package: python-buildpack.online python-buildpack.offline
+buildpacks.python.tests.sources := \
+	$(buildpacks.python.path)/go.mod \
+	$(buildpacks.python.path)/go.sum \
+	$(shell find '$(buildpacks.python.path)/tests' -type f -iname '*.go') \
+	$(buildpacks.python.path)/tests \
 
-python-buildpack.publish: python-buildpack.package
-	docker push $(python-buildpack.image)
-	docker push $(python-buildpack.image_with_deps)
+#########
+# Targets
+#########
 
-python-buildpack.tests: $(python-buildpack.go-sources) $(python-buildpack.test-sources)
-	cd $(python-buildpack.path) && go test -v -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
+buildpacks.python.images.offline: $(buildpacks.python.images.offline.out) $(buildpacks.python.images.offline.out).sha256
+buildpacks.python.images.online: $(buildpacks.python.images.online.out) $(buildpacks.python.images.online.out).sha256
+buildpacks.python.images: buildpacks.python.images.offline buildpacks.python.images.online
 
-python-buildpack.clean:
-	rm -rf $(python-buildpack.path)/out
-	rm -rf $(python-buildpack.path)/bin
-	rm -rf $(python-buildpack.path)/package.toml
+buildpacks.python.images.offline.publish: buildpacks.python.images.offline
+	docker push $(buildpacks.python.images.offline.name)
+buildpacks.python.images.online.publish: buildpacks.python.images.online
+	docker push $(buildpacks.python.images.online.name)
+buildpacks.python.images.publish: buildpacks.python.images.offline.publish buildpacks.python.images.online.publish
 
-all buildpacks .PHONY: python-buildpack.package
-buildpacks.offline .PHONY: python-buildpack.offline
-buildpacks.online .PHONY: python-buildpack.online
-publish-buildpacks .PHONY: python-buildpack.publish
-tests buildpack-tests .PHONY: python-buildpack.tests
-clean .PHONY: python-buildpack.clean
+buildpacks.python.tests: $(buildpacks.python.bin.sources) $(buildpacks.python.tests.sources)
+	cd $(buildpacks.python.path) && go test -v -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
+
+buildpacks.python.clean:
+	rm -rf $(buildpacks.python.path)/out
+	rm -rf $(buildpacks.python.path)/bin
+	rm -rf $(buildpacks.python.path)/package.toml
+
+all buildpacks .PHONY: buildpacks.python.images
+buildpacks.offline .PHONY: buildpacks.python.images.offline
+buildpacks.offline.publish .PHONY: buildpacks.python.images.offline.publish
+buildpacks.online .PHONY: buildpacks.python.images.online
+buildpacks.online.publish .PHONY: buildpacks.python.images.online.publish
+buildpacks.publish .PHONY: buildpacks.offline.publish buildpacks.online.publish
+tests buildpacks.tests .PHONY: buildpacks.python.tests
+clean .PHONY: buildpacks.python.clean
