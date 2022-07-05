@@ -13,4 +13,3 @@ spec:
      kind: Service
      name: consumer
      namespace: #@ data.values.namespace
-    uri: /func
