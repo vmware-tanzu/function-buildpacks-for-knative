@@ -21,6 +21,8 @@ git.dirty := $(shell git status -s)
 git.branch := $(shell git rev-parse --abbrev-ref HEAD)
 git.commit := $(shell git rev-parse HEAD)
 
+base_url := https://github.com/vmware-tanzu/function-buildpacks-for-knative
+
 registry.location := gcr
 registry.gcr := us.gcr.io/daisy-284300/kn-fn
 registry.other := $(REGISTRY)
@@ -47,6 +49,11 @@ endif
 
 include $(ROOT_DIR)/version.mk
 include $(ROOT_DIR)/tools.mk
+
+define newline
+
+
+endef
 
 # Sha recipes
 %.sha256: %
