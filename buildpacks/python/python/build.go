@@ -112,40 +112,51 @@ func (b Build) getFuncYamlOptions(appPath string) []libcnb.Label {
 }
 
 func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
-	var requestsJson []byte
-	var limitsJson []byte
 	labels := []libcnb.Label{}
 
-	scaleJson, err := json.Marshal(options.Scale)
-	if err != nil {
-		b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
+	if options.Scale != nil {
+		scaleJson, err := json.Marshal(options.Scale)
+		if err != nil {
+			b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
+		} else {
+			labels = append(labels,
+				libcnb.Label{
+					Key:   "options-scale",
+					Value: string(scaleJson),
+				},
+			)
+		}
 	}
 
 	if options.Resources != nil {
-		requestsJson, err = json.Marshal(options.Resources.Requests)
-		if err != nil {
-			b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
-
+		if options.Resources.Requests != nil {
+			requestsJson, err := json.Marshal(options.Resources.Requests)
+			if err != nil {
+				b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
+			} else {
+				labels = append(labels,
+					libcnb.Label{
+						Key:   "options-resources-requests",
+						Value: string(requestsJson),
+					},
+				)
+			}
 		}
-		limitsJson, err = json.Marshal(options.Resources.Limits)
-		if err != nil {
-			b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
+
+		if options.Resources.Limits != nil {
+			limitsJson, err := json.Marshal(options.Resources.Limits)
+			if err != nil {
+				b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
+			} else {
+				labels = append(labels,
+					libcnb.Label{
+						Key:   "options-resources-limits",
+						Value: string(limitsJson),
+					},
+				)
+			}
 		}
 	}
-
-	labels = append(labels,
-		libcnb.Label{
-			Key:   "options-scale",
-			Value: string(scaleJson),
-		},
-		libcnb.Label{
-			Key:   "options-resources-requests",
-			Value: string(requestsJson),
-		},
-		libcnb.Label{
-			Key:   "options-resources-limits",
-			Value: string(limitsJson),
-		})
 
 	return labels
 }
