@@ -122,3 +122,5 @@ To cleanup, simply run:
 ```
 make destroy
 ```    
+
+If you encounter any Knative errors while re-deploying the app, be sure to delete the `ksvc` consumer before re-running `make deploy`.
