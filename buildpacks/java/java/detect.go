@@ -43,7 +43,7 @@ func (d Detect) checkFuncYaml(appPath string) bool {
 }
 
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
-	var labels []libcnb.Label
+	labels := []libcnb.Label{}
 	result := libcnb.DetectResult{}
 
 	appPath := context.Application.Path
@@ -121,32 +121,49 @@ func (d Detect) getFuncYamlOptions(appPath string) []libcnb.Label {
 func (d Detect) optionsToLabels(options knfn.Options) []libcnb.Label {
 	labels := []libcnb.Label{}
 
-	scaleJson, err := json.Marshal(options.Scale)
-	if err != nil {
-		d.Logger.Bodyf("unable to marshal func.yaml options.Scale")
+	if options.Scale != nil {
+		scaleJson, err := json.Marshal(options.Scale)
+		if err != nil {
+			d.Logger.Bodyf("unable to marshal func.yaml options.Scale")
+		} else {
+			labels = append(labels,
+				libcnb.Label{
+					Key:   "options-scale",
+					Value: string(scaleJson),
+				},
+			)
+		}
 	}
-	requestsJson, err := json.Marshal(options.Resources.Requests)
-	if err != nil {
-		d.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
 
+	if options.Resources != nil {
+		if options.Resources.Requests != nil {
+			requestsJson, err := json.Marshal(options.Resources.Requests)
+			if err != nil {
+				d.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
+			} else {
+				labels = append(labels,
+					libcnb.Label{
+						Key:   "options-resources-requests",
+						Value: string(requestsJson),
+					},
+				)
+			}
+		}
+
+		if options.Resources.Limits != nil {
+			limitsJson, err := json.Marshal(options.Resources.Limits)
+			if err != nil {
+				d.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
+			} else {
+				labels = append(labels,
+					libcnb.Label{
+						Key:   "options-resources-limits",
+						Value: string(limitsJson),
+					},
+				)
+			}
+		}
 	}
-	limitsJson, err := json.Marshal(options.Resources.Limits)
-	if err != nil {
-		d.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
-	}
-	labels = append(labels,
-		libcnb.Label{
-			Key:   "options-scale",
-			Value: string(scaleJson),
-		},
-		libcnb.Label{
-			Key:   "options-resources-requests",
-			Value: string(requestsJson),
-		},
-		libcnb.Label{
-			Key:   "options-resources-limits",
-			Value: string(limitsJson),
-		})
 
 	return labels
 }
