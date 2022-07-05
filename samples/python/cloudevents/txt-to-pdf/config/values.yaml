@@ -1,18 +1,15 @@
-# Copyright 2021-2022 VMware, Inc.
-# SPDX-License-Identifier: BSD-2-Clause
-
 #@data/values
 ---
 namespace: demo
 
 triggermesh:
-  accesskey:
-  secretkey:
+  accesskey: <your AccessKeyId from step 2>
+  secretkey: <your AccessKeyId from step 2>
 
 app:
-  accesskey:
-  secretkey:
-  sessionkey:
+  accesskey: <your AWS_ACCESS_KEY_ID from step 3 (different from the value in step 2!)>
+  secretkey: <your AWS_SECRET_KEY_ID from step 3 (different from the value in step 2!)>
+  sessionkey: <your SessionToken from step 2>
 
-function_image:
-bucket_arn:
+function_image: <(optional) writable image url repository>
+bucket_arn:  <your bucket ARN from step 1 (Must be the full ARN including the region and account)>
