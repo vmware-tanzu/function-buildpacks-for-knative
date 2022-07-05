@@ -84,7 +84,7 @@ def main(dir: str = "."):
     func = find_func(dir)
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
-    app = Flask(func.__name__)
+    app = flask.Flask(func.__name__)
     app.register_blueprint(healthz, url_prefix="/health")
     app.config.update(
         HEALTHZ = {
