@@ -10,7 +10,7 @@ import cloudevents.http
 
 from cloudevents.http.util import default_marshaller
 from cloudevents.sdk import types
-from flask_healthz import HealthError, Healthz
+from flask_healthz import HealthError, healthz
 from waitress import serve
 from .locate import ArgumentConversion, find_func
 from functools import reduce
@@ -85,7 +85,7 @@ def main(dir: str = "."):
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
     app = flask.Flask(func.__name__)
-    Healthz(app)
+    app.register_blueprint(healthz, url_prefix="/health")
     app.config.update(
         HEALTHZ = {
             "live": "pyfunc.invoke.liveness",
