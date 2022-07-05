@@ -14,8 +14,8 @@ buildpack-files:
 invokers:
 
 publish-invokers:
-publish-builder:
 buildpacks.publish:
+builder.publish:
 
 tests:
 invoker-tests:
