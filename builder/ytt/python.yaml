@@ -1,0 +1,17 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+
+#@overlay/match by=overlay.all
+---
+buildpacks:
+- id: paketo-community/python
+  uri: docker://gcr.io/paketo-community/python:0.7.0
+- id: kn-fn/python-function
+  uri: #@ data.values.python_function_buildpack.url
+order:
+- group:
+  - id: paketo-community/python
+  - id: kn-fn/python-function

@@ -1,0 +1,12 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+---
+buildpacks: []
+order: []
+lifecycle:
+  uri: https://github.com/buildpacks/lifecycle/releases/download/v0.11.4/lifecycle-v0.11.4+linux.x86-64.tgz
+stack:
+  id: io.buildpacks.stacks.bionic
+  build-image: gcr.io/paketo-buildpacks/build:0.0.97-base-cnb
+  run-image: gcr.io/paketo-buildpacks/run:base-cnb
