@@ -53,7 +53,6 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		envs.Logger = b.Logger
 		result.Layers = append(result.Layers, envs)
 		result.Labels = b.convertLabels(e.Metadata["labels"])
-
 	}
 
 	dep, err := dr.Resolve("invoker", "")
@@ -115,8 +114,11 @@ func findPath(path string, r *regexp.Regexp) (string, error) {
 }
 
 func (b Build) convertLabels(t interface{}) []libcnb.Label {
-	sliceOfMaps := t.([]map[string]interface{})
 	labels := []libcnb.Label{}
+	if t == nil {
+		return labels
+	}
+	sliceOfMaps := t.([]map[string]interface{})
 	for _, mapOfLabels := range sliceOfMaps {
 		pairs := []string{}
 		for _, val := range mapOfLabels {
