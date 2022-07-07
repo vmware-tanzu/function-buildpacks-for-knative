@@ -48,11 +48,22 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return result, nil
 	}
 
-	if e.Metadata["has_func_yaml"] == true {
-		envs := NewFuncYamlEnvs(context.Application.Path)
-		envs.Logger = b.Logger
-		result.Layers = append(result.Layers, envs)
-		result.Labels = b.convertLabels(e.Metadata["labels"])
+	functionClass, isFuncDefDefault := cr.Resolve("BP_FUNCTION")
+	defaultDef, isDefaultFuncDefault := cr.Resolve("BP_DEFAULT_FUNCTION")
+
+	functionLayer := NewFunction(context.Application.Path,
+		WithLogger(b.Logger),
+		WithFunctionClass(functionClass, isFuncDefDefault),
+		WithDefaultFunction(defaultDef, isDefaultFuncDefault),
+		WithFuncYamlEnvs(e.Metadata["func_yaml_envs"].(map[string]interface{})),
+	)
+	result.Layers = append(result.Layers, functionLayer)
+
+	for optionName, optionValue := range e.Metadata["func_yaml_options"].(map[string]interface{}) {
+		result.Labels = append(result.Labels, libcnb.Label{
+			Key:   optionName,
+			Value: optionValue.(string),
+		})
 	}
 
 	dep, err := dr.Resolve("invoker", "")
@@ -77,13 +88,6 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		result.Layers = append(result.Layers, i)
 		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
-
-	funcDef, _ := cr.Resolve("BP_FUNCTION")
-	defaultDef, _ := cr.Resolve("BP_DEFAULT_FUNCTION")
-
-	f := NewFunction(funcDef, defaultDef, context.Application.Path)
-	f.Logger = b.Logger
-	result.Layers = append(result.Layers, f)
 
 	command := "java"
 	arguments := []string{"org.springframework.boot.loader.JarLauncher"}
@@ -111,24 +115,4 @@ func findPath(path string, r *regexp.Regexp) (string, error) {
 		}
 	}
 	return "", nil
-}
-
-func (b Build) convertLabels(t interface{}) []libcnb.Label {
-	labels := []libcnb.Label{}
-	if t == nil {
-		return labels
-	}
-	sliceOfMaps := t.([]map[string]interface{})
-	for _, mapOfLabels := range sliceOfMaps {
-		pairs := []string{}
-		for _, val := range mapOfLabels {
-			pairs = append(pairs, val.(string))
-		}
-		labels = append(labels,
-			libcnb.Label{
-				Key:   pairs[0],
-				Value: pairs[1],
-			})
-	}
-	return labels
 }
