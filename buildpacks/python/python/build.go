@@ -4,15 +4,11 @@
 package python
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
-	knfn "knative.dev/kn-plugin-func"
 )
 
 type Build struct {
@@ -23,7 +19,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	b.Logger.Title(context.Buildpack)
 	result := libcnb.NewBuildResult()
 
-	_, err := libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
+	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
 
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
@@ -70,12 +66,29 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	if !ok {
 		return result, nil
 	}
-	functionLayer := NewFunction(functionPlan)
+
+	functionClass, isFuncDefDefault := cr.Resolve("BP_FUNCTION")
+	functionLayer := NewFunction(
+		WithLogger(b.Logger),
+		WithFunctionClass(functionClass, isFuncDefDefault),
+		WithFuncYamlEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]interface{})),
+	)
 	result.Layers = append(result.Layers, functionLayer)
 
-	validationLayer := NewFunctionValidationLayer(functionPlan, context.Application.Path)
+	validationLayer := NewFunctionValidationLayer(
+		context.Application.Path,
+		WithValidationLogger(b.Logger),
+		WithValidationFunctionClass(functionClass, isFuncDefDefault),
+		WithValidationFunctionEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]interface{})),
+	)
 	result.Layers = append(result.Layers, validationLayer)
-	result.Labels = b.getFuncYamlOptions(context.Application.Path)
+
+	for optionName, optionValue := range functionPlan.Metadata["func_yaml_options"].(map[string]interface{}) {
+		result.Labels = append(result.Labels, libcnb.Label{
+			Key:   optionName,
+			Value: optionValue.(string),
+		})
+	}
 
 	command := "python"
 	arguments := []string{"-m", "pyfunc", "start"}
@@ -93,70 +106,4 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	)
 
 	return result, nil
-}
-
-func (b Build) getFuncYamlOptions(appPath string) []libcnb.Label {
-	configFile := filepath.Join(appPath, knfn.ConfigFile)
-	_, err := os.Stat(configFile)
-	if err != nil {
-		b.Logger.Bodyf("'%s' not detected", knfn.ConfigFile)
-		return []libcnb.Label{}
-	}
-
-	f, err := knfn.NewFunction(appPath)
-	if err != nil {
-		b.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
-		return []libcnb.Label{}
-	}
-	return b.optionsToLabels(f.Options)
-}
-
-func (b Build) optionsToLabels(options knfn.Options) []libcnb.Label {
-	labels := []libcnb.Label{}
-
-	if options.Scale != nil {
-		scaleJson, err := json.Marshal(options.Scale)
-		if err != nil {
-			b.Logger.Bodyf("unable to marshal func.yaml options.Scale")
-		} else {
-			labels = append(labels,
-				libcnb.Label{
-					Key:   "options-scale",
-					Value: string(scaleJson),
-				},
-			)
-		}
-	}
-
-	if options.Resources != nil {
-		if options.Resources.Requests != nil {
-			requestsJson, err := json.Marshal(options.Resources.Requests)
-			if err != nil {
-				b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Requests")
-			} else {
-				labels = append(labels,
-					libcnb.Label{
-						Key:   "options-resources-requests",
-						Value: string(requestsJson),
-					},
-				)
-			}
-		}
-
-		if options.Resources.Limits != nil {
-			limitsJson, err := json.Marshal(options.Resources.Limits)
-			if err != nil {
-				b.Logger.Bodyf("unable to marshal func.yaml options.Resources.Limits")
-			} else {
-				labels = append(labels,
-					libcnb.Label{
-						Key:   "options-resources-limits",
-						Value: string(limitsJson),
-					},
-				)
-			}
-		}
-	}
-
-	return labels
 }

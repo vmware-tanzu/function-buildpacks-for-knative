@@ -4,46 +4,21 @@
 package python
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
-	knfn "knative.dev/kn-plugin-func"
-)
-
-const (
-	EnvModuleName   = "MODULE_NAME"
-	EnvFunctionName = "FUNCTION_NAME"
 )
 
 type Detect struct {
 	Logger bard.Logger
 }
 
-func (d Detect) getFuncYamlEnvs(appPath string) (map[string]string, bool) {
-	configFile := filepath.Join(appPath, knfn.ConfigFile)
-	_, err := os.Stat(configFile)
-	if err != nil {
-		d.Logger.Bodyf("'%s' not detected", knfn.ConfigFile)
-		return make(map[string]string), false
-	}
-
-	f, err := knfn.NewFunction(appPath)
-	if err != nil {
-		d.Logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
-		return make(map[string]string), false
-	}
-
-	return envsToMap(f.Envs), true
-}
-
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
 	result := libcnb.DetectResult{}
 
-	envs, hasValidFuncYaml := d.getFuncYamlEnvs(context.Application.Path)
+	funcYaml := ParseFuncYaml(context.Application.Path, d.Logger)
 
 	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &d.Logger)
 	if err != nil {
@@ -57,17 +32,6 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 			d.Logger.Bodyf("BP_FUNCTION detected but is invalid, it should be in the form of `module.function_name`")
 			return libcnb.DetectResult{}, nil
 		}
-
-		envs[EnvModuleName] = funcParts[0]
-		envs[EnvFunctionName] = funcParts[1]
-	} else {
-		if _, found := envs[EnvModuleName]; !found {
-			envs[EnvModuleName] = funcParts[0]
-		}
-
-		if _, found := envs[EnvFunctionName]; !found {
-			envs[EnvFunctionName] = funcParts[1]
-		}
 	}
 
 	result.Plans = append(result.Plans, libcnb.BuildPlan{
@@ -80,8 +44,9 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 			{
 				Name: "python-function",
 				Metadata: map[string]interface{}{
-					"launch": true,
-					"envs":   envs,
+					"launch":            true,
+					"func_yaml_envs":    funcYaml.Envs,
+					"func_yaml_options": funcYaml.Options,
 				},
 			},
 			{
@@ -100,26 +65,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		},
 	})
 
-	result.Pass = hasValidFuncYaml || funcFound
+	result.Pass = funcYaml.Exists || funcFound
 
 	return result, nil
-}
-
-func (d Detect) logf(format string, args ...interface{}) {
-	d.Logger.Infof(format, args...)
-}
-
-func envsToMap(envs knfn.Envs) map[string]string {
-	result := map[string]string{}
-
-	for _, e := range envs {
-		key := *e.Name
-		val := ""
-		if e.Value != nil {
-			val = *e.Value
-		}
-		result[key] = val
-	}
-
-	return result
 }

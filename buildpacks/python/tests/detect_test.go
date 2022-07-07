@@ -20,21 +20,21 @@ type result struct {
 
 func TestDetectNoEnvironmentWithValidFile(t *testing.T) {
 	d := getDetector()
-	app := createTestApplication(withDefaultHTTPFunction())
-	defer app.Finish()
+	appDir, cleanup := SetupTestDirectory(
+		WithFuncYaml(),
+	)
+	defer cleanup()
 
 	plan, err := d.Detect(getContext(
-		withApplicationPath(app.ApplicationPath),
+		withApplicationPath(appDir),
 	))
 
 	expectations := DetectExpectations{
 		Result: result{plan, err},
 		Pass:   true,
 		Metadata: map[string]interface{}{
-			"envs": map[string]string{
-				EnvModuleName:   "func",
-				EnvFunctionName: "main",
-			},
+			"func_yaml_envs":    map[string]string{},
+			"func_yaml_options": map[string]string{},
 		},
 	}
 	expectations.Check(t)
@@ -42,11 +42,16 @@ func TestDetectNoEnvironmentWithValidFile(t *testing.T) {
 
 func TestDetectEnvironmentWithValidFile(t *testing.T) {
 	d := getDetector()
-	app := createTestApplication(withHTTPFunction("other", "handler2"))
-	defer app.Finish()
+	appDir, cleanup := SetupTestDirectory(
+		WithFuncEnvs(map[string]string{
+			"MODULE_NAME":   "other",
+			"FUNCTION_NAME": "handler2",
+		}),
+	)
+	defer cleanup()
 
 	plan, err := d.Detect(getContext(
-		withApplicationPath(app.ApplicationPath),
+		withApplicationPath(appDir),
 		withModuleName("other"),
 		withFunctionName("handler2"),
 	))
@@ -55,10 +60,11 @@ func TestDetectEnvironmentWithValidFile(t *testing.T) {
 		Result: result{plan, err},
 		Pass:   true,
 		Metadata: map[string]interface{}{
-			"envs": map[string]string{
-				EnvModuleName:   "other",
-				EnvFunctionName: "handler2",
+			"func_yaml_envs": map[string]string{
+				"MODULE_NAME":   "other",
+				"FUNCTION_NAME": "handler2",
 			},
+			"func_yaml_options": map[string]string{},
 		},
 	}
 	expectations.Check(t)
@@ -96,13 +102,13 @@ func withApplicationPath(path string) func(*libcnb.DetectContext) {
 
 func withModuleName(value string) func(*libcnb.DetectContext) {
 	return func(dc *libcnb.DetectContext) {
-		dc.Platform.Environment[EnvModuleName] = value
+		dc.Platform.Environment["MODULE_NAME"] = value
 	}
 }
 
 func withFunctionName(value string) func(*libcnb.DetectContext) {
 	return func(dc *libcnb.DetectContext) {
-		dc.Platform.Environment[EnvFunctionName] = value
+		dc.Platform.Environment["FUNCTION_NAME"] = value
 	}
 }
 
@@ -151,7 +157,7 @@ func (e DetectExpectations) Check(t *testing.T) {
 					}
 
 					if !reflect.DeepEqual(v, val) {
-						t.Errorf("unexpected value in '%s' requires metadata for key %s", planName, k)
+						t.Errorf("unexpected value in '%s' requires metadata for key %s. Expected %s but got %s", planName, k, v, val)
 						return
 					}
 				}
