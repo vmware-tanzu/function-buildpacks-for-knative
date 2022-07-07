@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
@@ -15,31 +16,36 @@ import (
 )
 
 type FunctionValidationLayer struct {
-	LayerContributor libpak.LayerContributor
-	Logger           bard.Logger
+	layerContributor libpak.LayerContributor
+	logger           bard.Logger
 
 	module          string
 	function        string
 	applicationPath string
+
+	override bool
 }
 
-func NewFunctionValidationLayer(plan libcnb.BuildpackPlanEntry, appPath string) FunctionValidationLayer {
-	envs := plan.Metadata["envs"].(map[string]interface{})
-	contributor := libpak.NewLayerContributor("validation", envs, libcnb.LayerTypes{})
+type FunctionValidationOpts func(*FunctionValidationLayer, map[string]string)
 
-	return FunctionValidationLayer{
-		LayerContributor: contributor,
-		module:           envs[EnvModuleName].(string),
-		function:         envs[EnvFunctionName].(string),
-		applicationPath:  appPath,
+func NewFunctionValidationLayer(appPath string, opts ...FunctionValidationOpts) FunctionValidationLayer {
+	fvl := FunctionValidationLayer{}
+	meta := map[string]string{}
+
+	for _, opt := range opts {
+		opt(&fvl, meta)
 	}
+
+	fvl.layerContributor = libpak.NewLayerContributor("validation", meta, libcnb.LayerTypes{})
+
+	return fvl
 }
 
 func (i FunctionValidationLayer) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
-	i.LayerContributor.Logger = i.Logger
+	i.layerContributor.Logger = i.logger
 
-	return i.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
-		i.Logger.Body("Validating function")
+	return i.layerContributor.Contribute(layer, func() (libcnb.Layer, error) {
+		i.logger.Body("Validating function")
 
 		var stderr bytes.Buffer
 		cmd := exec.Command("python", "-m", "pyfunc", "check", "-s", i.applicationPath)
@@ -51,11 +57,45 @@ func (i FunctionValidationLayer) Contribute(layer libcnb.Layer) (libcnb.Layer, e
 			return layer, fmt.Errorf("%v: %v", stderr.String(), err)
 		}
 
-		i.Logger.Body("Function was successfully parsed")
+		i.logger.Body("Function was successfully parsed")
 		return layer, nil
 	})
 }
 
 func (i FunctionValidationLayer) Name() string {
-	return i.LayerContributor.Name
+	return i.layerContributor.Name
+}
+
+func WithValidationLogger(logger bard.Logger) FunctionValidationOpts {
+	return func(vl *FunctionValidationLayer, metadata map[string]string) {
+		vl.logger = logger
+	}
+}
+
+func WithValidationFunctionClass(functionClass string, override bool) FunctionValidationOpts {
+	return func(vl *FunctionValidationLayer, metadata map[string]string) {
+		vl.override = override
+
+		fSplit := strings.Split(functionClass, ".")
+		if override || (vl.module == "" && vl.function == "") {
+			vl.module = fSplit[0]
+			vl.function = fSplit[1]
+			metadata[EnvModuleName] = fSplit[0]
+			metadata[EnvFunctionName] = fSplit[1]
+		}
+	}
+}
+
+func WithValidationFunctionEnvs(envs map[string]interface{}) FunctionValidationOpts {
+	return func(vl *FunctionValidationLayer, metadata map[string]string) {
+		for name, value := range envs {
+			if name == EnvModuleName && !vl.override {
+				vl.module = value.(string)
+			} else if name == EnvFunctionName && !vl.override {
+				vl.function = value.(string)
+			} else {
+				metadata[name] = value.(string)
+			}
+		}
+	}
 }
