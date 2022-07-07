@@ -19,57 +19,45 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 
 ## Known Issues
 * Image registry authentication syncing with Tanzu Application Platform
+* ⚠️ Cloud Native Runtimes has a regression in which TriggerMesh does not work
 
 ## Setup
 
-1. Create a public S3 bucket for the demo, and note the ARN of this S3 bucket -- you'll use it soon. (e.g. `arn:aws:s3:us-west-2:123456789012:bucket_name`)
+1. Log in to AWS console and [obtain your AWS Access Key and Secret Key](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html), save these somewhere secure.
 
-1. Deploy a Kubernetes cluster (recommended: with Tanzu Application Platform installed)
+1. [Create a public S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) for the demo, and note the [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) of this S3 bucket.
 
-    -  If you are NOT using Tanzu Application Platform, install [Cloud Native Runtimes](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-install.html) first.
+1. Deploy a Kubernetes cluster with [Tanzu Application Platform (TAP)](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-intro.html) installed
+    
+    -  Ensure you have [Tanzu Image Registry](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install.html) secrets configured properly
 
-    -  If you ARE using Tanzu Application Platform, you will need to configure the Tanzu Image Registry secrets (Steps WIP).
+    -  Install [Cloud Native Runtimes](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-install.html)
     
 1. [Verify](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verify-installation.html) your Cloud Native Runtimes installation was successful. 
 
-    >  Important: Ensure you verify [TriggerMesh SAWS](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verifying-triggermesh.html) up to Step 5, then instead proceed with deplying an AWSS3Source.
+    >  Important: Ensure you verify [TriggerMesh SAWS](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verifying-triggermesh.html), as any error in the cluster or configuration should surface by here.
 
-1. Deploy an [AWS S3 Source](https://github.com/triggermesh/aws-event-sources/blob/main/config/samples/awss3source.yaml)
+1. Locate the `values.yaml` file under this sample's `/config`. You will use your AWS Access Key and AWS Secret Key to fill out the fields here. Use the following below as a guide:
+    ```
+    #@data/values
+    ---
+    namespace: cnr-demo
 
-    - (Optional) Learn more about [Sources and TriggerMesh](https://docs.triggermesh.io/cloud/sources/awss3/), since Cloud Native Runtimes uses TriggerMesh SAWS to subscribe to event notifications and connect to AWS services.
+    triggermesh:
+        accesskey: <your AWS_ACCESS_KEY_ID>
+        secretkey: <your AWS_SECRET_KEY_ID>
 
-    - You may use the template below, which already contains `namespace` added. Be sure to replace `<YOUR-ARN`> with the ARN from Step 1.
-        ```
-        kubectl apply -f - << EOF
-        apiVersion: sources.triggermesh.io/v1alpha1
-        kind: AWSS3Source
-        metadata:
-        name: sample
-        spec:
-        arn: <YOUR-ARN>
+    app:
+        accesskey: <your AWS_ACCESS_KEY_ID>
+        secretkey: <your AWS_SECRET_KEY_ID>
 
-        eventTypes:
-        - s3:ObjectCreated:*
-        - s3:ObjectRemoved:*
+    function_image: <optional>
+    bucket_arn: <e.g. arn:aws:s3:us-west-2:123456789012:bucket_name>
+    ```
 
-        credentials:
-            accessKeyID:
-            valueFromSecret:
-                name: awscreds
-                key: aws_access_key_id
-            secretAccessKey:
-            valueFromSecret:
-                name: awscreds
-                key: aws_secret_access_key
+1.  (Optional) Change the function_image repository location
 
-        sink:
-            ref:
-            apiVersion: eventing.knative.dev/v1
-            kind: Broker
-            name: default
-            namespace: ${WORKLOAD_NAMESPACE}
-        EOF
-        ```
+## (Outdated / Optional) Using AWS STS for Temporary Sessions
 
 1. Obtain your AWS `accesskey` and `secretkey` that will be used in the next steps.
 
@@ -78,28 +66,26 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
     aws sts get-session-token --duration-seconds=129600 # This will generate a session that is going to last for 36h
     ```
 
-1. Now let's create a new file called `creds.yaml` in the current folder (`samples/python/cloudevent/txt-to-pdf`). Paste the following into your terminal to create this file, then fill in your keys.
+1. Use the following template as a reference to fill out `config/values.yaml`:
     ```
-    cat > creds.yaml << EOF
-    ---
     triggermesh:
-        accesskey: <your AccessKeyId from step 2>
-        secretkey: <your SecretAccessKey from step 2>
+        accesskey: <your AWS Access Key>
+        secretkey: <your AWS Secret Key>
 
     app:
-        accesskey: <your AWS_ACCESS_KEY_ID from step 3 (different from the value in step 2!)>
-        secretkey: <your AWS_ACCESS_KEY_ID from step 3 (different from the value in step 2!)>
-        sessionkey: <your SessionToken from step 2>
+        accesskey: <your STS access key>
+        secretkey: <your STS secret key>
+        sessionkey: <your STS session key>
 
-    bucket_arn: <your bucket ARN from step 1 (Must be the full ARN including the region and account)>
-    EOF
+    bucket_arn: <your full bucket ARN>
     ```
 
-1.  (Optional) If you want to change the location of the function, you need to define the environment variable `FUNCTION_IMAGE`
+1. (Optional) If you want to change the location of the function, you need to define the environment variable `FUNCTION_IMAGE`
     ```
     export FUNCTION_IMAGE=<your full image url that can be pushed to>
     ```
 
+1. Uncomment the session key field found under `config/300-app-secret.yaml`
 ## Deploying
 
 There are three steps in our Makefile to build and deploy the demo. For your convenience:
@@ -110,7 +96,7 @@ make build && make publish && make deploy
 
 ## Demo'ing
 
-1. Upload a file ending in `.txt` to your public S3 bucket.
+1. Upload a file ending in `.txt` to your public S3 bucket. (We've provided you `story.txt`)
 
 2. A `.pdf` should have generated in the same bucket immediately after the upload.
 
