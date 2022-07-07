@@ -92,6 +92,10 @@ Publish it to your registry:
 docker push <your_image_name_and_tag>
 ```
 
+## Health Endpoints
+
+The Python Invoker has health endpoints exposed by `healthz`. By default, the path is found at `localhost:8080/healthz/live` or `localhost:8080/healthz/ready`.
+
 ## Templates
 If you want to quickly start writing your functions, take a look at the `templates/python` folder at the root of this repo.
 
