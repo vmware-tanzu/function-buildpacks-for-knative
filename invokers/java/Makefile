@@ -2,62 +2,62 @@ RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
-invoker.java.path := $(abspath $(path))
+invokers.java.path := $(abspath $(path))
 
-include $(invoker.java.path)/../rules.mk
+include $(invokers.java.path)/../rules.mk
 
-invoker.java.sources := $(shell find $(invoker.java.path) -type f -iname '*.java') \
-	$(invoker.java.path)/pom.xml \
-	$(invoker.java.path)/VERSION \
+invokers.java.sources := $(shell find $(invokers.java.path) -type f -iname '*.java') \
+	$(invokers.java.path)/pom.xml \
+	$(invokers.java.path)/VERSION \
 
-$(eval $(call VERSION_template,invoker.java,$(invoker.java.path)))
+$(eval $(call VERSION_template,invokers.java,$(invokers.java.path)))
 
 # The tools should always build based on the version in VERSION file.
-invoker.java.version := $(invoker.java.version.release)
+invokers.java.version := $(invokers.java.version.release)
 
-invoker.java.build_dir := $(invoker.build_dir)/java
-invoker.java.out_dir := $(invoker.out_dir)/java
+invokers.java.build_dir := $(invokers.build_dir)/java
+invokers.java.out_dir := $(invokers.out_dir)/java
 
-invoker.java.artifact.release = $(invoker.java.out_dir)/java-function-invoker-$(invoker.java.version).jar
+invokers.java.artifact.release = $(invokers.java.out_dir)/java-function-invoker-$(invokers.java.version).jar
 
 # We want to use the branch here, it's okay as this isn't something we're pushing
-invoker.java.builder.tag := $(invoker.java.version.branch)
-invoker.java.builder.image_name := java-invoker:$(invoker.java.builder.tag)
-invoker.java.builder.image := $(invoker.java.build_dir)/image.$(invoker.java.builder.tag)
+invokers.java.builder.tag := $(invokers.java.version.branch)
+invokers.java.builder.image_name := java-invoker:$(invokers.java.builder.tag)
+invokers.java.builder.image := $(invokers.java.build_dir)/image.$(invokers.java.builder.tag)
 
-$(invoker.java.builder.image): $(invoker.java.path)/Dockerfile $(invoker.java.sources)
+$(invokers.java.builder.image): $(invokers.java.path)/Dockerfile $(invokers.java.sources)
 	@mkdir -p $(@D)
-	DOCKER_BUILDKIT=1 docker build -t $(invoker.java.builder.image_name) -f $< $(invoker.java.path)
-	printf $(invoker.java.builder.image_name) > $@
+	DOCKER_BUILDKIT=1 docker build -t $(invokers.java.builder.image_name) -f $< $(invokers.java.path)
+	printf $(invokers.java.builder.image_name) > $@
 
-$(invoker.java.artifact.release): $(invoker.java.builder.image)
+$(invokers.java.artifact.release): $(invokers.java.builder.image)
 	@mkdir -p $(@D)
-	docker cp `docker create $(invoker.java.builder.image_name)`:/out/$(notdir $(invoker.java.artifact.release)) $@
+	docker cp `docker create $(invokers.java.builder.image_name)`:/out/$(notdir $(invokers.java.artifact.release)) $@
 	touch $@
 
-invoker.java.bucket := $(invoker.bucket)/java
+invokers.java.bucket := $(invokers.bucket)/java
 
-invoker.java.artifacts := $(invoker.java.artifact.release) $(invoker.java.artifact.release).sha256
-invoker.java.publish := $(invoker.java.build_dir)/publish.$(invoker.java.version)
-$(invoker.java.publish): $(GSUTIL) $(invoker.java.artifacts)
-	$(GSUTIL) cp $(invoker.java.artifacts) $(invoker.java.bucket)
-	$(GSUTIL) retention temp set $(addprefix $(invoker.java.bucket)/,$(notdir $(invoker.java.artifacts)))
-	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(invoker.java.bucket)/,$(notdir $(invoker.java.artifacts)))
+invokers.java.artifacts := $(invokers.java.artifact.release) $(invokers.java.artifact.release).sha256
+invokers.java.publish := $(invokers.java.build_dir)/publish.$(invokers.java.version)
+$(invokers.java.publish): $(GSUTIL) $(invokers.java.artifacts)
+	$(GSUTIL) cp $(invokers.java.artifacts) $(invokers.java.bucket)
+	$(GSUTIL) retention temp set $(addprefix $(invokers.java.bucket)/,$(notdir $(invokers.java.artifacts)))
+	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(invokers.java.bucket)/,$(notdir $(invokers.java.artifacts)))
 	touch $@
 
-.PHONY: invoker.java.tests
-invoker.java.tests: $(invoker.java.builder.image) $(invoker.java.sources)
+.PHONY: invokers.java.tests
+invokers.java.tests: $(invokers.java.builder.image) $(invokers.java.sources)
 	docker run $(shell cat $<)
 
-.PHONY: invoker.java.clean
-invoker.java.clean:
-	# -docker rmi -f $(invoker.java.builder.image_name)
-	$(RM) -r $(invoker.java.build_dir)
-	$(RM) -r $(invoker.java.out_dir)
+.PHONY: invokers.java.clean
+invokers.java.clean:
+	# -docker rmi -f $(invokers.java.builder.image_name)
+	$(RM) -r $(invokers.java.build_dir)
+	$(RM) -r $(invokers.java.out_dir)
 
-.PHONY: invoker.java invoker.java.publish
-invokers invoker.java: $(invoker.java.artifacts)
-publish-invokers invoker.java.publish: $(invoker.java.publish)
-print-sha invokers.java.print-sha: $(invoker.java.artifact.release).print-sha
-tests invokers.tests: invoker.java.tests
-clean: invoker.java.clean
+.PHONY: invokers.java invokers.java.publish
+invokers invokers.java: $(invokers.java.artifacts)
+invokers.publish invokers.java.publish: $(invokers.java.publish)
+print-sha invokers.java.print-sha: $(invokers.java.artifact.release).print-sha
+tests invokers.tests: invokers.java.tests
+clean: invokers.java.clean

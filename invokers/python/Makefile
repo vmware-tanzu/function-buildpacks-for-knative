@@ -2,71 +2,71 @@ RULES.MK ?= ../../rules.mk
 include $(RULES.MK)
 
 path ?= .
-invoker.python.path := $(abspath $(path))
+invokers.python.path := $(abspath $(path))
 
-include $(invoker.python.path)/../rules.mk
+include $(invokers.python.path)/../rules.mk
 
-invoker.python.sources := $(shell find $(invoker.python.path) -type f -iname '*.py') \
-	$(invoker.python.path)/pyproject.toml \
-	$(invoker.python.path)/MANIFEST.in \
-	$(invoker.python.path)/VERSION \
-	$(invoker.python.path)/LICENSE \
-	$(shell find $(invoker.python.path) -mindepth 1 -type d) \
+invokers.python.sources := $(shell find $(invokers.python.path) -type f -iname '*.py') \
+	$(invokers.python.path)/pyproject.toml \
+	$(invokers.python.path)/MANIFEST.in \
+	$(invokers.python.path)/VERSION \
+	$(invokers.python.path)/LICENSE \
+	$(shell find $(invokers.python.path) -mindepth 1 -type d) \
 
-$(eval $(call VERSION_template,invoker.python,$(invoker.python.path)))
+$(eval $(call VERSION_template,invokers.python,$(invokers.python.path)))
 
 # The tools should always build based on the version in VERSION file.
-invoker.python.version := $(invoker.python.version.release)
+invokers.python.version := $(invokers.python.version.release)
 
-invoker.python.build_dir := $(invoker.build_dir)/python
-invoker.python.out_dir := $(invoker.out_dir)/python
+invokers.python.build_dir := $(invokers.build_dir)/python
+invokers.python.out_dir := $(invokers.out_dir)/python
 
-invoker.python.artifact.release = $(invoker.python.out_dir)/pyfunc-invoker-$(invoker.python.version).tar.gz
-invoker.python.artifact.release-deps = $(invoker.python.out_dir)/pyfunc-invoker-deps-$(invoker.python.version).tar.gz
+invokers.python.artifact.release = $(invokers.python.out_dir)/pyfunc-invoker-$(invokers.python.version).tar.gz
+invokers.python.artifact.release-deps = $(invokers.python.out_dir)/pyfunc-invoker-deps-$(invokers.python.version).tar.gz
 
 # We want to use the branch here, it's okay as this isn't something we're pushing
-invoker.python.builder.tag := $(invoker.python.version.branch)
-invoker.python.builder.image_name := python-invoker:$(invoker.python.builder.tag)
-invoker.python.builder.image := $(invoker.python.build_dir)/image.$(invoker.python.builder.tag)
+invokers.python.builder.tag := $(invokers.python.version.branch)
+invokers.python.builder.image_name := python-invoker:$(invokers.python.builder.tag)
+invokers.python.builder.image := $(invokers.python.build_dir)/image.$(invokers.python.builder.tag)
 
-$(invoker.python.builder.image): $(invoker.python.path)/Dockerfile $(invoker.python.sources)
+$(invokers.python.builder.image): $(invokers.python.path)/Dockerfile $(invokers.python.sources)
 	@mkdir -p $(@D)
-	DOCKER_BUILDKIT=1 docker build -t $(invoker.python.builder.image_name) -f $< $(invoker.python.path)
-	printf $(invoker.python.builder.image_name) > $@
+	DOCKER_BUILDKIT=1 docker build -t $(invokers.python.builder.image_name) -f $< $(invokers.python.path)
+	printf $(invokers.python.builder.image_name) > $@
 
-$(invoker.python.artifact.release): $(invoker.python.builder.image)
+$(invokers.python.artifact.release): $(invokers.python.builder.image)
 	@mkdir -p $(@D)
-	docker cp `docker create $(invoker.python.builder.image_name)`:/out/$(notdir $(invoker.python.artifact.release)) $@
+	docker cp `docker create $(invokers.python.builder.image_name)`:/out/$(notdir $(invokers.python.artifact.release)) $@
 	touch $@
 
-$(invoker.python.artifact.release-deps): $(invoker.python.builder.image)
+$(invokers.python.artifact.release-deps): $(invokers.python.builder.image)
 	@mkdir -p $(@D)
-	docker cp `docker create $(invoker.python.builder.image_name)`:/out/$(notdir $(invoker.python.artifact.release-deps)) $@
+	docker cp `docker create $(invokers.python.builder.image_name)`:/out/$(notdir $(invokers.python.artifact.release-deps)) $@
 	touch $@
 
-invoker.python.bucket := $(invoker.bucket)/python
+invokers.python.bucket := $(invokers.bucket)/python
 
-invoker.python.artifacts := $(invoker.python.artifact.release) $(invoker.python.artifact.release).sha256 $(invoker.python.artifact.release-deps) $(invoker.python.artifact.release-deps).sha256
-invoker.python.publish := $(invoker.python.build_dir)/publish.$(invoker.python.version)
-$(invoker.python.publish): $(GSUTIL) $(invoker.python.artifacts)
-	$(GSUTIL) cp $(invoker.python.artifacts) $(invoker.python.bucket)
-	$(GSUTIL) retention temp set $(addprefix $(invoker.python.bucket)/,$(notdir $(invoker.python.artifacts)))
-	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(invoker.python.bucket)/,$(notdir $(invoker.python.artifacts)))
+invokers.python.artifacts := $(invokers.python.artifact.release) $(invokers.python.artifact.release).sha256 $(invokers.python.artifact.release-deps) $(invokers.python.artifact.release-deps).sha256
+invokers.python.publish := $(invokers.python.build_dir)/publish.$(invokers.python.version)
+$(invokers.python.publish): $(GSUTIL) $(invokers.python.artifacts)
+	$(GSUTIL) cp $(invokers.python.artifacts) $(invokers.python.bucket)
+	$(GSUTIL) retention temp set $(addprefix $(invokers.python.bucket)/,$(notdir $(invokers.python.artifacts)))
+	$(GSUTIL) acl ch -u AllUsers:R $(addprefix $(invokers.python.bucket)/,$(notdir $(invokers.python.artifacts)))
 	touch $@
 
-.PHONY: invoker.python.tests
-invoker.python.tests: $(invoker.python.builder.image) $(invoker.python.sources)
+.PHONY: invokers.python.tests
+invokers.python.tests: $(invokers.python.builder.image) $(invokers.python.sources)
 	docker run $(shell cat $<)
 
-.PHONY: invoker.python.clean
-invoker.python.clean:
-	# -docker rmi -f $(invoker.python.builder.image_name)
-	$(RM) -r $(invoker.python.build_dir)
-	$(RM) -r $(invoker.python.out_dir)
+.PHONY: invokers.python.clean
+invokers.python.clean:
+	# -docker rmi -f $(invokers.python.builder.image_name)
+	$(RM) -r $(invokers.python.build_dir)
+	$(RM) -r $(invokers.python.out_dir)
 
-.PHONY: invoker.python invoker.python.publish
-invokers invoker.python: $(invoker.python.artifacts)
-publish-invokers invoker.python.publish: $(invoker.python.publish)
-print-sha invokers.python.print-sha: $(invoker.python.artifact.release).print-sha
-tests invokers.tests: invoker.python.tests
-clean: invoker.python.clean
+.PHONY: invokers.python invokers.python.publish
+invokers invokers.python: $(invokers.python.artifacts)
+invoker.publish invokers.python.publish: $(invokers.python.publish)
+print-sha invokers.python.print-sha: $(invokers.python.artifact.release).print-sha
+tests invokers.tests: invokers.python.tests
+clean: invokers.python.clean
