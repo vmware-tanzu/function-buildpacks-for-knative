@@ -58,7 +58,7 @@ func NewLogger() bard.Logger {
 type SetupOpts func(directory string)
 
 func SetupTestDirectory(opts ...SetupOpts) (string, func()) {
-	dir, err := ioutil.TempDir(os.TempDir(), "java-functions-buildpack-*")
+	dir, err := ioutil.TempDir(os.TempDir(), "python-functions-buildpack-*")
 	if err != nil {
 		panic(fmt.Sprintf("unable to create test directory: %v", err))
 	}

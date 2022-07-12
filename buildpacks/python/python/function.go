@@ -37,7 +37,7 @@ func NewFunction(opts ...FunctionOpt) Function {
 	}
 
 	f.layerContributor = libpak.NewLayerContributor(
-		"java-function",
+		"python-function",
 		meta,
 		libcnb.LayerTypes{
 			Launch: true,
