@@ -56,7 +56,7 @@ jobs:
       - name: Create Tag
         id: tag
         run: |
-          tag=${{ github.event.inputs.invoker }}-invoker/v${{ needs.bump-version.outputs.version }}
+          tag=${{ github.event.inputs.invoker }}-invoker/v${{ steps.version.outputs.version }}
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
@@ -79,7 +79,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ github.event.inputs.invoker }}-invoker v${{ needs.bump-version.outputs.version }}
+          name: ${{ github.event.inputs.invoker }}-invoker v${{ steps.version.outputs.version }}
           body: |
             # File Checksums
             ```
