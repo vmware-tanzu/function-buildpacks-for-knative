@@ -9,7 +9,7 @@ $(eval $(call INCLUDE_FILE, $(ROOT_DIR)/builder))
 echo-ce.image := kn-fn-test/echo-ce
 echo-ce.image_paths := $(shell find $(echo-ce.path) -mindepth 1 -maxdepth 1 -type d)
 $(echo-ce.image_paths): $(PACK) $(builder.image.out)
-	cd $@ && $(PACK) build $(echo-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --pull-policy if-not-present
+	cd $@ && $(PACK) build $(echo-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --pull-policy if-not-present --clear-cache
 
 echo-ce.clean := $(addsuffix .clean,$(echo-ce.image_paths))
 $(echo-ce.clean):
