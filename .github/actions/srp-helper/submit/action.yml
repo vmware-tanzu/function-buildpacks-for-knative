@@ -1,0 +1,26 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: 'SRP Helper Submit'
+description: 'Helper action to submit data for VMware SRP CLI'
+inputs:
+  source-provenance-path:
+    description: 'Location of the source provenance file'
+    required: false
+  network-provenance-path:
+    description: 'Location of the network provenance file'
+    required: false
+  srp-url:
+    description: 'SRP service URL, if set to empty it will use the default internal URL. Defaults to the external service URL.'
+    default: 'https://apigw.vmware.com/v1/s1/api/helix-beta'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - id: submit
+      run: ${{ github.action_path }}/submit.sh
+      env:
+        SOURCE_PROVENANCE_PATH: ${{ inputs.source-provenance-path }}
+        NETWORK_PROVENANCE_PATH: ${{ inputs.network-provenance-path }}
+        SRP_URL: ${{ inputs.srp-url }}
+      shell: bash
