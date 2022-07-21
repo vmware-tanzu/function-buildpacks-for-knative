@@ -1,0 +1,27 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: 'SRP Helper Collect'
+description: 'Helper action to collect data for VMware SRP CLI'
+inputs:
+  git-repos:
+    description: 'List of repos to process. Space separated.'
+    required: true
+  build-type:
+    description: 'Name of the built type to be stored in source provenance'
+    default: release
+    required: true
+  scm-type:
+    description: 'SCM type of the processed repos'
+    default: git
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - id: collect
+      env:
+        GIT_REPOS: ${{ inputs.git-repos }}
+        BUILD_TYPE: ${{ inputs.build-type }}
+        SCM_TYPE: ${{ inputs.scm-type }}
+      run: ${{ github.action_path }}/collect.sh
+      shell: bash
