@@ -1,0 +1,31 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: 'SRP Helper Init'
+description: 'Helper action for using VMware SRP CLI to initialize the environment.'
+inputs:
+  client-id:
+    description: 'Client ID associated with your CSP org'
+    required: true
+  client-secret:
+    description: 'Client Secret associated with your CSP org'
+    required: true
+  domain:
+    description: |
+      Optionally provide the domain, such as 'tanzu-buildpacks' or 'tanzu-java-buildpacks'.
+      Do not provide quotes.
+    required: false
+outputs:
+  srp-data:
+    description: "Location of SRP data from collect."
+    value: ${{ steps.init.outputs.srp-data }}
+runs:
+  using: "composite"
+  steps:
+    - id: init
+      run: ${{ github.action_path }}/init.sh
+      env:
+        CLIENT_ID: ${{ inputs.client-id }}
+        CLIENT_SECRET: ${{ inputs.client-secret }}
+        DOMAIN: ${{ inputs.domain }}
+      shell: bash
