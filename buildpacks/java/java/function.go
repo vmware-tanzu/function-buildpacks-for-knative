@@ -88,26 +88,31 @@ func WithLogger(logger bard.Logger) FunctionOpt {
 	}
 }
 
-func WithDefaultFunction(defaultFunctionName string, override bool) FunctionOpt {
+// TODO test this code
+func WithDefaultFunction(defaultFunctionName string, override bool, funcYamlName string) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
-		fun.defaultFunctionName = defaultFunctionName
-		fun.overrideDefaultFunctionName = override
+		fun.defaultFunctionName = funcYamlName
+		metadata["bp-default-function"] = funcYamlName
 
-		metadata["bp-default-function"] = defaultFunctionName
+		if override {
+			fun.functionClass = defaultFunctionName
+			metadata["bp-function-class"] = defaultFunctionName
+		}
+
+		fun.overrideDefaultFunctionName = override
 		metadata["bp-default-function-override"] = strconv.FormatBool(override)
 	}
 }
 
-// TODO test this code
+//TODO This should not be the way that works
 func WithFunctionClass(functionClass string, override bool, funcYamlName string) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
-
-		fun.functionClass = functionClass
-		metadata["bp-function-class"] = functionClass
+		fun.functionClass = funcYamlName
+		metadata["bp-function-class"] = funcYamlName
 
 		if override {
-			fun.functionClass = funcYamlName
-			metadata["bp-function-class"] = funcYamlName
+			fun.functionClass = functionClass
+			metadata["bp-function-class"] = functionClass
 		}
 
 		fun.overrideFunctionClass = override

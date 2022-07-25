@@ -33,9 +33,9 @@ func TestDetectNoEnvironmentWithValidFile(t *testing.T) {
 		Result: result{plan, err},
 		Pass:   true,
 		Metadata: map[string]interface{}{
-			"func_yaml_function_name": "my-function",
-			"func_yaml_envs":          map[string]string{},
-			"func_yaml_options":       map[string]string{},
+			"func_yaml_name":    "my-function",
+			"func_yaml_envs":    map[string]string{},
+			"func_yaml_options": map[string]string{},
 		},
 	}
 	expectations.Check(t)
@@ -44,59 +44,24 @@ func TestDetectNoEnvironmentWithValidFile(t *testing.T) {
 func TestDetectEnvironmentWithValidFile(t *testing.T) {
 	d := getDetector()
 	appDir, cleanup := SetupTestDirectory(
+		WithFuncName("my-function"),
 		WithFuncEnvs(map[string]string{
-			"MODULE_NAME":   "other",
-			"FUNCTION_NAME": "handler2",
+			"--spring.config.name": "my-project",
 		}),
 	)
 	defer cleanup()
 
 	plan, err := d.Detect(getContext(
 		withApplicationPath(appDir),
-		withModuleName("other"),
-		withFunctionName("handler2"),
 	))
 
 	expectations := DetectExpectations{
 		Result: result{plan, err},
 		Pass:   true,
 		Metadata: map[string]interface{}{
-			"func_yaml_function_name": "handler2",
+			"func_yaml_name": "my-function",
 			"func_yaml_envs": map[string]string{
-				"MODULE_NAME":   "other",
-				"FUNCTION_NAME": "handler2",
-			},
-			"func_yaml_options": map[string]string{},
-		},
-	}
-	expectations.Check(t)
-}
-
-func TestDetectNameFromEnvsBeforeFuncYamlFile(t *testing.T) {
-	d := getDetector()
-	appDir, cleanup := SetupTestDirectory(
-		WithFuncName("not-the-best-name"),
-		WithFuncEnvs(map[string]string{
-			"MODULE_NAME":   "other",
-			"FUNCTION_NAME": "goodName",
-		}),
-	)
-	defer cleanup()
-
-	plan, err := d.Detect(getContext(
-		withApplicationPath(appDir),
-		withModuleName("other"),
-		withFunctionName("goodName"),
-	))
-
-	expectations := DetectExpectations{
-		Result: result{plan, err},
-		Pass:   true,
-		Metadata: map[string]interface{}{
-			"func_yaml_function_name": "goodName",
-			"func_yaml_envs": map[string]string{
-				"MODULE_NAME":   "other",
-				"FUNCTION_NAME": "goodName",
+				"--spring.config.name": "my-project",
 			},
 			"func_yaml_options": map[string]string{},
 		},
@@ -131,18 +96,6 @@ func getContext(opts ...func(*libcnb.DetectContext)) libcnb.DetectContext {
 func withApplicationPath(path string) func(*libcnb.DetectContext) {
 	return func(dc *libcnb.DetectContext) {
 		dc.Application.Path = path
-	}
-}
-
-func withModuleName(value string) func(*libcnb.DetectContext) {
-	return func(dc *libcnb.DetectContext) {
-		dc.Platform.Environment["MODULE_NAME"] = value
-	}
-}
-
-func withFunctionName(value string) func(*libcnb.DetectContext) {
-	return func(dc *libcnb.DetectContext) {
-		dc.Platform.Environment["FUNCTION_NAME"] = value
 	}
 }
 
