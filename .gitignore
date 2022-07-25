@@ -86,6 +86,7 @@ creds.yaml
 .classpath
 
 # Java subdirectory layers
+target/
 invokers/java/target/
 samples/java/cloudevents/txt-to-pdf-gradle/.gradle/
 samples/java/http/request-response-gradle/.gradle/

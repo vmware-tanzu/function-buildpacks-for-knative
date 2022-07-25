@@ -8,10 +8,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>functions</groupId>
-	<artifactId>hire</artifactId>
+	<artifactId>http-function</artifactId>
 	<version>0.0.1</version>
-	<name>hire</name>
-	<description>Function which will hire a person</description>
+	<name>http-function</name>
+	<description>Sample http function</description>
 	<properties>
 		<java.version>11</java.version>
 		<maven.compiler.source>11</maven.compiler.source>
