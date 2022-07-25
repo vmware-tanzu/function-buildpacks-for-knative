@@ -95,8 +95,8 @@ func WithDefaultFunction(defaultFunctionName string, override bool, funcYamlName
 		metadata["bp-default-function"] = funcYamlName
 
 		if override {
-			fun.functionClass = defaultFunctionName
-			metadata["bp-function-class"] = defaultFunctionName
+			fun.defaultFunctionName = defaultFunctionName
+			metadata["bp-default-function"] = defaultFunctionName
 		}
 
 		fun.overrideDefaultFunctionName = override
