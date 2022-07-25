@@ -104,16 +104,10 @@ func WithDefaultFunction(defaultFunctionName string, override bool, funcYamlName
 	}
 }
 
-//TODO This should not be the way that works
-func WithFunctionClass(functionClass string, override bool, funcYamlName string) FunctionOpt {
+func WithFunctionClass(functionClass string, override bool) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
-		fun.functionClass = funcYamlName
-		metadata["bp-function-class"] = funcYamlName
-
-		if override {
-			fun.functionClass = functionClass
-			metadata["bp-function-class"] = functionClass
-		}
+		fun.functionClass = functionClass
+		metadata["bp-function-class"] = functionClass
 
 		fun.overrideFunctionClass = override
 		metadata["bp-function-class-override"] = strconv.FormatBool(override)
