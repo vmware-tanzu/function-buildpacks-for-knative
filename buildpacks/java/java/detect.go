@@ -53,9 +53,10 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 			{
 				Name: "java-function",
 				Metadata: map[string]interface{}{
-					"launch":            true,
-					"func_yaml_envs":    funcYaml.Envs,
-					"func_yaml_options": funcYaml.Options,
+					"launch":                  true,
+					"func_yaml_envs":          funcYaml.Envs,
+					"func_yaml_function_name": funcYaml.Name,
+					"func_yaml_options":       funcYaml.Options,
 				},
 			},
 			{

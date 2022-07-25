@@ -53,7 +53,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	functionLayer := NewFunction(context.Application.Path,
 		WithLogger(b.Logger),
-		WithFunctionClass(functionClass, isFuncDefDefault),
+		WithFunctionClass(functionClass, isFuncDefDefault, e.Metadata["func_yaml_function_name"].(string)),
 		WithDefaultFunction(defaultDef, isDefaultFuncDefault),
 		WithFuncYamlEnvs(e.Metadata["func_yaml_envs"].(map[string]interface{})),
 	)

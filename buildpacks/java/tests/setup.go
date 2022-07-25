@@ -54,6 +54,22 @@ func WithFuncYaml() SetupOpts {
 	}
 }
 
+func WithFuncName(name string) SetupOpts {
+	return func(directory string) {
+		cfg, err := knfn.NewFunction(directory)
+		if err != nil {
+			panic(err)
+		}
+
+		cfg.Name = name
+
+		err = cfg.WriteConfig()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func WithFuncEnvs(envs map[string]string) SetupOpts {
 	return func(directory string) {
 		cfg, err := knfn.NewFunction(directory)

@@ -98,12 +98,18 @@ func WithDefaultFunction(defaultFunctionName string, override bool) FunctionOpt 
 	}
 }
 
-func WithFunctionClass(functionClass string, override bool) FunctionOpt {
+// TODO test this code
+func WithFunctionClass(functionClass string, override bool, funcYamlName string) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
-		fun.functionClass = functionClass
-		fun.overrideFunctionClass = override
+		if functionClass == "" {
+			fun.functionClass = funcYamlName
+			metadata["bp-function-class"] = funcYamlName
+		} else {
+			fun.functionClass = functionClass
+			metadata["bp-function-class"] = functionClass
+		}
 
-		metadata["bp-function-class"] = functionClass
+		fun.overrideFunctionClass = override
 		metadata["bp-function-class-override"] = strconv.FormatBool(override)
 	}
 }
