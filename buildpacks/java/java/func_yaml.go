@@ -35,31 +35,13 @@ func ParseFuncYaml(filedir string, logger bard.Logger) FuncYaml {
 
 	options := optionsToMap(cfg.Options, logger)
 	envs := envsToMap(cfg.Envs, logger)
-	name := getName(cfg.Envs, cfg.Name)
+
 	return FuncYaml{
-		Name:    name,
+		Name:    cfg.Name,
 		Options: options,
 		Envs:    envs,
 		Exists:  true,
 	}
-}
-
-func getName(envs knfn.Envs, nameFromYaml string) string {
-	result := nameFromYaml
-
-	if envs == nil {
-		return result
-	}
-
-	for _, e := range envs {
-		key := *e.Name
-		if key == "FUNCTION_NAME" {
-			result = *e.Value
-			break
-		}
-	}
-
-	return result
 }
 
 func envsToMap(envs knfn.Envs, logger bard.Logger) map[string]string {
