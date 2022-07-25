@@ -55,6 +55,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 				Metadata: map[string]interface{}{
 					"launch":            true,
 					"func_yaml_envs":    funcYaml.Envs,
+					"func_yaml_name":    funcYaml.Name,
 					"func_yaml_options": funcYaml.Options,
 				},
 			},

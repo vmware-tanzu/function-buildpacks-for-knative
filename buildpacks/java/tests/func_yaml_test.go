@@ -32,6 +32,18 @@ func TestParseFuncYaml_FileExistsButEmpty(t *testing.T) {
 	}
 }
 
+func TestParseFuncYaml_HasFuncClass(t *testing.T) {
+	expectedFunctionName := "functionName"
+	appDir, cleanup := SetupTestDirectory(WithFuncName(expectedFunctionName))
+	defer cleanup()
+	result := java.ParseFuncYaml(appDir, NewLogger())
+
+	if result.Name != "functionName" {
+		t.Logf("Expected function name to be %s but received %s", expectedFunctionName, result.Name)
+		t.Fail()
+	}
+}
+
 func TestParseFuncYaml_HasEnvs(t *testing.T) {
 	envs := map[string]string{
 		"my-env":   "my-env-value",

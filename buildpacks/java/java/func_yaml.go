@@ -13,6 +13,7 @@ import (
 )
 
 type FuncYaml struct {
+	Name    string
 	Options map[string]string
 	Envs    map[string]string
 	Exists  bool
@@ -36,6 +37,7 @@ func ParseFuncYaml(filedir string, logger bard.Logger) FuncYaml {
 	envs := envsToMap(cfg.Envs, logger)
 
 	return FuncYaml{
+		Name:    cfg.Name,
 		Options: options,
 		Envs:    envs,
 		Exists:  true,
