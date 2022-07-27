@@ -24,7 +24,7 @@ git.commit := $(shell git rev-parse HEAD)
 base_url := https://github.com/vmware-tanzu/function-buildpacks-for-knative
 
 registry.location := gcr
-registry.gcr := us.gcr.io/daisy-284300/dolfo/kn-fn
+registry.gcr := us.gcr.io/daisy-284300/kn-fn
 registry.other := $(REGISTRY)
 registry = $(registry.$(registry.location))
 
