@@ -5,7 +5,7 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
-group = 'com.vmware.functions'
+group = 'functions'
 version = '0.0.1'
 sourceCompatibility = '11'
 
