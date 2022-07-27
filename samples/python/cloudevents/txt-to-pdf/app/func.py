@@ -1,15 +1,23 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-from fpdf import FPDF
 from typing import Any
+from fpdf import FPDF
 from urllib.parse import unquote_plus
 
 import boto3
 import os
 import sys
 
-def DoEvent(data: Any, attributes: dict):
+def main(data: Any, attributes: dict):
+    creds = AWSCreds()
+    client = boto3.client(
+        's3',
+        aws_access_key_id=creds.accessKey,
+        aws_secret_access_key=creds.secretKey,
+        aws_session_token=creds.sessionKey,
+    )
+
     print(f"Got event data: {data}", file=sys.stderr)
 
     file = unquote_plus(data["s3"]["object"]["key"])
@@ -54,11 +62,3 @@ class AWSCreds:
     @property
     def sessionKey(self):
         return self._session_key
-
-creds = AWSCreds()
-client = boto3.client(
-    's3',
-    aws_access_key_id=creds.accessKey,
-    aws_secret_access_key=creds.secretKey,
-    aws_session_token=creds.sessionKey,
-)
