@@ -49,12 +49,10 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 
 	functionClass, isFuncDefDefault := cr.Resolve("BP_FUNCTION")
-	defaultDef, isDefaultFuncDefault := cr.Resolve("BP_DEFAULT_FUNCTION")
 
 	functionLayer := NewFunction(context.Application.Path,
 		WithLogger(b.Logger),
 		WithFunctionClass(functionClass, isFuncDefDefault),
-		WithDefaultFunction(defaultDef, isDefaultFuncDefault),
 		WithFuncYamlEnvs(e.Metadata["func_yaml_envs"].(map[string]interface{})),
 	)
 	result.Layers = append(result.Layers, functionLayer)
