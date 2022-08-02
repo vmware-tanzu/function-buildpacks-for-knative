@@ -59,14 +59,6 @@ func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 			layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_FUNCTION_CLASS", f.functionClass)
 		}
 
-		if len(f.defaultFunctionName) > 0 {
-			if f.overrideDefaultFunctionName {
-				layer.LaunchEnvironment.Override("SPRING_CLOUD_FUNCTION_DEFINITION", f.defaultFunctionName)
-			} else {
-				layer.LaunchEnvironment.Default("SPRING_CLOUD_FUNCTION_DEFINITION", f.defaultFunctionName)
-			}
-		}
-
 		for envName, envValue := range f.funcYamlEnvs {
 			layer.LaunchEnvironment.Default(envName, envValue)
 		}
@@ -85,16 +77,6 @@ type FunctionOpt func(fun *Function, metadata map[string]string)
 func WithLogger(logger bard.Logger) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
 		fun.logger = logger
-	}
-}
-
-func WithDefaultFunction(defaultFunctionName string, override bool) FunctionOpt {
-	return func(fun *Function, metadata map[string]string) {
-		fun.defaultFunctionName = defaultFunctionName
-		fun.overrideDefaultFunctionName = override
-
-		metadata["bp-default-function"] = defaultFunctionName
-		metadata["bp-default-function-override"] = strconv.FormatBool(override)
 	}
 }
 
