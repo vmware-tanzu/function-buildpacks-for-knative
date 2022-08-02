@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      if: ${{ github.event_name == 'workflow_dispatch'}}
     - name: Check SRP Creds
       uses: ./.github/actions/srp-helper/check-srp-creds
       with:
