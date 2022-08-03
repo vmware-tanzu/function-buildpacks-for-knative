@@ -20,10 +20,6 @@ func (d Detect) checkConfigs(cr libpak.ConfigurationResolver) bool {
 		return true
 	}
 
-	if _, defined := cr.Resolve("BP_DEFAULT_FUNCTION"); defined {
-		return true
-	}
-
 	return false
 }
 

@@ -1,0 +1,29 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: 'Check SRP Credentials'
+
+description: 'Do you have the SRP credentials (client id and secret)?'
+
+inputs:
+  client-id:
+    description: 'Client ID associated with your CSP org'
+    required: false
+  client-secret:
+    description: 'Client Secret associated with your CSP org'
+    required: false
+
+outputs:
+  has-srp-creds:
+    description: "Returns 'true' if and only if SRP_CLIENT_ID and SRP_CLIENT_SECRET are not empty"
+    value: ${{ steps.has-srp-creds.outputs.has-srp-creds }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: has-srp-creds
+      env:
+        CLIENT_ID: ${{ inputs.client-id }}
+        CLIENT_SECRET: ${{ inputs.client-secret }}
+      run: ${{ github.action_path }}/check.sh
+      shell: bash

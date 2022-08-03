@@ -1,0 +1,11 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: 'SRP Helper Install'
+description: 'Helper action to install VMware SRP CLI. Adds the srp cli to $PATH'
+runs:
+  using: "composite"
+  steps:
+    - id: install
+      run: ${{ github.action_path }}/install.sh
+      shell: bash
