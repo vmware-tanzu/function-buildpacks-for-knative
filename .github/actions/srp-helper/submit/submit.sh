@@ -12,11 +12,7 @@ catch() {
 
 echo "Runway SRP: Submit provenance."
 
-# TODO: remove sed call
-#  At the moment, the SRP CLI does not properly URL encode the UID. This causes
-#  the API call to fail. The SRP CLI released in a few weeks should fix this.
-#  When that happens, it'll be safe to remove the sed translation.
-SRP_UID="$(sed 's|/|%2F|g' < ./srp_data/srp_uid)"
+SRP_UID="$(<./srp_data/srp_uid)"
 FULL_SRP_UID="uid.mtd.provenance_2_5.fragment(obj_uid=$SRP_UID,revision='')"
 echo "Full SRP UID that will be used for upload: $FULL_SRP_UID"
 
