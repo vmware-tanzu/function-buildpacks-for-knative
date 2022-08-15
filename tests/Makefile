@@ -19,3 +19,6 @@ template-tests.run: template-tests.images
 	cd $(tests.path) && go test -v -tags=template
 
 tests template-tests .PHONY: template-tests.run
+
+integration: $(builder.image.out) $(PACK)
+	cd $(tests.path) && go test ./integration/... -v -args -pack=$(PACK) -builder=$(shell cat $(builder.image.out))
