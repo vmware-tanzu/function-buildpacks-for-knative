@@ -45,7 +45,7 @@ buildpacks.java.invoker.sha := $(buildpacks.java.temp_dir)/invoker.sha256
 
 $(buildpacks.java.invoker.sha):
 	@mkdir -p $(@D)
-	curl -w '\0' -L $(buildpacks.java.invoker.url).sha256 -o $@
+	curl -sw '\0' -L $(buildpacks.java.invoker.url).sha256 -o $@
 
 buildpacks.java.invoker.values := $(buildpacks.java.temp_dir)/values.yaml
 
@@ -134,6 +134,15 @@ $(buildpacks.java.images.offline.out): $(PACK) $(buildpacks.java.package.offline
 	$(PACK) buildpack package $(buildpacks.java.images.offline.name) --config $(buildpacks.java.package.offline)/package.toml
 	printf '$(buildpacks.java.images.offline.name)' > $@
 
+########
+# commit
+########
+
+$(buildpacks.java.path)/buildpack.toml: $(buildpacks.java.config)
+	sed 's/^/# /' $(ROOT_DIR)hack/boilerplate.go.txt > $@
+	printf '#\n# DO NOT EDIT!! This file is auto-generated.\n\n' >> $@
+	cat $< >> $@
+
 #########
 # Testing
 #########
@@ -157,6 +166,8 @@ buildpacks.java.images.offline.publish: buildpacks.java.images.offline
 buildpacks.java.images.online.publish: buildpacks.java.images.online
 	docker push $(buildpacks.java.images.online.name)
 buildpacks.java.images.publish: buildpacks.java.images.offline.publish buildpacks.java.images.online.publish
+
+buildpacks.java.commit.prep: $(buildpacks.java.path)/buildpack.toml
 
 buildpacks.java.tests: $(buildpacks.java.bin.sources) $(buildpacks.java.tests.sources)
 	cd $(buildpacks.java.path) && go test -v -count=1 -timeout 30s kn-fn/java-function-buildpack/tests
