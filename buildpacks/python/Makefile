@@ -47,11 +47,11 @@ buildpacks.python.invoker_deps.sha := $(buildpacks.python.temp_dir)/invoker_dep.
 
 $(buildpacks.python.invoker.sha):
 	@mkdir -p $(@D)
-	curl -w '\0' -L $(buildpacks.python.invoker.url).sha256 -o $@
+	curl -sw '\0' -L $(buildpacks.python.invoker.url).sha256 -o $@
 
 $(buildpacks.python.invoker_deps.sha):
 	@mkdir -p $(@D)
-	curl -w '\0' -L $(buildpacks.python.invoker_deps.url).sha256 -o $@
+	curl -sw '\0' -L $(buildpacks.python.invoker_deps.url).sha256 -o $@
 
 buildpacks.python.invoker.values := $(buildpacks.python.temp_dir)/values.yaml
 
@@ -145,6 +145,15 @@ $(buildpacks.python.images.offline.out): $(PACK) $(buildpacks.python.package.off
 	$(PACK) buildpack package $(buildpacks.python.images.offline.name) --config $(buildpacks.python.package.offline)/package.toml
 	printf '$(buildpacks.python.images.offline.name)' > $@
 
+########
+# commit
+########
+
+$(buildpacks.python.path)/buildpack.toml: $(buildpacks.python.config)
+	sed 's/^/# /' $(ROOT_DIR)hack/boilerplate.go.txt > $@
+	printf '#\n# DO NOT EDIT!! This file is auto-generated.\n\n' >> $@
+	cat $< >> $@
+
 #########
 # Testing
 #########
@@ -168,6 +177,8 @@ buildpacks.python.images.offline.publish: buildpacks.python.images.offline
 buildpacks.python.images.online.publish: buildpacks.python.images.online
 	docker push $(buildpacks.python.images.online.name)
 buildpacks.python.images.publish: buildpacks.python.images.offline.publish buildpacks.python.images.online.publish
+
+buildpacks.python.commit.prep: $(buildpacks.python.path)/buildpack.toml
 
 buildpacks.python.tests: $(buildpacks.python.bin.sources) $(buildpacks.python.tests.sources)
 	cd $(buildpacks.python.path) && go test -v -count=1 -timeout 30s kn-fn/python-function-buildpack/tests

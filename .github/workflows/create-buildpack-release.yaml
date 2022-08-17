@@ -61,9 +61,12 @@ jobs:
       - name: Publish Container
         run: |
           make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} buildpacks.${{ github.event.inputs.buildpack }}.images.publish
-      - name: Commit Version
+      - name: Prepare Commit
+          make buildpacks.${{ github.event.inputs.buildpack }}.commit.prep
+      - name: Commit
         run: |
           git add ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
+          git add ./buildpacks/${{ github.event.inputs.buildpack }}/buildpack.toml
           git config user.name github-actions
           git config user.email github-actions@github.com
           git commit -m 'Update ${{ github.event.inputs.buildpack }} buildpack version to ${{ steps.version.outputs.version }}'
