@@ -14,4 +14,4 @@ metadata:
     uri: #@ data.values.invoker.url
     sha256: #@ data.values.invoker.sha
     stacks:
-    - io.buildpacks.stacks.bionic
+    - "*"
