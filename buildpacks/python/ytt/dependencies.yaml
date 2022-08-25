@@ -14,11 +14,11 @@ metadata:
     uri: #@ data.values.invoker.url
     sha256: #@ data.values.invoker.sha
     stacks:
-    - io.buildpacks.stacks.bionic
+    - "*"
   - id: invoker-deps
     name: Python Invoker Deps
     version: #@ data.values.invoker_dep.version
     uri: #@ data.values.invoker_dep.url
     sha256: #@ data.values.invoker_dep.sha
     stacks:
-    - io.buildpacks.stacks.bionic
+    - "*"
