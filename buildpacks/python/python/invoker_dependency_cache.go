@@ -24,6 +24,7 @@ type InvokerDependencyCache struct {
 }
 
 func NewInvokerDependencyCache(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) InvokerDependencyCache {
+	dependency.CPEs = []string{}
 	contributor := libpak.NewDependencyLayerContributor(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
 		Cache:  true,
