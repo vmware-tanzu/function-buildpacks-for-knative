@@ -24,19 +24,32 @@ type FunctionValidationLayer struct {
 	applicationPath string
 
 	override bool
+
+	Invoker    Layer
+	InvokerDep Layer
 }
 
 type FunctionValidationOpts func(*FunctionValidationLayer, map[string]string)
 
-func NewFunctionValidationLayer(appPath string, opts ...FunctionValidationOpts) FunctionValidationLayer {
-	fvl := FunctionValidationLayer{}
+type Layer interface {
+	PythonPath() string
+}
+
+func NewFunctionValidationLayer(appPath string, invoker Layer, InvokerDepLayer Layer, opts ...FunctionValidationOpts) FunctionValidationLayer {
+	fvl := FunctionValidationLayer{
+		applicationPath: appPath,
+		Invoker:         invoker,
+		InvokerDep:      InvokerDepLayer,
+	}
 	meta := map[string]string{}
 
 	for _, opt := range opts {
 		opt(&fvl, meta)
 	}
 
-	fvl.layerContributor = libpak.NewLayerContributor("validation", meta, libcnb.LayerTypes{})
+	fvl.layerContributor = libpak.NewLayerContributor("validation", meta, libcnb.LayerTypes{
+		Build: true,
+	})
 
 	return fvl
 }
@@ -47,17 +60,32 @@ func (i FunctionValidationLayer) Contribute(layer libcnb.Layer) (libcnb.Layer, e
 	return i.layerContributor.Contribute(layer, func() (libcnb.Layer, error) {
 		i.logger.Body("Validating function")
 
-		var stderr bytes.Buffer
-		cmd := exec.Command("python", "-m", "pyfunc", "check", "-s", i.applicationPath)
-		cmd.Env = os.Environ()
-		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", EnvModuleName, i.module), fmt.Sprintf("%s=%s", EnvFunctionName, i.function))
-		cmd.Stderr = &stderr
-
-		if err := cmd.Run(); err != nil {
-			return layer, fmt.Errorf("%v: %v", stderr.String(), err)
+		var pythonPath []string
+		if i.Invoker.PythonPath() != "" {
+			pythonPath = append(pythonPath, i.Invoker.PythonPath())
 		}
 
-		i.logger.Body("Function was successfully parsed")
+		if i.InvokerDep.PythonPath() != "" {
+			pythonPath = append(pythonPath, i.InvokerDep.PythonPath())
+		}
+
+		if env, found := os.LookupEnv("PYTHONPATH"); found {
+			pythonPath = append(pythonPath, env)
+		}
+
+		buffer := bytes.NewBuffer(nil)
+		cmd := exec.Command("python", "-m", "pyfunc", "check", "-s", i.applicationPath)
+		// cmd := exec.Command("env")
+		cmd.Env = append(os.Environ(), fmt.Sprintf("PYTHONPATH=%s", strings.Join(pythonPath, string(os.PathListSeparator))))
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", EnvModuleName, i.module), fmt.Sprintf("%s=%s", EnvFunctionName, i.function))
+		cmd.Stderr = buffer
+		cmd.Stdout = buffer
+
+		if err := cmd.Run(); err != nil {
+			return layer, fmt.Errorf("%v: %v", buffer.String(), err)
+		}
+
+		i.logger.Debug("Function was successfully parsed")
 		return layer, nil
 	})
 }
