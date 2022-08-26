@@ -48,16 +48,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 	}
 
-	invokerDepCacheLayer, invokerDepCacheBom := NewInvokerDependencyCache(invokerDepCache, dependencyCache)
+	invokerDepCacheLayer := NewInvokerDependencyCache(invokerDepCache, dependencyCache)
 	invokerDepCacheLayer.Logger = b.Logger
-	result.Layers = append(result.Layers, invokerDepCacheLayer)
-	result.BOM.Entries = append(result.BOM.Entries, invokerDepCacheBom)
+	result.Layers = append(result.Layers, &invokerDepCacheLayer)
 
-	invokerLayer, invokerBOM := NewInvoker(invoker, dependencyCache)
+	invokerLayer := NewInvoker(invoker, dependencyCache)
 	invokerLayer.Logger = b.Logger
-	invokerLayer.DependencyCacheLayer = &invokerDepCacheLayer
-	result.Layers = append(result.Layers, invokerLayer)
-	result.BOM.Entries = append(result.BOM.Entries, invokerBOM)
+	result.Layers = append(result.Layers, &invokerLayer)
 
 	functionPlan, ok, err := planResolver.Resolve("python-function")
 	if err != nil {
@@ -77,6 +74,8 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	validationLayer := NewFunctionValidationLayer(
 		context.Application.Path,
+		&invokerLayer,
+		&invokerDepCacheLayer,
 		WithValidationLogger(b.Logger),
 		WithValidationFunctionClass(functionClass, isFuncDefDefault),
 		WithValidationFunctionEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]interface{})),
