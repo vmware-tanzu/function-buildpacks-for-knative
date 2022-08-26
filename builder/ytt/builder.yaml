@@ -7,6 +7,6 @@ order: []
 lifecycle:
   uri: https://github.com/buildpacks/lifecycle/releases/download/v0.14.1/lifecycle-v0.14.1+linux.x86-64.tgz
 stack:
-  id: io.buildpacks.stacks.bionic
-  build-image: gcr.io/paketo-buildpacks/build:0.0.97-base-cnb
-  run-image: gcr.io/paketo-buildpacks/run:base-cnb
+  id: io.buildpacks.stacks.jammy
+  build-image: paketobuildpacks/builder-jammy-buildpackless-base:latest
+  run-image: paketobuildpacks/run-jammy-base:latest

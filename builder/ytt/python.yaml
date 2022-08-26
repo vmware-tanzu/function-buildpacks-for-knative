@@ -7,11 +7,11 @@
 #@overlay/match by=overlay.all
 ---
 buildpacks:
-- id: paketo-community/python
-  uri: docker://gcr.io/paketo-community/python:0.7.0
+- id: paketo-buildpacks/python
+  uri: docker://gcr.io/paketo-buildpacks/python:2.0.0
 - id: kn-fn/python-function
   uri: #@ data.values.python_function_buildpack.url
 order:
 - group:
-  - id: paketo-community/python
+  - id: paketo-buildpacks/python
   - id: kn-fn/python-function
