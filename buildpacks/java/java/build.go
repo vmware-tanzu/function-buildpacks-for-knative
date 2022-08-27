@@ -81,10 +81,9 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	if dependencyPath != "" {
 		b.Logger.Info("embedded tomcat dependency found at: ", dependencyPath, " (skipping invoker layer)")
 	} else {
-		i, be := NewInvoker(dep, dc)
+		i := NewInvoker(dep, dc)
 		i.Logger = b.Logger
 		result.Layers = append(result.Layers, i)
-		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
 
 	command := "java"

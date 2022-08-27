@@ -18,11 +18,12 @@ type Invoker struct {
 	Logger           bard.Logger
 }
 
-func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) (Invoker, libcnb.BOMEntry) {
-	contributor, entry := libpak.NewDependencyLayer(dependency, cache, libcnb.LayerTypes{
+func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) Invoker {
+	dependency.CPEs = []string{}
+	contributor := libpak.NewDependencyLayerContributor(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
 	})
-	return Invoker{LayerContributor: contributor}, entry
+	return Invoker{LayerContributor: contributor}
 }
 
 func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
@@ -31,7 +32,7 @@ func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	return i.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
 		i.Logger.Bodyf("Expanding to %s", layer.Path)
 
-		if err := crush.ExtractZip(artifact, layer.Path, 0); err != nil {
+		if err := crush.Extract(artifact, layer.Path, 0); err != nil {
 			return libcnb.Layer{}, fmt.Errorf("unable to extract %s\n%w", artifact.Name(), err)
 		}
 
