@@ -19,6 +19,7 @@ type Invoker struct {
 }
 
 func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) (Invoker, libcnb.BOMEntry) {
+	dependency.CPEs = []string{}
 	contributor, entry := libpak.NewDependencyLayer(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
 	})
