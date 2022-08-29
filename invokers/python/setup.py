@@ -23,7 +23,7 @@ setup(
     version=version,
     long_description=long_description,
     long_description_content_type='text/markdown',
-    license='Apache',
+    license='BSD-2-Clause',
     install_requires=[
         'cloudevents >=1.2, <2',
         'flask-healthz >=0.0.3',
@@ -35,7 +35,7 @@ setup(
     test_suite='tests',
     classifiers=[
         "Programming Language :: Python :: 3",
-        'License :: OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: BSD License',
         'Operating System :: Unix',
     ],
 )
