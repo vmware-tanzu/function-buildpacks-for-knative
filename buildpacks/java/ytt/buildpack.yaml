@@ -10,6 +10,7 @@ buildpack:
   version: #@ data.values.buildpack.version
   sbom-formats:
   - application/vnd.syft+json
+  - application/vnd.cyclonedx+json
 stacks:
 - id: "*"
 metadata:
