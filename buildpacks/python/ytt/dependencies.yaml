@@ -15,6 +15,11 @@ metadata:
     sha256: #@ data.values.invoker.sha
     stacks:
     - "*"
+    purl: #@ "pkg:generic/pyfunc_invoker@{version}?checksum={sha}&download_url={url}".format(version=data.values.invoker.version, sha=data.values.invoker.sha, url=data.values.invoker.url)
+    licenses: [ BSD-2-Clause ]
+    cpes:
+    - #@ 'cpe:2.3:a:vmware:pyfunc_invoker:{version}:*:*:*:*:*:*:*'.format(version=data.values.invoker.version)
+
   - id: invoker-deps
     name: Python Invoker Deps
     version: #@ data.values.invoker_dep.version
@@ -22,3 +27,4 @@ metadata:
     sha256: #@ data.values.invoker_dep.sha
     stacks:
     - "*"
+    purl: #@ "pkg:generic/pyfunc_invoker_deps@{version}?checksum={sha}&download_url={url}".format(version=data.values.invoker_dep.version, sha=data.values.invoker_dep.sha, url=data.values.invoker_dep.url)

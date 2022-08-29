@@ -1,0 +1,33 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+#! This is temporary. We should automate this section.
+#@ load("@ytt:overlay", "overlay")
+
+#@overlay/match by=overlay.all
+---
+metadata:
+  dependencies:
+  #@overlay/match by="id"
+  - id: invoker-deps
+    #@overlay/match expects=0
+    licenses:
+    - BSD-3-Clause
+    - MIT
+    - Apache-2.0
+    - BSD-2-Clause or Apache-2.0
+    - ZPL-2.1
+    #@overlay/match expects=0
+    cpes:
+    - cpe:2.3:a:palletsproject:click:8.1.3:*:*:*:*:*:*:*
+    - cpe:2.3:a:palletsproject:flask:2.2.2:*:*:*:*:*:*:*
+    - cpe:2.3:a:palletsproject:itsdangerous:2.1.2:*:*:*:*:*:*:*
+    - cpe:2.3:a:palletsproject:jinja2:3.1.2:*:*:*:*:*:*:*
+    - cpe:2.3:a:palletsproject:markupsafe:2.1.1:*:*:*:*:*:*:*
+    - cpe:2.3:a:palletsproject:werkzeug:2.2.2:*:*:*:*:*:*:*
+    - cpe:2.3:a:agendaless:waitress:2.1.2:*:*:*:*:*:*:*
+    - cpe:2.3:a:fedora-infrastructure:0.0.3:*:*:*:*:*:*:*
+    - cpe:2.3:a:pyparsing:pyparsing:3.0.9:*:*:*:*:*:*:*
+    - cpe:2.3:a:pypa:packaging:21.3:*:*:*:*:*:*:*
+    - cpe:2.3:a:cloudevents:sdk-python:1.6.1:*:*:*:*:*:*:*
+    - cpe:2.3:a:brian_curtin:deprecation:2.1.0:*:*:*:*:*:*:*
