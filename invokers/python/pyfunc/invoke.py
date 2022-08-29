@@ -62,7 +62,8 @@ def WrapFunction(func: typing.Callable) -> typing.Callable:
                 return flask.Response(
                     "Accepted with no event response", 200, mimetype="text/plain"
                 )
-        return flask.make_response(result, 200)
+
+        return flask.Response(result, 200)
 
     print(f"$$ Converting {inspect.signature(func)} to {inspect.signature(handler)}")
     return handler

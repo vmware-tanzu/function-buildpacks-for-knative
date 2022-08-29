@@ -12,11 +12,6 @@ on:
   schedule:
     - cron: '0 6 * * 1'
 
-env:
-  REGISTRY: ghcr.io
-  CONTAINER_PATH: ${{ github.repository }}
-  DEPENDENCY_BASE_URL: https://github.com/${{ github.repository }}
-
 jobs:
   template-tests:
     runs-on: ubuntu-latest
@@ -28,4 +23,4 @@ jobs:
         go-version: '1.17.8'
     - run: go version
     - name: Run Template Tests
-      run: make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} template-tests
+      run: make template-tests

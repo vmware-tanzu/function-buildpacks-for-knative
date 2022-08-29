@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run Python Invoker Tests
-      run: make invokers.python.tests
+      run: make invoker.python.tests
 
   test-java-invoker:
     name: Test Java Invoker
@@ -31,5 +31,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run Java Invoker Tests
-      run: make invokers.java.tests
+      run: make invoker.java.tests
 

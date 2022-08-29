@@ -10,15 +10,16 @@ all:
 
 builder:
 buildpacks:
+buildpack-files:
 invokers:
 
-buildpacks.publish:
-invokers.publish:
-builder.publish:
+publish-buildpacks:
+publish-invokers:
+publish-builder:
 
 tests:
-buildpacks.tests:
-invokers.tests:
+buildpack-tests:
+invoker-tests:
 smoke-tests:
 
 clean:

@@ -18,9 +18,9 @@ If you are a developer making changes to these invokers, there are several gener
 
 After making your changes to your Invoker's files:
 
-1) Use the provided `Makefile`'s `publish` command to push your changes to a GCR repo (e.g. `make invokers.<language>.publish`)
+1) Use the provided `Makefile`'s `publish` command to push your changes to a GCR repo (e.g. `make invoker.<language>.publish`)
 2) Note down that link and the `SHA` provided in the newly generated `out` folder
-3) Then, modify the respective language's `buildpacks/<language>/buildpack.toml`, and then cut a new release of the buildpack to GCR (`make buildpacks.<language>.publish`)
+3) Then, modify the respective language's `buildpacks/<language>/buildpack.toml`, and then cut a new release of the buildpack to GCR (`make <language>-buildpack.publish`)
 4) Update `builder/builder.toml` to finally push all these changes to the builder
 5) Locally build your function with this new builder (`make builder.clean` if needed, then `make builder`)
 

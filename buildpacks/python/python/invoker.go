@@ -4,52 +4,53 @@
 package python
 
 import (
-	"fmt"
+	"bytes"
 	"os"
+	"os/exec"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
-	"github.com/paketo-buildpacks/libpak/crush"
 )
 
 type Invoker struct {
 	LayerContributor libpak.DependencyLayerContributor
 	Logger           bard.Logger
 
-	pythonPath string
+	DependencyCacheLayer *InvokerDependencyCache
 }
 
-func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) Invoker {
-	dependency.CPEs = []string{}
-	contributor := libpak.NewDependencyLayerContributor(dependency, cache, libcnb.LayerTypes{
+func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) (Invoker, libcnb.BOMEntry) {
+	contributor, entry := libpak.NewDependencyLayer(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
-		Cache:  true,
 	})
-	return Invoker{LayerContributor: contributor}
+	return Invoker{LayerContributor: contributor}, entry
 }
 
-func (i *Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	i.LayerContributor.Logger = i.Logger
-	i.pythonPath = layer.Path
-
 	return i.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
-		i.Logger.Bodyf("Extracting invoker to %s", layer.Path)
+		i.Logger.Bodyf("Installing to %s", artifact.Name())
 
-		if err := crush.Extract(artifact, layer.Path, 1); err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to extract %s\n%w", artifact.Name(), err)
+		args := []string{"install"}
+		if i.DependencyCacheLayer != nil {
+			args = append(args, "--find-links", i.DependencyCacheLayer.CacheDir)
 		}
+		args = append(args, artifact.Name())
 
-		layer.LaunchEnvironment.Append("PYTHONPATH", string(os.PathListSeparator), i.PythonPath())
+		var stderr bytes.Buffer
+		cmd := exec.Command("pip", args...)
+		cmd.Stderr = &stderr
+
+		if err := cmd.Run(); err != nil {
+			i.Logger.Body("failed to install invoker: %s", stderr.String())
+			return layer, err
+		}
 
 		return layer, nil
 	})
 }
 
-func (i *Invoker) Name() string {
-	return "invoker"
-}
-
-func (i *Invoker) PythonPath() string {
-	return i.pythonPath
+func (i Invoker) Name() string {
+	return i.LayerContributor.Name()
 }

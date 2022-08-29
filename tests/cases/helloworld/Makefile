@@ -8,8 +8,8 @@ $(eval $(call INCLUDE_FILE, $(ROOT_DIR)/builder))
 
 helloworld.image := kn-fn-test/helloworld
 helloworld.image_paths := $(shell find $(helloworld.path) -mindepth 1 -maxdepth 1 -type d)
-$(helloworld.image_paths): $(PACK) $(builder.image.out)
-	cd $@ && $(PACK) build $(helloworld.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --pull-policy if-not-present --clear-cache
+$(helloworld.image_paths): $(PACK) $(builder.build)
+	cd $@ && $(PACK) build $(helloworld.image):$(notdir $@) --builder $(shell cat $(builder.build))
 
 helloworld.clean := $(addsuffix .clean,$(helloworld.image_paths))
 $(helloworld.clean):

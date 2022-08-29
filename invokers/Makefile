@@ -2,14 +2,14 @@ RULES.MK ?= ../rules.mk
 include $(RULES.MK)
 
 path ?= .
-invokers.path := $(abspath $(path))
+invoker.path := $(abspath $(path))
 
-include $(invokers.path)/rules.mk
+include $(invoker.path)/rules.mk
 
 # Include test case images
-invokers.languages := \
+invoker.languages := \
 	python \
 	java \
 
-SUBDIRS := $(addprefix $(invokers.path)/, $(invokers.languages))
+SUBDIRS := $(addprefix $(invoker.path)/, $(invoker.languages))
 $(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))

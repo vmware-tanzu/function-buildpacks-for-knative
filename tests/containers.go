@@ -49,7 +49,7 @@ func runTestContainer(image string) (func(), error) {
 	}
 
 	// We may want to figure something else out here. The container may be running but the server may not be ready
-	time.Sleep(30 * time.Second)
+	time.Sleep(15 * time.Second)
 
 	return func() {
 		cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{Force: true})

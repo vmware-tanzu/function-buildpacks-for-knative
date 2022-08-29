@@ -18,6 +18,7 @@ The buildpack will do the following if detection passed:
 | Environment Variable | Description |
 |----------------------|-------------|
 | `$BP_FUNCTION` | Configure the function to load. If the function lives in the default package: `<class>`. If the function lives in their own package: `<package>.<class>`. Defaults to `functions.Handler` |
+| `$BP_DEFAULT_FUNCTION` | Configure the default function. By specifying this property, a function with the name can be accessed via the `/` path. Defaults to empty. |
 
 ## Getting started
 To get started you'll need to create a directory where your function will be defined.

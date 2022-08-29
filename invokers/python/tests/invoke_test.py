@@ -5,7 +5,6 @@ from flask import Request
 from pyfunc.invoke import WrapFunction
 import pytest
 
-@pytest.mark.skip(reason="Trying to run a method from Flask, needs app context properly tested")
 def test_wrap_function():
     is_called = False
     def testfunc(req):

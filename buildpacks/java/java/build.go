@@ -48,20 +48,12 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return result, nil
 	}
 
-	functionClass, isFuncDefDefault := cr.Resolve("BP_FUNCTION")
+	if e.Metadata["has_func_yaml"] == true {
+		envs := NewFuncYamlEnvs(context.Application.Path)
+		envs.Logger = b.Logger
+		result.Layers = append(result.Layers, envs)
+		result.Labels = b.convertLabels(e.Metadata["labels"])
 
-	functionLayer := NewFunction(context.Application.Path,
-		WithLogger(b.Logger),
-		WithFunctionClass(functionClass, isFuncDefDefault),
-		WithFuncYamlEnvs(e.Metadata["func_yaml_envs"].(map[string]interface{})),
-	)
-	result.Layers = append(result.Layers, functionLayer)
-
-	for optionName, optionValue := range e.Metadata["func_yaml_options"].(map[string]interface{}) {
-		result.Labels = append(result.Labels, libcnb.Label{
-			Key:   optionName,
-			Value: optionValue.(string),
-		})
 	}
 
 	dep, err := dr.Resolve("invoker", "")
@@ -81,10 +73,18 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	if dependencyPath != "" {
 		b.Logger.Info("embedded tomcat dependency found at: ", dependencyPath, " (skipping invoker layer)")
 	} else {
-		i := NewInvoker(dep, dc)
+		i, be := NewInvoker(dep, dc)
 		i.Logger = b.Logger
 		result.Layers = append(result.Layers, i)
+		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
+
+	funcDef, _ := cr.Resolve("BP_FUNCTION")
+	defaultDef, _ := cr.Resolve("BP_DEFAULT_FUNCTION")
+
+	f := NewFunction(funcDef, defaultDef, context.Application.Path)
+	f.Logger = b.Logger
+	result.Layers = append(result.Layers, f)
 
 	command := "java"
 	arguments := []string{"org.springframework.boot.loader.JarLauncher"}
@@ -112,4 +112,21 @@ func findPath(path string, r *regexp.Regexp) (string, error) {
 		}
 	}
 	return "", nil
+}
+
+func (b Build) convertLabels(t interface{}) []libcnb.Label {
+	sliceOfMaps := t.([]map[string]interface{})
+	labels := []libcnb.Label{}
+	for _, mapOfLabels := range sliceOfMaps {
+		pairs := []string{}
+		for _, val := range mapOfLabels {
+			pairs = append(pairs, val.(string))
+		}
+		labels = append(labels,
+			libcnb.Label{
+				Key:   pairs[0],
+				Value: pairs[1],
+			})
+	}
+	return labels
 }
