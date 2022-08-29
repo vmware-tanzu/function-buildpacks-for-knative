@@ -15,3 +15,6 @@ metadata:
     sha256: #@ data.values.invoker.sha
     stacks:
     - "*"
+    purl: #@ "pkg:generic/java_invoker@{version}?checksum={sha}&download_url={url}".format(version=data.values.invoker.version, sha=data.values.invoker.sha, url=data.values.invoker.url)
+    cpes:
+    - #@ 'cpe:2.3:a:vmware:java_invoker:{version}:*:*:*:*:*:*:*'.format(version=data.values.invoker.version)
