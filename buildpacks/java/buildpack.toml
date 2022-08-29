@@ -3,16 +3,16 @@
 #
 # DO NOT EDIT!! This file is auto-generated.
 
-api = "0.6"
+api = "0.7"
 
 [buildpack]
 id = "kn-fn/java-function"
 name = "Java Function Buildpack"
-version = "1.0.1"
-sbom-formats = ["application/vnd.syft+json"]
+version = "1.0.2"
+sbom-formats = ["application/vnd.syft+json", "application/vnd.cyclonedx+json"]
 
 [[stacks]]
-id = "io.buildpacks.stacks.bionic"
+id = "*"
 
 [metadata]
 include-files = ["README.md", "bin/build", "bin/detect", "bin/main", "buildpack.toml", "VERSION"]
@@ -26,7 +26,9 @@ name = "BP_FUNCTION"
 [[metadata.dependencies]]
 id = "invoker"
 name = "Java Invoker"
-version = "0.0.3"
-uri = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker/v0.0.3/java-function-invoker-0.0.3.jar"
-sha256 = "96e37417475e179e0cc396c612c6c73ee7b3d4da59b965078ff1a10f5ca744b5"
-stacks = ["io.buildpacks.stacks.bionic"]
+version = "0.0.4"
+uri = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker/v0.0.4/java-function-invoker-0.0.4.jar"
+sha256 = "1114df91a056c51aa687c9deeb918b87d8c98ca143c11935573f955a0323a869"
+stacks = ["*"]
+purl = "pkg:generic/java_invoker@0.0.4?checksum=1114df91a056c51aa687c9deeb918b87d8c98ca143c11935573f955a0323a869&download_url=https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker/v0.0.4/java-function-invoker-0.0.4.jar"
+cpes = ["cpe:2.3:a:vmware:java_invoker:0.0.4:*:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_actuator:2.7.3:*:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_web:2.7.3:*:*:*:*:*:*:*", "cpe:2.3:a:vmware:spring_cloud_function_deployer::3.2.6:*:*:*:*:*:*:*", "cpe:2.3:a:vmware:spring_cloud_function_web::3.2.6:*:*:*:*:*:*:*"]
