@@ -10,7 +10,6 @@ invokers.python.sources := $(shell find $(invokers.python.path) -type f -iname '
 	$(invokers.python.path)/pyproject.toml \
 	$(invokers.python.path)/MANIFEST.in \
 	$(invokers.python.path)/VERSION \
-	$(invokers.python.path)/LICENSE \
 	$(shell find $(invokers.python.path) -mindepth 1 -type d) \
 
 $(eval $(call VERSION_template,invokers.python,$(invokers.python.path)))
