@@ -103,7 +103,7 @@ If you want to quickly start writing your functions, take a look at the `templat
 For some inspiration, take a look at the `samples/python` folder at the root of this repo.
 
 CloudEvent samples:
-- [Simple S3 Interaction](https://gitlab.eng.vmware.com/daisy/functions/buildpacks/-/tree/master/samples/python/cloudevent/s3_lamba)
+- [Simple S3 Interaction](https://gitlab.eng.vmware.com/daisy/functions/buildpacks/-/tree/master/samples/python/cloudevent/s3-lambda)
 - [SQS Secrets Encrypter](https://gitlab.eng.vmware.com/daisy/functions/buildpacks/-/tree/master/samples/python/cloudevent/sqs-lambda)
 - [Automatic S3 txt-to-pdf Converter](https://gitlab.eng.vmware.com/daisy/functions/buildpacks/-/tree/master/samples/python/cloudevent/txt-to-pdf)
 
