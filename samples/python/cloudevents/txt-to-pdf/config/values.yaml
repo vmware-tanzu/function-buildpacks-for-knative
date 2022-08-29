@@ -1,6 +1,6 @@
 #@data/values
 ---
-namespace: demo
+namespace: cnr-demo
 
 triggermesh:
   accesskey:
@@ -9,7 +9,6 @@ triggermesh:
 app:
   accesskey:
   secretkey:
-  sessionkey:
 
 function_image:
 bucket_arn:

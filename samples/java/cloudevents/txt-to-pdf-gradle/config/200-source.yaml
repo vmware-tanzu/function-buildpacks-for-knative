@@ -1,0 +1,29 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: sources.triggermesh.io/v1alpha1
+kind: AWSS3Source
+metadata:
+  name: source
+  namespace: #@ data.values.namespace
+spec:
+  arn: #@ data.values.bucket_arn
+
+  eventTypes:
+    - "s3:ObjectCreated:*"   
+
+  credentials:
+    accessKeyID:
+      valueFromSecret:
+        name: awscreds
+        key: aws_access_key_id
+    secretAccessKey:
+      valueFromSecret:
+        name: awscreds
+        key: aws_secret_access_key    
+
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: broker
+      namespace: #@ data.values.namespace

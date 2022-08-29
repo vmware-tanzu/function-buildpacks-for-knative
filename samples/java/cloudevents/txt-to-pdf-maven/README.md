@@ -1,76 +1,107 @@
 # txt-to-pdf
 
-This is the core txt-to-pdf sample folder.
-
 ## Summary
 
 This Java function listens for AWS S3 create events. When a new `.txt` file is detected, it will attempt to convert the text file into a PDF, then upload it to S3.
 
 ## Video Demos
 
-- [Python video demo](https://vmware.enterprise.slack.com/files/WS0819VJM/F02C0ASMJAY/func-demo-full.mp4?origin_team=T024JFTN4&origin_channel=C021B90DLMA)
-- [Java video demo](#)
+- [Python video demo](https://vimeo.com/724580619)
+- [Java video demo](https://vimeo.com/724580576)
+
+## Prerequisites
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [aws](https://aws.amazon.com/cli/)
+* [docker](https://docs.docker.com/engine/install/)
+* [pack](https://buildpacks.io/docs/tools/pack/)
+* [kapp](https://carvel.dev/kapp/)
+* [ytt](https://carvel.dev/ytt/)
+
+## Known Issues
+* Image registry authentication syncing with Tanzu Application Platform
+* ⚠️ Cloud Native Runtimes has a regression in which TriggerMesh does not work
 
 ## Setup
 
-### Prerequisites
-* Cloud Native Runtimes: 1.0.0+
-* AWS CLI
-* Docker
-* Buildpack CLI
-* Kapp
-* ytt >= 0.36
+1. Log in to AWS console and [obtain your AWS Access Key and Secret Key](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html), save these somewhere secure.
 
-### Known Issues
-* n/a
+1. [Create a public S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) for the demo, and note the [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) of this S3 bucket.
 
-### Instructions
+1. Deploy a Kubernetes cluster with [Tanzu Application Platform (TAP)](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-intro.html) installed
+    
+    -  Ensure you have [Tanzu Image Registry](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install.html) secrets configured properly
 
-1. Create a bucket in S3 for the demo. Note down the ARN of this S3 bucket.
+    -  Install [Cloud Native Runtimes](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-install.html)
+    
+1. [Verify](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verify-installation.html) your Cloud Native Runtimes installation was successful. 
 
-1. Get your AWS access key and secret key that will be used by Triggermesh to listen for events.
+    >  Important: Ensure you verify [TriggerMesh SAWS](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.2/tanzu-cloud-native-runtimes/GUID-verifying-triggermesh.html), as any error in the cluster or configuration should surface by here.
 
-1. Create a new file called `creds.yaml` in the current folder (`samples/java/cloudevent/txt-to-pdf`):
+1. Locate the `values.yaml` file under this sample's `/config`. You will use your AWS Access Key and AWS Secret Key to fill out the fields here. Use the following below as a guide:
     ```
-    cat > creds.yaml << EOF
+    #@data/values
     ---
+    namespace: cnr-demo
+
     triggermesh:
-      accesskey: <your access key from step 2>
-      secretkey: <your secret key from step 2>
+        accesskey: <your AWS_ACCESS_KEY_ID>
+        secretkey: <your AWS_SECRET_KEY_ID>
 
     app:
-      accesskey: <your access key from step 2>
-      secretkey: <your secret key from step 2>
+        accesskey: <your AWS_ACCESS_KEY_ID>
+        secretkey: <your AWS_SECRET_KEY_ID>
 
-    bucket_arn: <your bucket ARN from step 1 (Must be the full ARN including the region and account)>
-    EOF
+    function_image: <optional>
+    bucket_arn: <e.g. arn:aws:s3:us-west-2:123456789012:bucket_name>
     ```
 
-    Optionally, if you need to use STS to configure your AWS credentials, see "AWS Credentials via STS" below.
+1.  (Optional) Change the function_image repository location
 
-1.  If you want to change the location of the function, you need to define the environment variable `FUNCTION_IMAGE`
+## (Outdated / Optional) Using AWS STS for Temporary Sessions
+
+1. Obtain your AWS `accesskey` and `secretkey` that will be used in the next steps.
+
+1. Use the following STS command to to [generate a temporary session](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html) for the application via the AWS CLI. This will generate three keys you use under app in `creds.yaml` below, please note them down somewhere safe temporarily.
+    ```
+    aws sts get-session-token --duration-seconds=129600 # This will generate a session that is going to last for 36h
+    ```
+
+1. Use the following template as a reference to fill out `config/values.yaml`:
+    ```
+    triggermesh:
+        accesskey: <your AWS Access Key>
+        secretkey: <your AWS Secret Key>
+
+    app:
+        accesskey: <your STS access key>
+        secretkey: <your STS secret key>
+        sessionkey: <your STS session key>
+
+    bucket_arn: <your full bucket ARN>
+    ```
+
+1. (Optional) If you want to change the location of the function, you need to define the environment variable `FUNCTION_IMAGE`
     ```
     export FUNCTION_IMAGE=<your full image url that can be pushed to>
     ```
 
-1. (Optional) Deploy Cloud Native Runtimes on a platform of your choice, including [these verifying steps](https://docs.vmware.com/en/Cloud-Native-Runtimes-for-VMware-Tanzu/1.0/tanzu-cloud-native-runtimes-1-0/GUID-verifying-triggermesh.html).
+1. Uncomment the session key field found under `config/300-app-secret.yaml`
+## Deploying
 
-1. Create a TriggerMesh S3 Source mapped to the public bucket name you created in Step 1.
+There are three steps in our Makefile to build and deploy the demo. For your convenience:
 
-1. Create the function container image.
-    ```
-    make build
-    ```
+```
+make build && make publish && make deploy
+```
 
-1. Publish your image.
-    ```
-    make publish
-    ```
+## Demo'ing
 
-1. Deploy your app!
-    ```
-    make deploy
-    ```
+1. Upload a file ending in `.txt` to your public S3 bucket. (We've provided you `story.txt`)
+
+2. A `.pdf` should have generated in the same bucket immediately after the upload.
+
+3. Download and view your newly converted document!
+ 
 
 ### Cleanup
 To cleanup, simply run:
@@ -79,75 +110,3 @@ make destroy
 ```    
 
 If you encounter any Knative errors while re-deploying the app, be sure to delete the `ksvc` consumer before re-running `make deploy`.
-
-
-## AWS Credentials via STS
-
-1. We will also be using STS to [generate a temporary session](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html) for the application via the AWS cli.
-    ```
-    aws sts get-session-token --duration-seconds=1800 # This will generate a session that is going to last for 30m
-    ```
-
-1. Now let's create a new file called `creds.yaml` in the current folder (`samples/java/cloudevent/txt-to-pdf`):
-    ```
-    cat > creds.yaml << EOF
-    ---
-    triggermesh:
-      accesskey: <your access key from step 2>
-      secretkey: <your secret key from step 2>
-
-    app:
-      accesskey: <your access key from step 3 (This value is different from the one in step 2!)>
-      secretkey: <your secret key from step 3 (This value is different from the one in step 2!)>
-      sessionkey: <your session key from step 3>
-
-    bucket_arn: <your bucket ARN from step 1 (Must be the full ARN including the region and account)>
-    EOF
-    ```
-
-## Legacy Deployment YAML
-```
-apiVersion: v1
-kind: Secret
-metadata:
-  name: my-aws-creds
-  namespace: cnr-demo
-type: Opaque
-stringData:
-  aws-access-key: "key"
-  aws-secret-key: "key"
-  aws-session-key: "key"
----
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: consumer
-  namespace: cnr-demo
-spec:
-  template:
-    metadata:
-      annotations:
-        autoscaling.knative.dev/minScale: "1"
-    spec:
-      containers:
-        - image: <your-image>
-          imagePullPolicy: Always
-          env:
-            - name: FLASK_ENV
-              value: development
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: my-aws-creds
-                  key: aws-access-key
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: my-aws-creds
-                  key: aws-secret-key
-            - name: AWS_SESSION_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: my-aws-creds
-                  key: aws-session-key
-```
