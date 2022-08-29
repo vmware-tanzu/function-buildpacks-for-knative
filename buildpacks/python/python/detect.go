@@ -62,6 +62,13 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 					"build": true,
 				},
 			},
+			{
+				Name: "cpython",
+				Metadata: map[string]interface{}{
+					"build":  true,
+					"launch": true,
+				},
+			},
 		},
 	})
 
