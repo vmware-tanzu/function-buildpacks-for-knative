@@ -98,10 +98,6 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 			Command:   command,
 			Arguments: arguments,
 		},
-		libcnb.Process{
-			Type:    "shell",
-			Command: "bash",
-		},
 	)
 
 	return result, nil
