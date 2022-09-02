@@ -168,6 +168,10 @@ buildpacks.python.tests.sources := \
 # Targets
 #########
 
+buildpacks.python.images.local: buildpacks.python.invoker.url=file://$(abspath $(invokers.out_dir)/python/pyfunc-invoker-$(buildpacks.python.invoker.version).tar.gz)
+buildpacks.python.images.local: buildpacks.python.invoker_deps.url=file://$(abspath $(invokers.out_dir)/python/pyfunc-invoker-deps-$(buildpacks.python.invoker.version).tar.gz)
+buildpacks.python.images.local: buildpacks.python.images.offline
+
 buildpacks.python.images.offline: $(buildpacks.python.images.offline.out) $(buildpacks.python.images.offline.out).sha256
 buildpacks.python.images.online: $(buildpacks.python.images.online.out) $(buildpacks.python.images.online.out).sha256
 buildpacks.python.images: buildpacks.python.images.offline buildpacks.python.images.online

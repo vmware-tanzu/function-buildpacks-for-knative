@@ -157,6 +157,9 @@ buildpacks.java.tests.sources := \
 # Targets
 #########
 
+buildpacks.java.images.local: buildpacks.java.invoker.url=file://$(abspath $(invokers.out_dir)/java/java-function-invoker-$(buildpacks.java.invoker.version).jar)
+buildpacks.java.images.local: buildpacks.java.images.offline
+
 buildpacks.java.images.offline: $(buildpacks.java.images.offline.out) $(buildpacks.java.images.offline.out).sha256
 buildpacks.java.images.online: $(buildpacks.java.images.online.out) $(buildpacks.java.images.online.out).sha256
 buildpacks.java.images: buildpacks.java.images.offline buildpacks.java.images.online
