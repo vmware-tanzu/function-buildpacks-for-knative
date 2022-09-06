@@ -64,12 +64,6 @@ endef
 %.print-sha: %.sha256
 	@cat $<
 
-rules.clean:
-	$(RM) -rf $(out_dir)
-	$(RM) -rf $(build_dir)
-
-clean .PHONY: rules.clean
-
 define INCLUDE_FILE
 path = $(1)
 include $(1)/Makefile

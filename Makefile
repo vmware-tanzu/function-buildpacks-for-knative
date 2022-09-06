@@ -22,7 +22,11 @@ invokers.tests:
 smoke-tests:
 template-tests:
 
-clean:
+.PHONY: clean main.clean
+main.clean:
+	$(RM) -rf $(out_dir)
+	$(RM) -rf $(build_dir)
+clean: main.clean
 
 .PHONY: add-copyright
 add-copyright:

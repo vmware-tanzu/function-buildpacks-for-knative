@@ -59,13 +59,15 @@ invokers.python.tests: $(invokers.python.builder.image) $(invokers.python.source
 
 .PHONY: invokers.python.clean
 invokers.python.clean:
-	# -docker rmi -f $(invokers.python.builder.image_name)
 	$(RM) -r $(invokers.python.build_dir)
 	$(RM) -r $(invokers.python.out_dir)
 
-.PHONY: invokers.python invokers.python.publish
-invokers invokers.python: $(invokers.python.artifacts)
-invoker.publish invokers.python.publish: $(invokers.python.publish)
-print-sha invokers.python.print-sha: $(invokers.python.artifact.release).print-sha
-tests invokers.tests: invokers.python.tests
-clean: invokers.python.clean
+invokers.python: $(invokers.python.artifacts)
+invokers.python.publish: $(invokers.python.publish)
+invokers.python.print-sha: $(invokers.python.artifact.release).print-sha
+
+invokers.publish .PHONY: invokers.python.publish
+invokers.print-sha .PHONY: invokers.python.print-sha
+invokers.tests .PHONY: invokers.python.tests
+invokers.clean .PHONY: invokers.python.clean
+invokers .PHONY: invokers.python
