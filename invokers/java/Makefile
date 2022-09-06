@@ -55,9 +55,12 @@ invokers.java.clean:
 	$(RM) -r $(invokers.java.build_dir)
 	$(RM) -r $(invokers.java.out_dir)
 
-.PHONY: invokers.java invokers.java.publish
-invokers invokers.java: $(invokers.java.artifacts)
-invokers.publish invokers.java.publish: $(invokers.java.publish)
-print-sha invokers.java.print-sha: $(invokers.java.artifact.release).print-sha
-tests invokers.tests: invokers.java.tests
-clean: invokers.java.clean
+invokers.java: $(invokers.java.artifacts)
+invokers.java.publish: $(invokers.java.publish)
+invokers.java.print-sha: $(invokers.java.artifact.release).print-sha
+
+invokers.publish .PHONY: invokers.java.publish
+invokers.print-sha .PHONY: invokers.java.print-sha
+invokers.tests .PHONY: invokers.java.tests
+invokers.clean .PHONY: invokers.java.clean
+invokers .PHONY: invokers.java

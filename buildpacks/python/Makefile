@@ -184,15 +184,14 @@ buildpacks.python.tests: $(buildpacks.python.bin.sources) $(buildpacks.python.te
 	cd $(buildpacks.python.path) && go test -v -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
 
 buildpacks.python.clean:
-	rm -rf $(buildpacks.python.path)/out
-	rm -rf $(buildpacks.python.path)/bin
-	rm -rf $(buildpacks.python.path)/package.toml
+	rm -rf $(buildpacks.python.build_dir)
+	rm -rf $(buildpacks.python.temp_dir)
+	rm -rf $(buildpacks.python.out_dir)
 
-all buildpacks .PHONY: buildpacks.python.images
 buildpacks.offline .PHONY: buildpacks.python.images.offline
 buildpacks.offline.publish .PHONY: buildpacks.python.images.offline.publish
 buildpacks.online .PHONY: buildpacks.python.images.online
 buildpacks.online.publish .PHONY: buildpacks.python.images.online.publish
 buildpacks.publish .PHONY: buildpacks.offline.publish buildpacks.online.publish
-tests buildpacks.tests .PHONY: buildpacks.python.tests
-clean .PHONY: buildpacks.python.clean
+buildpacks.tests .PHONY: buildpacks.python.tests
+buildpacks.clean .PHONY: buildpacks.python.clean

@@ -173,15 +173,14 @@ buildpacks.java.tests: $(buildpacks.java.bin.sources) $(buildpacks.java.tests.so
 	cd $(buildpacks.java.path) && go test -v -count=1 -timeout 30s kn-fn/java-function-buildpack/tests
 
 buildpacks.java.clean:
-	rm -rf $(buildpacks.java.path)/out
-	rm -rf $(buildpacks.java.path)/bin
-	rm -rf $(buildpacks.java.path)/package.toml
+	rm -rf $(buildpacks.java.build_dir)
+	rm -rf $(buildpacks.java.temp_dir)
+	rm -rf $(buildpacks.java.out_dir)
 
-all buildpacks .PHONY: buildpacks.java.images
 buildpacks.offline .PHONY: buildpacks.java.images.offline
 buildpacks.offline.publish .PHONY: buildpacks.java.images.offline.publish
 buildpacks.online .PHONY: buildpacks.java.images.online
 buildpacks.online.publish .PHONY: buildpacks.java.images.online.publish
 buildpacks.publish .PHONY: buildpacks.offline.publish buildpacks.online.publish
-tests buildpacks.tests .PHONY: buildpacks.java.tests
-clean .PHONY: buildpacks.java.clean
+buildpacks.tests .PHONY: buildpacks.java.tests
+buildpacks.clean .PHONY: buildpacks.java.clean
