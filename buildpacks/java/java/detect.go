@@ -61,7 +61,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 				},
 			},
 			{
-				Name: "jvm-application",
+				Name: "jvm-application-package",
 			},
 		},
 	})
