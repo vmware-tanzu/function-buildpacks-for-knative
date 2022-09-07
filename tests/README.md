@@ -1,6 +1,10 @@
 # Tests
 
-To run the smoke tests, run `make smoke-tests` from this directory.
+To run the smoke tests, run `make smoke-tests`.
+
+To run template tests, run `make template-tests`.
+
+Or to run all tests, run `make tests`.
 
 ## Adding Tests
 

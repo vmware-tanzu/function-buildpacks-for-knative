@@ -12,14 +12,14 @@ The function-buildpacks-for-knative project is organized into "layers" that sum 
 
 The `invokers` layer is the lowest level, followed by `buildpacks`, then lastly the `builder` references the `buildpacks` by URI and SHA at the highest level. To learn more about each layer, you may read the `README` for each respective layer's directory.
 
-New additions to the `samples/` and `templates/` directories are welcome -- each directory also has information about usage and testing. We can only accept PRs for these that DO NOT include imports from unvetted repositories or infringing licenses. Please keep them as lightweight and templateable as possible.
-
-> ⚠️ You will need to set your own registry you can read/write to in [rules.mk](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/f247b62ff9bcd3ac4f31d495f7630b4904a193cf/rules.mk#L25).
+New additions to the `samples/` and `templates/` directories are welcome -- each directory also has information about usage and testing. We can only accept PRs for these that DO NOT include imports from unvetted repositories or infringing licenses. Please keep them as lightweight and template-able as possible.
 
 To deploy your work, see [DEPLOYING](DEPLOYING.md).
 
-To test your work, run `make tests`, visit the `tests/` directory, or read the `Makefile` to view all available commands. We will not accept PRs that fail any tests. If you are including any feature additions, templates, samples, or breaking changes, it is expected that a corresponding test will be added.
+To learn how to test your work, read the [testing documentation](/tests/README.md). We will not accept PRs that fail any tests. If you are including any feature additions, templates, samples, or breaking changes, it is expected that a corresponding test will be added.
 
+> **Note:** To use your own registry for local development and tests, copy and edit [local.example.mk](/local.example.mk) to set the registry to one for which you have read/write access.
+> Be sure to also run `make clean` any time you adjust the registry value.
 
 ## Contribution Flow
 

@@ -20,6 +20,7 @@ tests:
 buildpacks.tests:
 invokers.tests:
 smoke-tests:
+template-tests:
 
 clean:
 

@@ -3,6 +3,8 @@ RULES_MK := $(lastword $(MAKEFILE_LIST))
 RULES_INCLUDE_DIR := $(dir $(RULES_MK))
 ROOT_DIR := $(RULES_INCLUDE_DIR)
 
+-include $(ROOT_DIR)/local.mk
+
 .DEFAULT_GOAL := all
 .DELETE_ON_ERROR: # This will delete files from targets that don't succeed.
 .SUFFIXES: # This removes a lot of the implicit rules.
@@ -23,14 +25,14 @@ git.commit := $(shell git rev-parse HEAD)
 
 base_url := https://github.com/vmware-tanzu/function-buildpacks-for-knative
 
-registry.location := gcr
-registry.gcr := us.gcr.io/daisy-284300/kn-fn
+registry.location ?= ghcr
+registry.ghcr := ghcr.io/vmware-tanzu/function-buildpacks-for-knative
 registry.other := $(REGISTRY)
 registry = $(registry.$(registry.location))
 
 ifeq ($(registry.location), other)
 ifndef REGISTRY
-$(error REGISTRY not defined. This is required for targetting "other" registry)
+$(error REGISTRY not defined. This is required for targeting "other" registry)
 endif
 endif
 
