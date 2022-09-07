@@ -4,6 +4,7 @@
 bin/
 out/
 tools/
+local.mk
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
