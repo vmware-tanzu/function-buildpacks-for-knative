@@ -180,6 +180,8 @@ buildpacks.java.clean:
 	rm -rf $(buildpacks.java.temp_dir)
 	rm -rf $(buildpacks.java.out_dir)
 
+all buildpacks .PHONY: buildpacks.java.images
+buildpacks.local .PHONY: buildpacks.images.local
 buildpacks.offline .PHONY: buildpacks.java.images.offline
 buildpacks.offline.publish .PHONY: buildpacks.java.images.offline.publish
 buildpacks.online .PHONY: buildpacks.java.images.online
