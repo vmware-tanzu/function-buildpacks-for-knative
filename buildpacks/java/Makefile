@@ -157,6 +157,9 @@ buildpacks.java.tests.sources := \
 # Targets
 #########
 
+buildpacks.java.images.local: buildpacks.java.invoker.url=file://$(abspath $(invokers.out_dir)/java/java-function-invoker-$(buildpacks.java.invoker.version).jar)
+buildpacks.java.images.local: buildpacks.java.images.offline
+
 buildpacks.java.images.offline: $(buildpacks.java.images.offline.out) $(buildpacks.java.images.offline.out).sha256
 buildpacks.java.images.online: $(buildpacks.java.images.online.out) $(buildpacks.java.images.online.out).sha256
 buildpacks.java.images: buildpacks.java.images.offline buildpacks.java.images.online
@@ -177,6 +180,8 @@ buildpacks.java.clean:
 	rm -rf $(buildpacks.java.temp_dir)
 	rm -rf $(buildpacks.java.out_dir)
 
+all buildpacks .PHONY: buildpacks.java.images
+buildpacks.local .PHONY: buildpacks.images.local
 buildpacks.offline .PHONY: buildpacks.java.images.offline
 buildpacks.offline.publish .PHONY: buildpacks.java.images.offline.publish
 buildpacks.online .PHONY: buildpacks.java.images.online
