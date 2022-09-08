@@ -1,17 +1,41 @@
 # Buildpacks -- function-buildpacks-for-knative
 
-You may find your language-specific buildpacks here and edit them.
+This folder contains language-specific buildpacks. 
 
-## Testing your changes
+## Testing your buildpacks
 
-> :warning: **Change your project's registry to a development one**
->
-> Navigate to `rules.mk` in the **root directory** and replace the registry with your own. By default it is set to `us.gcr.io/daisy-284300`, which is for VMware developers only, and is not a true development environment. Ensure you have sufficient privileges and re-authenticate with your CLI of choice, such as using `gcloud auth login`.
+### Prerequisite
+Before you can build a local buildpack, you'll need the invoker files created.  
+Run `make invokers.<language>`
 
-To test your changes, ensure you have taken the necessary steps to access your repository with read/write access. This includes updating your repository type and location, found at [rules.mk](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/rules.mk).
+### Building
+To make a buildpack locally run `make buildpacks.<language>.images.local`.  The output of this 
+is a built image in your local registry. 
 
-After, you can run `make buildpacks.<language>.images.publish` to publish your language's new buildpack. (e.g. `make buildpacks.python.images.publish`)
+### Testing
+To test your newly built local buildpack use the pack command. 
 
-With the new registry's URL obtained by the `make` command's output, you can now update [builder/builder.toml](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/builder/builder.toml) to use your development buildpack.
+Java example: 
+```
+cd <path-to-java-function>
+pack build \
+  -b gcr.io/paketo-buildpacks/java:7.0.0 \
+  -b <local-image> \
+  --builder paketobuildpacks/builder-jammy-buildpackless-base:latest \
+  --verbose --clear-cache --pull-policy if-not-present \
+  <output-image>
+```
 
-Please see the builder's [README.md](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/builder/README.md) for more information.
+Python example: 
+```
+cd <path-to-python-function>
+pack build \
+  -b gcr.io/paketo-buildpacks/python:2.0.0 \
+  -b <local-image> \
+  --builder paketobuildpacks/builder-jammy-buildpackless-base:latest \
+  --verbose --clear-cache --pull-policy if-not-present \
+  <output-image>
+```
+
+where `<local-image>` is the output of `make buildpacks.<language>.images.local` 
+and `<output-image>` is the function image you are building. 

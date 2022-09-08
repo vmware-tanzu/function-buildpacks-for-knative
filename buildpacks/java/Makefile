@@ -181,6 +181,7 @@ buildpacks.java.clean:
 	rm -rf $(buildpacks.java.path)/package.toml
 
 all buildpacks .PHONY: buildpacks.java.images
+buildpacks.local .PHONY: buildpacks.images.local
 buildpacks.offline .PHONY: buildpacks.java.images.offline
 buildpacks.offline.publish .PHONY: buildpacks.java.images.offline.publish
 buildpacks.online .PHONY: buildpacks.java.images.online

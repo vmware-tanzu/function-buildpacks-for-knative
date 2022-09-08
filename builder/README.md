@@ -16,10 +16,9 @@ You will find under the `buildpacks` variable a map of { `id` => `uri` }. Please
 
 To test your newly edited builder, run:
 1) `make builder.clean`
-2) `make builder`
-3) `make builder.publish`
+2) `make builder.image.local`
 
-then you may try the new `pack build` command outputted from that result.
+then you may try the new `pack build` command outputted from that result. Include `--pull-policy if-not-present`.  This will use local images first and pull any missing dependencies. 
 
 Please note that these `uri`s should remain unchanged except for a version number bump for RELEASE builds, so your PR should contain the necessary changes to `buildpacks` and `invokers`, but not necessarily to this directory.
 
