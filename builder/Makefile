@@ -60,10 +60,11 @@ $(builder.config): $(YJ) $(builder.config_intermediate)
 
 builder.image.name := $(registry)/functions-builder:$(builder.version)
 builder.image.out := $(builder.out_dir)/builder.image
+builder.flags :=
 
 $(builder.image.out): $(PACK) $(builder.config)
 	@mkdir -p $(@D)
-	$(PACK) builder create -c $(builder.config) $(builder.image.name)
+	$(PACK) builder create -c $(builder.config) $(builder.image.name) $(builder.flags)
 	printf $(builder.image.name) > $@
 
 #########
@@ -71,6 +72,8 @@ $(builder.image.out): $(PACK) $(builder.config)
 #########
 
 builder.image: $(builder.image.out) $(builder.image.out).sha256
+builder.image.local: builder.flags=--pull-policy if-not-present
+builder.image.local: builder.image
 
 .PHONY: builder.publish
 builder.publish: builder.image
