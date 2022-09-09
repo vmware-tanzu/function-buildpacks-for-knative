@@ -121,7 +121,7 @@ func TestJavaHTTP(t *testing.T) {
 			methodType:       http.MethodPost,
 			contentType:      "application/json",
 			data:             jsonData,
-			path:             "/hire",
+			path:             "/handler",
 			expectedResponse: expectedData,
 		},
 		{
@@ -131,7 +131,7 @@ func TestJavaHTTP(t *testing.T) {
 			methodType:       http.MethodPost,
 			contentType:      "application/json",
 			data:             jsonData,
-			path:             "/hire",
+			path:             "/handler",
 			expectedResponse: expectedData,
 		},
 	}
@@ -274,7 +274,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			name: "Java CloudEvents Gradle",
 			tag:  "java-cloudevents-gradle",
 
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
@@ -282,7 +282,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			name: "Java CloudEvents Maven",
 			tag:  "java-cloudevents-maven",
 
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
@@ -365,7 +365,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 
 			methodType:       http.MethodPost,
 			contentType:      "application/cloudevents+json",
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
@@ -375,7 +375,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 
 			methodType:       http.MethodPost,
 			contentType:      "application/cloudevents+json",
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
@@ -410,8 +410,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 
 			actualResponse := string(respBody)
 			if !(strings.Contains(actualResponse, c.expectedResponse)) {
-				t.Log("Skipped: Expected failure because Spring Cloud Functions broke CloudEvent Header handling.")
-				t.Skip()
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, actualResponse)
 			}
 		})
 	}
