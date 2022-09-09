@@ -93,7 +93,7 @@ func WithFunctionClass(functionClass string, override bool) FunctionOpt {
 	}
 }
 
-func WithFuncYamlEnvs(funcYamlEnvs map[string]interface{}) FunctionOpt {
+func WithFuncYamlEnvs(funcYamlEnvs map[string]any) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
 		fun.funcYamlEnvs = map[string]string{}
 

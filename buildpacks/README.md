@@ -2,20 +2,19 @@
 
 This folder contains language-specific buildpacks. 
 
-## Testing your buildpacks
+## Running locally
 
 ### Prerequisite
 Before you can build a local buildpack, you'll need the invoker files created.  
 Run `make invokers.<language>`
 
 ### Building
-To make a buildpack locally run `make buildpacks.<language>.images.local`.  The output of this 
-is a built image in your local registry. 
+To make a local buildpack image, run `make buildpacks.<language>.images.local`.
 
-### Testing
-To test your newly built local buildpack use the pack command. 
+### Running
+To run your newly built local buildpack, use the `pack` CLI. 
 
-Java example: 
+_Java example:_ 
 ```
 cd <path-to-java-function>
 pack build \
@@ -26,7 +25,7 @@ pack build \
   <output-image>
 ```
 
-Python example: 
+_Python example:_ 
 ```
 cd <path-to-python-function>
 pack build \
@@ -39,3 +38,7 @@ pack build \
 
 where `<local-image>` is the output of `make buildpacks.<language>.images.local` 
 and `<output-image>` is the function image you are building. 
+
+## Testing
+
+To run unit tests for a buildpack, run `make buildpacks.<language>.tests`. See the [testing documentation](/tests/README.md) to run other kinds of tests related to buildpacks.

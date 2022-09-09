@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	HTTPTemplate = `from typing import Any
+	HTTPFuncTemplate = `from typing import Any
 
 def {{.Name}}({{range $var, $type := .Arguments}}{{$var}}:{{$type}}{{end}}):
 	return "{{.ReturnValue}}"`
@@ -31,11 +31,11 @@ type HTTPFunction struct {
 }
 
 type Function interface {
-	Generate(path string) error
+	Generate(path, funcTemplate string) error
 }
 
-func (f HTTPFunction) Generate(path string) error {
-	templ, err := template.New("http-func-template").Parse(HTTPTemplate)
+func (f HTTPFunction) Generate(path, funcTemplate string) error {
+	templ, err := template.New("http-func-template").Parse(funcTemplate)
 	if err != nil {
 		return err
 	}
@@ -169,18 +169,14 @@ func WithFuncResourceLimits(limits knfn.ResourcesLimitsOptions) SetupOpts {
 	}
 }
 
-func WithDefaultFunctionFile() SetupOpts {
-	return WithFunctionFile("func", "main")
-}
-
-func WithFunctionFile(module string, function string) SetupOpts {
+func WithFunctionFile(module, function, funcTemplate string) SetupOpts {
 	return func(directory string) {
 		f := HTTPFunction{
 			Module: module,
 			Name:   function,
 		}
 
-		err := f.Generate(directory)
+		err := f.Generate(directory, funcTemplate)
 		if err != nil {
 			panic(err)
 		}

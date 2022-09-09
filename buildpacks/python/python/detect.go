@@ -43,7 +43,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		Requires: []libcnb.BuildPlanRequire{
 			{
 				Name: "python-function",
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"launch":            true,
 					"func_yaml_envs":    funcYaml.Envs,
 					"func_yaml_options": funcYaml.Options,
@@ -51,20 +51,20 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 			},
 			{
 				Name: "site-packages",
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"build":  true,
 					"launch": true,
 				},
 			},
 			{
 				Name: "pip",
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"build": true,
 				},
 			},
 			{
 				Name: "cpython",
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"build":  true,
 					"launch": true,
 				},
