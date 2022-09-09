@@ -121,7 +121,7 @@ func TestJavaHTTP(t *testing.T) {
 			methodType:       http.MethodPost,
 			contentType:      "application/json",
 			data:             jsonData,
-			path:             "/hire",
+			path:             "/handler",
 			expectedResponse: expectedData,
 		},
 		{
@@ -131,7 +131,7 @@ func TestJavaHTTP(t *testing.T) {
 			methodType:       http.MethodPost,
 			contentType:      "application/json",
 			data:             jsonData,
-			path:             "/hire",
+			path:             "/handler",
 			expectedResponse: expectedData,
 		},
 	}
@@ -274,7 +274,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			name: "Java CloudEvents Gradle",
 			tag:  "java-cloudevents-gradle",
 
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
@@ -282,7 +282,7 @@ func TestJavaCloudEvents(t *testing.T) {
 			name: "Java CloudEvents Maven",
 			tag:  "java-cloudevents-maven",
 
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
@@ -365,7 +365,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 
 			methodType:       http.MethodPost,
 			contentType:      "application/cloudevents+json",
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
@@ -375,7 +375,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 
 			methodType:       http.MethodPost,
 			contentType:      "application/cloudevents+json",
-			path:             "/hire",
+			path:             "/handler",
 			data:             jsonData,
 			expectedResponse: expectedData,
 		},
