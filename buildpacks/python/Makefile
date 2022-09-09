@@ -47,11 +47,11 @@ buildpacks.python.invoker_deps.sha := $(buildpacks.python.temp_dir)/invoker_dep.
 
 $(buildpacks.python.invoker.sha):
 	@mkdir -p $(@D)
-	curl -sw '\0' -L $(buildpacks.python.invoker.url).sha256 -o $@
+	curl -fsSw '\0' -L $(buildpacks.python.invoker.url).sha256 -o $@
 
 $(buildpacks.python.invoker_deps.sha):
 	@mkdir -p $(@D)
-	curl -sw '\0' -L $(buildpacks.python.invoker_deps.url).sha256 -o $@
+	curl -fsSw '\0' -L $(buildpacks.python.invoker_deps.url).sha256 -o $@
 
 buildpacks.python.invoker.values := $(buildpacks.python.temp_dir)/values.yaml
 
@@ -168,6 +168,7 @@ buildpacks.python.tests.sources := \
 # Targets
 #########
 
+buildpacks.python.images.local: invokers.python
 buildpacks.python.images.local: buildpacks.python.invoker.url=file://$(abspath $(invokers.out_dir)/python/pyfunc-invoker-$(buildpacks.python.invoker.version).tar.gz)
 buildpacks.python.images.local: buildpacks.python.invoker_deps.url=file://$(abspath $(invokers.out_dir)/python/pyfunc-invoker-deps-$(buildpacks.python.invoker.version).tar.gz)
 buildpacks.python.images.local: buildpacks.python.images.offline

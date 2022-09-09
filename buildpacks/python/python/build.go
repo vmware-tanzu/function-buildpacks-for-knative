@@ -5,6 +5,7 @@ package python
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
@@ -38,7 +39,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency resolver\n%w", err)
 	}
 
-	invokerDepCache, err := dependencyResolver.Resolve("invoker-deps", "")
+	invokerDeps, err := dependencyResolver.Resolve("invoker-deps", "")
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 	}
@@ -48,12 +49,11 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 	}
 
-	invokerDepCacheLayer := NewInvokerDependencyCache(invokerDepCache, dependencyCache)
+	invokerDepCacheLayer := NewInvokerDependencyCache(invokerDeps, dependencyCache)
 	invokerDepCacheLayer.Logger = b.Logger
 	result.Layers = append(result.Layers, &invokerDepCacheLayer)
 
 	invokerLayer := NewInvoker(invoker, dependencyCache)
-	invokerLayer.Logger = b.Logger
 	result.Layers = append(result.Layers, &invokerLayer)
 
 	functionPlan, ok, err := planResolver.Resolve("python-function")
@@ -68,7 +68,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	functionLayer := NewFunction(
 		WithLogger(b.Logger),
 		WithFunctionClass(functionClass, isFuncDefDefault),
-		WithFuncYamlEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]interface{})),
+		WithFuncYamlEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
 	)
 	result.Layers = append(result.Layers, functionLayer)
 
@@ -78,16 +78,17 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		&invokerDepCacheLayer,
 		WithValidationLogger(b.Logger),
 		WithValidationFunctionClass(functionClass, isFuncDefDefault),
-		WithValidationFunctionEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]interface{})),
+		WithValidationFunctionEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
 	)
 	result.Layers = append(result.Layers, validationLayer)
 
-	for optionName, optionValue := range functionPlan.Metadata["func_yaml_options"].(map[string]interface{}) {
+	for optionName, optionValue := range functionPlan.Metadata["func_yaml_options"].(map[string]any) {
 		result.Labels = append(result.Labels, libcnb.Label{
 			Key:   optionName,
 			Value: optionValue.(string),
 		})
 	}
+	sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 
 	command := "python"
 	arguments := []string{"-m", "pyfunc", "start"}

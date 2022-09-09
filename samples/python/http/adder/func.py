@@ -23,4 +23,3 @@ def main(req: Any):
 
     sum = int(first) + int(second)
     return f"Hello, {username}! The answer to {first} + {second} is {sum}\n" # Without returning a flask response, it'll automatically be HTTPOK
-    

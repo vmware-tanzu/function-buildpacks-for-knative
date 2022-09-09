@@ -1,6 +1,10 @@
 # Tests
 
-To run the smoke tests, run `make smoke-tests`.
+To run buildpack unit tests, run `make buildpacks.tests`.
+
+To run invoker tests, run `make invokers.tests`.
+
+To run smoke tests, run `make smoke-tests`.
 
 To run template tests, run `make template-tests`.
 

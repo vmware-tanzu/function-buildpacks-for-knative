@@ -4,86 +4,198 @@
 package tests
 
 import (
-	"bytes"
-	"kn-fn/python-function-buildpack/python"
-	"reflect"
+	"os"
 	"testing"
 
 	"github.com/buildpacks/libcnb"
-	"github.com/paketo-buildpacks/libpak/bard"
+	. "github.com/onsi/gomega"
+	"github.com/sclevine/spec"
+	"github.com/sclevine/spec/report"
+	function "knative.dev/kn-plugin-func"
+	"knative.dev/pkg/ptr"
+
+	"kn-fn/python-function-buildpack/python"
 )
 
-type result struct {
-	plan libcnb.DetectResult
-	err  error
+func TestDetect(t *testing.T) {
+	spec.Run(t, "Detect", testDetect, spec.Report(report.Terminal{}))
 }
 
-func TestDetectNoEnvironmentWithValidFile(t *testing.T) {
-	d := getDetector()
-	appDir, cleanup := SetupTestDirectory(
-		WithFuncYaml(),
+func testDetect(t *testing.T, when spec.G, it spec.S) {
+	var Expect = NewWithT(t).Expect
+
+	var (
+		detect        python.Detect
+		cleanupAppDir func()
+		context       libcnb.DetectContext
 	)
-	defer cleanup()
 
-	plan, err := d.Detect(getContext(
-		withApplicationPath(appDir),
-	))
+	it.Before(func() {
+		detect = python.Detect{
+			Logger: NewLogger(),
+		}
+	})
 
-	expectations := DetectExpectations{
-		Result: result{plan, err},
-		Pass:   true,
-		Metadata: map[string]interface{}{
-			"func_yaml_envs":    map[string]string{},
-			"func_yaml_options": map[string]string{},
-		},
-	}
-	expectations.Check(t)
+	it.After(func() {
+		cleanupAppDir()
+	})
+
+	when("#Detect", func() {
+		when("func.yaml exists", func() {
+			it.Before(func() {
+				var appDir string
+				appDir, cleanupAppDir = SetupTestDirectory(
+					WithFuncYaml(),
+				)
+				context = makeDetectContext(
+					withDetectApplicationPath(appDir),
+				)
+			})
+
+			it("passes detection", func() {
+				result, err := detect.Detect(context)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(result.Pass).To(BeTrue())
+			})
+		})
+
+		when("BP_FUNCTION is configured", func() {
+			it.Before(func() {
+				Expect(os.Setenv("BP_FUNCTION", "some.function")).To(Succeed())
+
+				var appDir string
+				appDir, cleanupAppDir = SetupTestDirectory()
+				context = makeDetectContext(
+					withDetectApplicationPath(appDir),
+				)
+			})
+
+			it.After(func() {
+				Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
+			})
+
+			it("passes detection", func() {
+				result, err := detect.Detect(context)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(result.Pass).To(BeTrue())
+			})
+		})
+
+		when("func.yaml does not exist", func() {
+			it.Before(func() {
+				var appDir string
+				appDir, cleanupAppDir = SetupTestDirectory()
+				context = makeDetectContext(
+					withDetectApplicationPath(appDir),
+				)
+			})
+
+			when("BP_FUNCTION is not configured", func() {
+				it.Before(func() {
+					Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
+				})
+
+				it("fails detection", func() {
+					result, err := detect.Detect(context)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(result.Pass).To(BeFalse())
+				})
+			})
+
+			when("BP_FUNCTION is configured incorrectly", func() {
+				it.Before(func() {
+					Expect(os.Setenv("BP_FUNCTION", "invalid function")).To(Succeed())
+				})
+
+				it.After(func() {
+					Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
+				})
+
+				it("fails detection", func() {
+					result, err := detect.Detect(context)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(result.Pass).To(BeFalse())
+				})
+			})
+		})
+
+		when("func.yaml has configuration for envs or options", func() {
+			it.Before(func() {
+				var appDir string
+				appDir, cleanupAppDir = SetupTestDirectory(
+					WithFuncEnvs(map[string]string{
+						"SOME_VAR": "SOME_VALUE",
+					}),
+					WithFuncScale(function.ScaleOptions{
+						Min: ptr.Int64(1),
+						Max: ptr.Int64(42),
+					}),
+				)
+				context = makeDetectContext(
+					withDetectApplicationPath(appDir),
+				)
+			})
+
+			it("includes configuration in build plan", func() {
+				result, err := detect.Detect(context)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(result.Plans).To(Equal([]libcnb.BuildPlan{{
+					Provides: []libcnb.BuildPlanProvide{
+						{
+							Name: "python-function",
+						},
+					},
+					Requires: []libcnb.BuildPlanRequire{
+						{
+							Name: "python-function",
+							Metadata: map[string]any{
+								"launch": true,
+								"func_yaml_envs": map[string]string{
+									"SOME_VAR": "SOME_VALUE",
+								},
+								"func_yaml_options": map[string]string{
+									"options-scale": "min: 1\nmax: 42\n",
+								},
+							},
+						},
+						{
+							Name: "site-packages",
+							Metadata: map[string]any{
+								"build":  true,
+								"launch": true,
+							},
+						},
+						{
+							Name: "pip",
+							Metadata: map[string]any{
+								"build": true,
+							},
+						},
+						{
+							Name: "cpython",
+							Metadata: map[string]any{
+								"build":  true,
+								"launch": true,
+							},
+						},
+					},
+				}}))
+			})
+		})
+	})
 }
 
-func TestDetectEnvironmentWithValidFile(t *testing.T) {
-	d := getDetector()
-	appDir, cleanup := SetupTestDirectory(
-		WithFuncEnvs(map[string]string{
-			"MODULE_NAME":   "other",
-			"FUNCTION_NAME": "handler2",
-		}),
-	)
-	defer cleanup()
-
-	plan, err := d.Detect(getContext(
-		withApplicationPath(appDir),
-		withModuleName("other"),
-		withFunctionName("handler2"),
-	))
-
-	expectations := DetectExpectations{
-		Result: result{plan, err},
-		Pass:   true,
-		Metadata: map[string]interface{}{
-			"func_yaml_envs": map[string]string{
-				"MODULE_NAME":   "other",
-				"FUNCTION_NAME": "handler2",
-			},
-			"func_yaml_options": map[string]string{},
-		},
-	}
-	expectations.Check(t)
-}
-
-func getDetector() python.Detect {
-	buf := bytes.NewBuffer(nil)
-	logger := bard.NewLogger(buf)
-	return python.Detect{
-		Logger: logger,
-	}
-}
-
-func getContext(opts ...func(*libcnb.DetectContext)) libcnb.DetectContext {
+func makeDetectContext(opts ...func(*libcnb.DetectContext)) libcnb.DetectContext {
 	ctx := libcnb.DetectContext{
 		Application: libcnb.Application{},
 		Buildpack:   libcnb.Buildpack{},
 		Platform: libcnb.Platform{
-			Environment: make(map[string]string),
+			Environment: map[string]string{},
 		},
 	}
 
@@ -94,74 +206,8 @@ func getContext(opts ...func(*libcnb.DetectContext)) libcnb.DetectContext {
 	return ctx
 }
 
-func withApplicationPath(path string) func(*libcnb.DetectContext) {
+func withDetectApplicationPath(path string) func(*libcnb.DetectContext) {
 	return func(dc *libcnb.DetectContext) {
 		dc.Application.Path = path
-	}
-}
-
-func withModuleName(value string) func(*libcnb.DetectContext) {
-	return func(dc *libcnb.DetectContext) {
-		dc.Platform.Environment["MODULE_NAME"] = value
-	}
-}
-
-func withFunctionName(value string) func(*libcnb.DetectContext) {
-	return func(dc *libcnb.DetectContext) {
-		dc.Platform.Environment["FUNCTION_NAME"] = value
-	}
-}
-
-func withEnvironmentVariable(key string, value string) func(*libcnb.DetectContext) {
-	return func(dc *libcnb.DetectContext) {
-		dc.Platform.Environment[key] = value
-	}
-}
-
-type DetectExpectations struct {
-	Result result
-
-	ExpectError  bool
-	Err          error
-	Pass         bool
-	Metadata     map[string]interface{}
-	SkipProvides bool
-	SkipRequires bool
-}
-
-func (e DetectExpectations) Check(t *testing.T) {
-	if !e.ExpectError && e.Result.err != nil {
-		if e.Err != nil && e.Result.err != e.Err {
-			t.Errorf("expected error %v, but received error %v", e.Err, e.Result.err)
-		} else {
-			t.Errorf("unexpected error received: %v", e.Result.err)
-		}
-		return
-	}
-
-	if e.Pass != e.Result.plan.Pass {
-		t.Errorf("expected detection to pass but it failed")
-		return
-	}
-
-	// Find the invoker requires
-	planName := "python-function"
-	for _, plan := range e.Result.plan.Plans {
-		for _, require := range plan.Requires {
-			if require.Name == planName {
-				for k, v := range e.Metadata {
-					val, ok := require.Metadata[k]
-					if !ok {
-						t.Errorf("plan requirement '%s' did not find metadata with key %s", planName, k)
-						return
-					}
-
-					if !reflect.DeepEqual(v, val) {
-						t.Errorf("unexpected value in '%s' requires metadata for key %s. Expected %s but got %s", planName, k, v, val)
-						return
-					}
-				}
-			}
-		}
 	}
 }

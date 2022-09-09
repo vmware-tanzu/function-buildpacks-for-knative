@@ -114,7 +114,7 @@ func WithValidationFunctionClass(functionClass string, override bool) FunctionVa
 	}
 }
 
-func WithValidationFunctionEnvs(envs map[string]interface{}) FunctionValidationOpts {
+func WithValidationFunctionEnvs(envs map[string]any) FunctionValidationOpts {
 	return func(vl *FunctionValidationLayer, metadata map[string]string) {
 		for name, value := range envs {
 			if name == EnvModuleName && !vl.override {
