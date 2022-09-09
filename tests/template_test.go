@@ -410,8 +410,7 @@ func TestJavaCloudEventsOverHTTP(t *testing.T) {
 
 			actualResponse := string(respBody)
 			if !(strings.Contains(actualResponse, c.expectedResponse)) {
-				t.Log("Skipped: Expected failure because Spring Cloud Functions broke CloudEvent Header handling.")
-				t.Skip()
+				t.Errorf("Expected response '%s' but received '%s'.", c.expectedResponse, actualResponse)
 			}
 		})
 	}
