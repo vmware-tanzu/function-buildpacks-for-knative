@@ -50,6 +50,11 @@ To learn about local deployment and testing via `curl`, check out [DEPLOYING](DE
 
 ## Links
 
+### Documentation
+
+- [Java Function Buildpack](/buildpacks/java/README.md)
+- [Python Function Buildpack](/buildpacks/python/README.md)
+
 ### Contributing
 
 The function-buildpacks-for-knative project team welcomes contributions from the community. Before you start working with function-buildpacks-for-knative, please
