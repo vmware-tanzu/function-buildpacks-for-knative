@@ -28,8 +28,7 @@ type Function struct {
 }
 
 func NewFunction(opts ...FunctionOpt) Function {
-	f := Function{
-	}
+	f := Function{}
 	meta := map[string]string{}
 
 	for _, opt := range opts {
