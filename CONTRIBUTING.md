@@ -8,6 +8,8 @@ as an open-source patch.
 
 ## Development Flow
 
+![System Architecture Diagram](hack/architecture-diagram.png)
+
 The function-buildpacks-for-knative project is organized into "layers" that sum into our functions experience. These layers create an image that can be used to deploy a FaaS experience in a few short commands.
 
 The `invokers` layer is the lowest level, followed by `buildpacks`, then lastly the `builder` references the `buildpacks` by URI and SHA at the highest level. To learn more about each layer, you may read the `README` for each respective layer's directory.
