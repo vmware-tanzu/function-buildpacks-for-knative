@@ -5,7 +5,7 @@ This example will take two number and add them up only if the requestor is authe
 # Running the sample
 1. We want to first build the image:
     ```
-    pack build adder --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.0.10
+    pack build adder --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.1.0
     ```
     * `VERSION` is the version of the builder to use.
 
