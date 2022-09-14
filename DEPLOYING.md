@@ -4,7 +4,7 @@
 
 You can build your function using our provided builder, which already includes buildpacks and an invoker layer:
 ```
-pack build my-function --path . --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.0.10
+pack build my-function --path . --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.1.0
 ```
 Where `my-function` is the name of your runnable function image, later used by Docker.
 
