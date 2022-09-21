@@ -10,9 +10,21 @@ as an open-source patch.
 
 ![System Architecture Diagram](hack/architecture-diagram.png)
 
+As you can see in the diagram's example above, a developer is using one of our Function Templates to write their code into. They run `pack build <name> --builder <builder-version>` to build a version of their code with dependencies included, then they run it in Docker locally to interact as an end user. This is a potential open-source use-case; a Tanzu Application involved use-case would skip several steps and run `tanzu workload create`. 
+
+If we break down what the `--builder` flag entains, it runs the builder provided against our code. This builder could be our provided URL _or_ a local path for an experimental builder.
+
+## Layers Explained
+
 The function-buildpacks-for-knative project is organized into "layers" that sum into our functions experience. These layers create an image that can be used to deploy a FaaS experience in a few short commands.
 
-The `invokers` layer is the lowest level, followed by `buildpacks`, then lastly the `builder` references the `buildpacks` by URI and SHA at the highest level. To learn more about each layer, you may read the `README` for each respective layer's directory.
+The `invokers` layer is the lowest level package.
+
+An abstraction level above, `buildpacks` uses `invokers` as a dependency along with bundling other dependencies.
+
+Lastly, at the highest level, the `builder` references the `buildpacks` by URI and SHA as an aggregator. 
+
+The end user should only be interacting with the builder. The name is as it implies -- the builder "builds" functions into images. Interacting with the invokers directly, for example, breaks the abstraction barrier. To learn more about each layer, you may read the `README` for each respective layer's directory.
 
 New additions to the `samples/` and `templates/` directories are welcome -- each directory also has information about usage and testing. We can only accept PRs for these that DO NOT include imports from unvetted repositories or infringing licenses. Please keep them as lightweight and template-able as possible.
 
