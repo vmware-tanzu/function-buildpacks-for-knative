@@ -1,0 +1,18 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: Check Inclusive Language
+on:
+  workflow_dispatch: {}
+  pull_request:
+
+jobs:
+  check-copyright:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run woke
+        uses: get-woke/woke-action@v0
+
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
