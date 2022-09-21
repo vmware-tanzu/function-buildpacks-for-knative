@@ -1,7 +1,7 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-name: Vmware SRP Report
+name: VMware SRP Report
 
 on:
   workflow_dispatch: {}
