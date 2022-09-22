@@ -13,7 +13,7 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 * Kapp
 * Ytt
 
-> ⚠️ This sample will require working dependencies TriggerMesh and Knative Eventing. If you are using Tanzu Application Platform (TAP), those will be added in TAP 1.4. Using the Cloud Native Runtimes package can replace these two dependencies
+> ⚠️ This sample will require working dependencies TriggerMesh and Knative Eventing, and may require tweaks to the TriggerMesh sources.
 
 ## Known Issues
 * N/A
