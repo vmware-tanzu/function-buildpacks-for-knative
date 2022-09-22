@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"text/template"
 
 	"github.com/paketo-buildpacks/libpak/bard"
 	knfn "knative.dev/kn-plugin-func"
@@ -17,6 +19,33 @@ import (
 func NewLogger() bard.Logger {
 	buf := bytes.NewBuffer(nil)
 	return bard.NewLogger(buf)
+}
+
+type HTTPFunction struct {
+	Module      string
+	Name        string
+	Arguments   map[string]string
+	ReturnValue string
+}
+
+type Function interface {
+	Generate(path, funcTemplate string) error
+}
+
+func (f HTTPFunction) Generate(path, funcTemplate string) error {
+	templ, err := template.New("http-func-template").Parse(funcTemplate)
+	if err != nil {
+		return err
+	}
+
+	modulePath := filepath.Join(path, fmt.Sprintf("%s.py", f.Module))
+	file, err := os.Create(modulePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return templ.Execute(file, f)
 }
 
 type SetupOpts func(directory string)
@@ -127,6 +156,20 @@ func WithFuncResourceLimits(limits knfn.ResourcesLimitsOptions) SetupOpts {
 		cfg.Options.Resources.Limits = &limits
 
 		err = cfg.WriteConfig()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func WithFunctionFile(module, function, funcTemplate string) SetupOpts {
+	return func(directory string) {
+		f := HTTPFunction{
+			Module: module,
+			Name:   function,
+		}
+
+		err := f.Generate(directory, funcTemplate)
 		if err != nil {
 			panic(err)
 		}
