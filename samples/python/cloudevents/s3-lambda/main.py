@@ -8,7 +8,7 @@ import boto3
 import os
 import sys
 
-def DoEvent(data: Any, attributes: dict):
+def main(data: Any, attributes: dict):
 
     bucket = data["s3"]["bucket"]["name"]
     key = unquote_plus(data["s3"]["object"]["key"], encoding='utf-8')

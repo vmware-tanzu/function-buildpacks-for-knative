@@ -11,8 +11,7 @@ import os
 import sys
 import json
 
-def DoEvent(data: Any, attributes: dict):
-
+def main(data: Any, attributes: dict):
     body = json.loads(data["Body"])
     
     file = s3Client.get_object(Bucket=body["bucket"], Key=body["key"])

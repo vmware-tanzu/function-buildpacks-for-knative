@@ -1,20 +1,23 @@
-# Adder
+# Python Sample - Adder
 
 This example will take two number and add them up only if the requestor is authenticated.
 
-# Running the sample
+## Prerequisites
+    - Docker
+    - Pack CLI
+
+## Usage
 1. We want to first build the image:
     ```
     pack build adder --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.1.0
     ```
-    * `VERSION` is the version of the builder to use.
 
 1. After the image is successfully built we can run it in docker.
     ```
     docker run -p 8080:8080 --rm adder
     ```
 
-1. In a separate terminal we can send some requests to the function!
+1. In a separate terminal we can send some POST requests to the function!
     ```
     # Sample request to do 65+6 as user "admin"
     curl localhost:8080 -F username=admin -F password=supersecure -F first=65 -F second=6
@@ -32,3 +35,8 @@ This example will take two number and add them up only if the requestor is authe
     * `second`
         * If not specified, default is `0`
         * Anything other than integers will cause an HTTP status 500
+
+1. You should see an expected result such as:
+    ```
+    Hello, admin! The answer to 65 + 6 is 71
+    ```

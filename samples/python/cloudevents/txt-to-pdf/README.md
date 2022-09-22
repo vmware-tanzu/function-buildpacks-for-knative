@@ -13,7 +13,7 @@ This Python function listens for AWS S3 create events. When a new `.txt` file is
 * Ytt
 
 ## Known Issues
-* n/a
+* ⚠️ This sample is currently broken until the CNR Eventing package for TAP is updated for TAP 1.4
 
 ## Demo
 1. Create a bucket in S3 for the demo. Note down the ARN of this S3 bucket.
