@@ -5,15 +5,18 @@
 This Python function listens for AWS S3 create events. When a new `.txt` file is detected, it will attempt to convert the text file into a PDF, then upload it to S3.
 
 ## Prerequisites
-* Cloud Native Runtimes: 1.0.0+
+* TriggerMesh
+* Knative Eventing
 * AWS CLI
 * Docker
 * Buildpack CLI
 * Kapp
 * Ytt
 
+> ⚠️ This sample will require working dependencies TriggerMesh and Knative Eventing, and may require tweaks to the TriggerMesh sources.
+
 ## Known Issues
-* n/a
+* N/A
 
 ## Demo
 1. Create a bucket in S3 for the demo. Note down the ARN of this S3 bucket.

@@ -9,7 +9,7 @@ import boto3
 import os
 import sys
 
-def DoEvent(data: Any, attributes: dict):
+def main(data: Any, attributes: dict):
     print(f"Got event data: {data}", file=sys.stderr)
 
     file = unquote_plus(data["s3"]["object"]["key"])

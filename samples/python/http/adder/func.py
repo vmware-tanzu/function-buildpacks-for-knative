@@ -9,7 +9,7 @@ import flask
 
 creds = {"admin": "supersecure", "asu": "mypassword", "someone": "123qwe"}
 
-def add(req: Any):
+def main(req: Any):
     username = req.form.get('username')
     if username not in creds:
         return flask.Response("Unauthorized: User does not exist", 401)
@@ -22,5 +22,5 @@ def add(req: Any):
     second = req.form.get("second", default=0)
 
     sum = int(first) + int(second)
-    return f"Hello, {username}! The answer to {first} + {second} is {sum}" # Without returning a flask response, it'll automatically be HTTPOK
+    return f"Hello, {username}! The answer to {first} + {second} is {sum}\n" # Without returning a flask response, it'll automatically be HTTPOK
     

@@ -5,4 +5,4 @@ envs:
 - name: MODULE_NAME
   value: main
 - name: FUNCTION_NAME
-  value: DoEvent
+  value: main
