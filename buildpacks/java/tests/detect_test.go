@@ -59,9 +59,9 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-	when("BP_FUNCTION is configured", func() {
+	when("BP_FUNCTION is configured without func.yaml", func() {
 		it.Before(func() {
-			Expect(os.Setenv("BP_FUNCTION", "some.function")).To(Succeed())
+			Expect(os.Setenv("BP_FUNCTION", "function.Handler")).To(Succeed())
 
 			var appDir string
 			appDir, cleanupAppDir = SetupTestDirectory()
@@ -103,7 +103,6 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				Expect(result.Pass).To(BeFalse())
 			})
 		})
-
 	})
 
 	when("func.yaml has configuration for envs or options", func() {

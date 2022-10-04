@@ -16,13 +16,6 @@ import (
 	"kn-fn/java-function-buildpack/java"
 )
 
-const (
-	HTTPFuncTemplate = `from typing import Any
-
-def {{.Name}}({{range $var, $type := .Arguments}}{{$var}}:{{$type}}{{end}}):
-	return "{{.ReturnValue}}"`
-)
-
 func TestBuild(t *testing.T) {
 	spec.Run(t, "Build", testBuild, spec.Report(report.Terminal{}))
 }
@@ -55,21 +48,19 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 				err    error
 			)
 
-			Expect(os.Setenv("BP_FUNCTION", "some_module.some_function"))
+			Expect(os.Setenv("BP_FUNCTION", "functions.Handler"))
 			appDir, cleanupAppDir = SetupTestDirectory(
 				WithFuncYaml(),
-				WithFunctionFile("some_module", "some_function", HTTPFuncTemplate),
 			)
 
 			context = makeBuildContext(
 				withBuildApplicationPath(appDir),
 				withDependencies([]map[string]any{
-					{"id": "invoker-deps", "version": "1.2.3"},
 					{"id": "invoker", "version": "2.3.4"},
 				}),
 				withOptions(map[string]any{
-					"some-option":       "some-value",
 					"some-other-option": "some-other-value",
+					"some-option":       "some-value",
 				}),
 			)
 
