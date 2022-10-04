@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/buildpacks/libcnb v1.26.0
+	github.com/golang/mock v1.6.0
 	github.com/onsi/gomega v1.20.2
 	github.com/paketo-buildpacks/libpak v1.61.0
 	github.com/sclevine/spec v1.4.0

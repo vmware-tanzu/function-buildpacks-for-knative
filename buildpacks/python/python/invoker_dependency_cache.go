@@ -4,7 +4,6 @@
 package python
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -20,16 +19,24 @@ type InvokerDependencyCache struct {
 	LayerContributor libpak.DependencyLayerContributor
 	Logger           bard.Logger
 
-	pythonPath string
+	pythonPath    string
+	commandRunner CommandRunner
 }
 
-func NewInvokerDependencyCache(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) InvokerDependencyCache {
+func NewInvokerDependencyCache(
+	dependency libpak.BuildpackDependency,
+	cache libpak.DependencyCache,
+	commandRunner CommandRunner,
+) *InvokerDependencyCache {
 	contributor := libpak.NewDependencyLayerContributor(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
 		Cache:  true,
 	})
 
-	return InvokerDependencyCache{LayerContributor: contributor}
+	return &InvokerDependencyCache{
+		LayerContributor: contributor,
+		commandRunner:    commandRunner,
+	}
 }
 
 func (i *InvokerDependencyCache) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
@@ -53,7 +60,7 @@ func (i *InvokerDependencyCache) Contribute(layer libcnb.Layer) (libcnb.Layer, e
 
 		args := []string{
 			"install",
-			"--target=" + i.PythonPath(),
+			"--target", i.PythonPath(),
 			"--no-index",
 			"--find-links", depsDir,
 			"--compile",
@@ -69,12 +76,10 @@ func (i *InvokerDependencyCache) Contribute(layer libcnb.Layer) (libcnb.Layer, e
 
 		args = append(args, files...)
 
-		var stderr bytes.Buffer
 		cmd := exec.Command("pip", args...)
-		cmd.Stderr = &stderr
 
-		if err := cmd.Run(); err != nil {
-			i.Logger.Body("failed to install dependencies: %s", stderr.String())
+		if output, err := i.commandRunner.Run(cmd); err != nil {
+			i.Logger.Body("failed to install dependencies: %s", output)
 			return layer, err
 		}
 

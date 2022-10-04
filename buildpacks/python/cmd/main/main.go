@@ -16,6 +16,6 @@ func main() {
 	logger := bard.NewLogger(os.Stdout)
 	libpak.Main(
 		python.Detect{Logger: logger},
-		python.Build{Logger: logger},
+		python.Build{Logger: logger, CommandRunner: python.NewDefaultCommandRunner()},
 	)
 }

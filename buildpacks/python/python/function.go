@@ -27,12 +27,12 @@ type Function struct {
 	funcYamlEnvs map[string]string
 }
 
-func NewFunction(opts ...FunctionOpt) Function {
-	f := Function{}
+func NewFunction(opts ...FunctionOpt) *Function {
+	f := &Function{}
 	meta := map[string]string{}
 
 	for _, opt := range opts {
-		opt(&f, meta)
+		opt(f, meta)
 	}
 
 	f.layerContributor = libpak.NewLayerContributor(
@@ -46,7 +46,7 @@ func NewFunction(opts ...FunctionOpt) Function {
 	return f
 }
 
-func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+func (f *Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	f.layerContributor.Logger = f.logger
 
 	return f.layerContributor.Contribute(layer, func() (libcnb.Layer, error) {
@@ -70,7 +70,7 @@ func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	})
 }
 
-func (f Function) Name() string {
+func (f *Function) Name() string {
 	return f.layerContributor.Name
 }
 

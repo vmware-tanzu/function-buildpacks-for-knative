@@ -13,7 +13,8 @@ import (
 )
 
 type Build struct {
-	Logger bard.Logger
+	Logger        bard.Logger
+	CommandRunner CommandRunner
 }
 
 func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
@@ -49,12 +50,12 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 	}
 
-	invokerDepCacheLayer := NewInvokerDependencyCache(invokerDeps, dependencyCache)
+	invokerDepCacheLayer := NewInvokerDependencyCache(invokerDeps, dependencyCache, b.CommandRunner)
 	invokerDepCacheLayer.Logger = b.Logger
-	result.Layers = append(result.Layers, &invokerDepCacheLayer)
+	result.Layers = append(result.Layers, invokerDepCacheLayer)
 
 	invokerLayer := NewInvoker(invoker, dependencyCache)
-	result.Layers = append(result.Layers, &invokerLayer)
+	result.Layers = append(result.Layers, invokerLayer)
 
 	functionPlan, ok, err := planResolver.Resolve("python-function")
 	if err != nil {
@@ -74,8 +75,9 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	validationLayer := NewFunctionValidationLayer(
 		context.Application.Path,
-		&invokerLayer,
-		&invokerDepCacheLayer,
+		invokerLayer,
+		invokerDepCacheLayer,
+		b.CommandRunner,
 		WithValidationLogger(b.Logger),
 		WithValidationFunctionClass(functionClass, isFuncDefDefault),
 		WithValidationFunctionEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
