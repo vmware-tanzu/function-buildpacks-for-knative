@@ -70,10 +70,6 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		it.After(func() {
-			Expect(os.Unsetenv("BP_FUNCTION"))
-		})
-
 		it("adds expected layers", func() {
 			var layers []string
 			for _, l := range result.Layers {

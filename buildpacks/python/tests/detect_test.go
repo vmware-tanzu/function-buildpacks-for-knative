@@ -62,7 +62,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		when("BP_FUNCTION is configured", func() {
 			it.Before(func() {
-				Expect(os.Setenv("BP_FUNCTION", "some.function")).To(Succeed())
+				t.Setenv("BP_FUNCTION", "some_module.some_function")
 
 				var appDir string
 				appDir, cleanupAppDir = SetupTestDirectory()
@@ -94,7 +94,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 			when("BP_FUNCTION is not configured", func() {
 				it.Before(func() {
-					Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
+					t.Setenv("BP_FUNCTION", "")
 				})
 
 				it("fails detection", func() {
@@ -107,7 +107,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 			when("BP_FUNCTION is configured incorrectly", func() {
 				it.Before(func() {
-					Expect(os.Setenv("BP_FUNCTION", "invalid function")).To(Succeed())
+					t.Setenv("BP_FUNCTION", "invalid function")
 				})
 
 				it.After(func() {

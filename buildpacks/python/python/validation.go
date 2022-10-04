@@ -4,7 +4,6 @@
 package python
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -18,6 +17,7 @@ import (
 type FunctionValidationLayer struct {
 	layerContributor libpak.LayerContributor
 	logger           bard.Logger
+	commandRunner    CommandRunner
 
 	module          string
 	function        string
@@ -31,20 +31,22 @@ type FunctionValidationLayer struct {
 
 type FunctionValidationOpts func(*FunctionValidationLayer, map[string]string)
 
+//go:generate mockgen -destination ../mock_python/layer.go . Layer
 type Layer interface {
 	PythonPath() string
 }
 
-func NewFunctionValidationLayer(appPath string, invoker Layer, InvokerDepLayer Layer, opts ...FunctionValidationOpts) FunctionValidationLayer {
-	fvl := FunctionValidationLayer{
+func NewFunctionValidationLayer(appPath string, invoker Layer, InvokerDepLayer Layer, commandRunner CommandRunner, opts ...FunctionValidationOpts) *FunctionValidationLayer {
+	fvl := &FunctionValidationLayer{
 		applicationPath: appPath,
 		Invoker:         invoker,
 		InvokerDep:      InvokerDepLayer,
+		commandRunner:   commandRunner,
 	}
 	meta := map[string]string{}
 
 	for _, opt := range opts {
-		opt(&fvl, meta)
+		opt(fvl, meta)
 	}
 
 	fvl.layerContributor = libpak.NewLayerContributor("validation", meta, libcnb.LayerTypes{
@@ -54,44 +56,40 @@ func NewFunctionValidationLayer(appPath string, invoker Layer, InvokerDepLayer L
 	return fvl
 }
 
-func (i FunctionValidationLayer) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
-	i.layerContributor.Logger = i.logger
+func (f *FunctionValidationLayer) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+	f.layerContributor.Logger = f.logger
 
-	return i.layerContributor.Contribute(layer, func() (libcnb.Layer, error) {
-		i.logger.Body("Validating function")
+	return f.layerContributor.Contribute(layer, func() (libcnb.Layer, error) {
+		f.logger.Body("Validating function")
 
 		var pythonPath []string
-		if i.Invoker.PythonPath() != "" {
-			pythonPath = append(pythonPath, i.Invoker.PythonPath())
+		if f.Invoker.PythonPath() != "" {
+			pythonPath = append(pythonPath, f.Invoker.PythonPath())
 		}
 
-		if i.InvokerDep.PythonPath() != "" {
-			pythonPath = append(pythonPath, i.InvokerDep.PythonPath())
+		if f.InvokerDep.PythonPath() != "" {
+			pythonPath = append(pythonPath, f.InvokerDep.PythonPath())
 		}
 
 		if env, found := os.LookupEnv("PYTHONPATH"); found {
 			pythonPath = append(pythonPath, env)
 		}
 
-		buffer := bytes.NewBuffer(nil)
-		cmd := exec.Command("python", "-m", "pyfunc", "check", "-s", i.applicationPath)
-		// cmd := exec.Command("env")
+		cmd := exec.Command("python", "-m", "pyfunc", "check", "-s", f.applicationPath)
 		cmd.Env = append(os.Environ(), fmt.Sprintf("PYTHONPATH=%s", strings.Join(pythonPath, string(os.PathListSeparator))))
-		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", EnvModuleName, i.module), fmt.Sprintf("%s=%s", EnvFunctionName, i.function))
-		cmd.Stderr = buffer
-		cmd.Stdout = buffer
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", EnvModuleName, f.module), fmt.Sprintf("%s=%s", EnvFunctionName, f.function))
 
-		if err := cmd.Run(); err != nil {
-			return layer, fmt.Errorf("%v: %v", buffer.String(), err)
+		if output, err := f.commandRunner.Run(cmd); err != nil {
+			return layer, fmt.Errorf("%v: %v", output, err)
 		}
 
-		i.logger.Debug("Function was successfully parsed")
+		f.logger.Debug("Function was successfully parsed")
 		return layer, nil
 	})
 }
 
-func (i FunctionValidationLayer) Name() string {
-	return i.layerContributor.Name
+func (f *FunctionValidationLayer) Name() string {
+	return f.layerContributor.Name
 }
 
 func WithValidationLogger(logger bard.Logger) FunctionValidationOpts {

@@ -20,12 +20,12 @@ type Invoker struct {
 	pythonPath string
 }
 
-func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) Invoker {
+func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) *Invoker {
 	contributor := libpak.NewDependencyLayerContributor(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
 		Cache:  true,
 	})
-	return Invoker{LayerContributor: contributor}
+	return &Invoker{LayerContributor: contributor}
 }
 
 func (i *Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
