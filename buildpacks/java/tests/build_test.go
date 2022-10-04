@@ -84,7 +84,73 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 			}))
 		})
 
-		it("adds expected labels", func() {
+		it("adds expected labels sorted", func() {
+			Expect(result.Labels).To(Equal([]libcnb.Label{
+				{Key: "some-option", Value: "some-value"},
+				{Key: "some-other-option", Value: "some-other-value"},
+			}))
+		})
+
+		it("adds launch command", func() {
+			Expect(result.Processes).To(Equal([]libcnb.Process{
+				{
+					Type:             "func",
+					Command:          "java",
+					Arguments:        []string{"org.springframework.boot.loader.JarLauncher"},
+					Direct:           false,
+					WorkingDirectory: "",
+					Default:          true,
+				},
+			}))
+		})
+	})
+
+	when("#Build with embedded tomcat dependency", func() {
+		var result libcnb.BuildResult
+
+		it.Before(func() {
+			var (
+				appDir string
+				err    error
+			)
+
+			Expect(os.Setenv("BP_FUNCTION", "functions.Handler"))
+			appDir, cleanupAppDir = SetupTestDirectory(
+				WithFuncYaml(),
+				WithTomcatJar(),
+			)
+
+			context = makeBuildContext(
+				withBuildApplicationPath(appDir),
+				withDependencies([]map[string]any{
+					{"id": "invoker", "version": "2.3.4"},
+				}),
+				withOptions(map[string]any{
+					"some-other-option": "some-other-value",
+					"some-option":       "some-value",
+				}),
+			)
+
+			result, err = build.Build(context)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		it.After(func() {
+			Expect(os.Unsetenv("BP_FUNCTION"))
+		})
+
+		it("adds expected layers", func() {
+			var layers []string
+			for _, l := range result.Layers {
+				layers = append(layers, l.Name())
+			}
+
+			Expect(layers).To(Equal([]string{
+				"java-function",
+			}))
+		})
+
+		it("adds expected labels sorted", func() {
 			Expect(result.Labels).To(Equal([]libcnb.Label{
 				{Key: "some-option", Value: "some-value"},
 				{Key: "some-other-option", Value: "some-other-value"},

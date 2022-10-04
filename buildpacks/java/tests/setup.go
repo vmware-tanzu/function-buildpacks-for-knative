@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/paketo-buildpacks/libpak/bard"
 	knfn "knative.dev/kn-plugin-func"
@@ -48,6 +49,16 @@ func WithFuncYaml() SetupOpts {
 		}
 
 		err = cfg.WriteConfig()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func WithTomcatJar() SetupOpts {
+	return func(directory string) {
+		path := filepath.Join(directory, "tomcat-embed-core-10.1.0.jar")
+		_, err := os.Create(path)
 		if err != nil {
 			panic(err)
 		}
