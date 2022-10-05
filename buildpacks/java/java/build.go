@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/buildpacks/libcnb"
@@ -63,6 +64,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 			Value: optionValue.(string),
 		})
 	}
+	sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 
 	dep, err := dr.Resolve("invoker", "")
 	if err != nil {
