@@ -12,12 +12,14 @@ import (
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
+
+	"kn-fn/buildpacks/command"
 )
 
 type FunctionValidationLayer struct {
 	layerContributor libpak.LayerContributor
 	logger           bard.Logger
-	commandRunner    CommandRunner
+	commandRunner    command.Runner
 
 	module          string
 	function        string
@@ -36,7 +38,7 @@ type Layer interface {
 	PythonPath() string
 }
 
-func NewFunctionValidationLayer(appPath string, invoker Layer, InvokerDepLayer Layer, commandRunner CommandRunner, opts ...FunctionValidationOpts) *FunctionValidationLayer {
+func NewFunctionValidationLayer(appPath string, invoker Layer, InvokerDepLayer Layer, commandRunner command.Runner, opts ...FunctionValidationOpts) *FunctionValidationLayer {
 	fvl := &FunctionValidationLayer{
 		applicationPath: appPath,
 		Invoker:         invoker,

@@ -10,11 +10,13 @@ import (
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
+
+	"kn-fn/buildpacks/command"
 )
 
 type Build struct {
 	Logger        bard.Logger
-	CommandRunner CommandRunner
+	CommandRunner command.Runner
 }
 
 func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
@@ -92,13 +94,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 	sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 
-	command := "python"
+	cmd := "python"
 	arguments := []string{"-m", "pyfunc", "start"}
 	result.Processes = append(result.Processes,
 		libcnb.Process{
 			Default:   true,
 			Type:      "func",
-			Command:   command,
+			Command:   cmd,
 			Arguments: arguments,
 		},
 	)

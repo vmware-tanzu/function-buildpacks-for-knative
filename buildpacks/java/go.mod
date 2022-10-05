@@ -4,10 +4,10 @@ go 1.19
 
 require (
 	github.com/buildpacks/libcnb v1.26.0
-	github.com/onsi/gomega v1.19.0
+	github.com/onsi/gomega v1.20.2
 	github.com/paketo-buildpacks/libpak v1.61.0
 	github.com/sclevine/spec v1.4.0
-	gopkg.in/yaml.v3 v3.0.1
+	kn-fn/buildpacks v0.0.0
 	knative.dev/kn-plugin-func v0.19.0
 	knative.dev/pkg v0.0.0-20210902173607-844a6bc45596
 )
@@ -25,6 +25,7 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/heroku/color v0.0.6 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
@@ -40,11 +41,14 @@ require (
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apimachinery v0.20.7 // indirect
 )
+
+replace kn-fn/buildpacks => ../common

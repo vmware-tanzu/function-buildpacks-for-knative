@@ -9,6 +9,8 @@ import (
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
+
+	"kn-fn/buildpacks/config"
 )
 
 type Detect struct {
@@ -18,7 +20,7 @@ type Detect struct {
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
 	result := libcnb.DetectResult{}
 
-	funcYaml := ParseFuncYaml(context.Application.Path, d.Logger)
+	funcYaml := config.ParseFuncYaml(context.Application.Path, d.Logger)
 
 	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &d.Logger)
 	if err != nil {

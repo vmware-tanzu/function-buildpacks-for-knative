@@ -17,6 +17,7 @@ import (
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 
+	"kn-fn/buildpacks/command"
 	"kn-fn/python-function-buildpack/mock_python"
 	"kn-fn/python-function-buildpack/python"
 )
@@ -57,7 +58,7 @@ func testInvokerDependencyCache(t *testing.T, when spec.G, it spec.S) {
 			invokerDepCache = python.NewInvokerDependencyCache(
 				libpak.BuildpackDependency{},
 				libpak.DependencyCache{},
-				python.NewDefaultCommandRunner(),
+				command.NewDefaultRunner(),
 			)
 
 			Expect(invokerDepCache.Name()).To(Equal("invoker-deps"))

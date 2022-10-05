@@ -9,11 +9,12 @@ buildpack.path := $(abspath $(path))
 include $(buildpack.path)/rules.mk
 
 # Include test case images
-buildpack.languages = \
+buildpack.subdirs = \
+	common \
 	python \
 	java \
 
-SUBDIRS := $(addprefix $(buildpack.path)/, $(buildpack.languages))
+SUBDIRS := $(addprefix $(buildpack.path)/, $(buildpack.subdirs))
 $(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))
 endif
 
@@ -28,5 +29,5 @@ all .PHONY: buildpacks
 buildpacks.clean:
 clean .PHONY: buildpacks.clean
 
-buildpacks.test:
+buildpacks.tests:
 tests .PHONY: buildpacks.clean

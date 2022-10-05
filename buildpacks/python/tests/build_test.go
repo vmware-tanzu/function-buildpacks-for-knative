@@ -13,6 +13,7 @@ import (
 
 	. "github.com/onsi/gomega"
 
+	"kn-fn/buildpacks/tests"
 	"kn-fn/python-function-buildpack/python"
 )
 
@@ -31,7 +32,7 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		build = python.Build{
-			Logger: NewLogger(),
+			Logger: tests.NewLogger(),
 		}
 	})
 
@@ -49,8 +50,8 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 			)
 
 			Expect(os.Setenv("BP_FUNCTION", "some_module.some_function"))
-			appDir, cleanupAppDir = SetupTestDirectory(
-				WithFuncYaml(),
+			appDir, cleanupAppDir = tests.SetupTestDirectory(
+				tests.WithFuncYaml(),
 				WithFunctionFile("some_module", "some_function", HTTPFuncTemplate),
 			)
 

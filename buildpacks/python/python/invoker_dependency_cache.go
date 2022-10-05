@@ -13,6 +13,8 @@ import (
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
 	"github.com/paketo-buildpacks/libpak/crush"
+
+	"kn-fn/buildpacks/command"
 )
 
 type InvokerDependencyCache struct {
@@ -20,13 +22,13 @@ type InvokerDependencyCache struct {
 	Logger           bard.Logger
 
 	pythonPath    string
-	commandRunner CommandRunner
+	commandRunner command.Runner
 }
 
 func NewInvokerDependencyCache(
 	dependency libpak.BuildpackDependency,
 	cache libpak.DependencyCache,
-	commandRunner CommandRunner,
+	commandRunner command.Runner,
 ) *InvokerDependencyCache {
 	contributor := libpak.NewDependencyLayerContributor(dependency, cache, libcnb.LayerTypes{
 		Launch: true,

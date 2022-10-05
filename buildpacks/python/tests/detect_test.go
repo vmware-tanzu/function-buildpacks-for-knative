@@ -14,6 +14,7 @@ import (
 	function "knative.dev/kn-plugin-func"
 	"knative.dev/pkg/ptr"
 
+	"kn-fn/buildpacks/tests"
 	"kn-fn/python-function-buildpack/python"
 )
 
@@ -32,7 +33,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		detect = python.Detect{
-			Logger: NewLogger(),
+			Logger: tests.NewLogger(),
 		}
 	})
 
@@ -44,8 +45,8 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		when("func.yaml exists", func() {
 			it.Before(func() {
 				var appDir string
-				appDir, cleanupAppDir = SetupTestDirectory(
-					WithFuncYaml(),
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
 				)
 				context = makeDetectContext(
 					withDetectApplicationPath(appDir),
@@ -65,7 +66,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				t.Setenv("BP_FUNCTION", "some_module.some_function")
 
 				var appDir string
-				appDir, cleanupAppDir = SetupTestDirectory()
+				appDir, cleanupAppDir = tests.SetupTestDirectory()
 				context = makeDetectContext(
 					withDetectApplicationPath(appDir),
 				)
@@ -86,7 +87,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		when("func.yaml does not exist", func() {
 			it.Before(func() {
 				var appDir string
-				appDir, cleanupAppDir = SetupTestDirectory()
+				appDir, cleanupAppDir = tests.SetupTestDirectory()
 				context = makeDetectContext(
 					withDetectApplicationPath(appDir),
 				)
@@ -126,11 +127,11 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		when("func.yaml has configuration for envs or options", func() {
 			it.Before(func() {
 				var appDir string
-				appDir, cleanupAppDir = SetupTestDirectory(
-					WithFuncEnvs(map[string]string{
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncEnvs(map[string]string{
 						"SOME_VAR": "SOME_VALUE",
 					}),
-					WithFuncScale(function.ScaleOptions{
+					tests.WithFuncScale(function.ScaleOptions{
 						Min: ptr.Int64(1),
 						Max: ptr.Int64(42),
 					}),
