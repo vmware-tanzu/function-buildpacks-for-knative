@@ -73,7 +73,7 @@ $(builder.image.out): $(PACK) $(builder.config)
 
 builder.image: $(builder.image.out) $(builder.image.out).sha256
 builder.image.local: builder.flags=--pull-policy if-not-present
-builder.image.local: builder.image
+builder.image.local: builder.clean buildpacks.images.local builder.image
 
 .PHONY: builder.publish
 builder.publish: builder.image
