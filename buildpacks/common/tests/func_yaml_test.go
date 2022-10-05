@@ -4,18 +4,19 @@
 package tests
 
 import (
-	"kn-fn/python-function-buildpack/python"
 	"testing"
 
 	"gopkg.in/yaml.v3"
 	knfn "knative.dev/kn-plugin-func"
 	"knative.dev/pkg/ptr"
+
+	"kn-fn/buildpacks/config"
 )
 
 func TestParseFuncYaml_FileDoesNotExist(t *testing.T) {
 	appDir, cleanup := SetupTestDirectory()
 	defer cleanup()
-	result := python.ParseFuncYaml(appDir, NewLogger())
+	result := config.ParseFuncYaml(appDir, NewLogger())
 	if result.Exists {
 		t.Logf("File should not exists but was detected")
 		t.Fail()
@@ -25,7 +26,7 @@ func TestParseFuncYaml_FileDoesNotExist(t *testing.T) {
 func TestParseFuncYaml_FileExistsButEmpty(t *testing.T) {
 	appDir, cleanup := SetupTestDirectory(WithFuncYaml())
 	defer cleanup()
-	result := python.ParseFuncYaml(appDir, NewLogger())
+	result := config.ParseFuncYaml(appDir, NewLogger())
 	if !result.Exists {
 		t.Logf("File should exists but was not detected")
 		t.Fail()
@@ -40,7 +41,7 @@ func TestParseFuncYaml_HasEnvs(t *testing.T) {
 
 	appDir, cleanup := SetupTestDirectory(WithFuncEnvs(envs))
 	defer cleanup()
-	result := python.ParseFuncYaml(appDir, NewLogger())
+	result := config.ParseFuncYaml(appDir, NewLogger())
 
 	for k, v := range result.Envs {
 		expected, found := envs[k]
@@ -67,7 +68,7 @@ func TestParseFuncYaml_HasScale(t *testing.T) {
 
 	appDir, cleanup := SetupTestDirectory(WithFuncScale(scaleOption))
 	defer cleanup()
-	result := python.ParseFuncYaml(appDir, NewLogger())
+	result := config.ParseFuncYaml(appDir, NewLogger())
 	resultScaleOptions := &knfn.ScaleOptions{}
 	yaml.Unmarshal([]byte(result.Options["options-scale"]), resultScaleOptions)
 
@@ -101,7 +102,7 @@ func TestParseFuncYaml_HasRequests(t *testing.T) {
 
 	appDir, cleanup := SetupTestDirectory(WithFuncResourceRequests(requestOptions))
 	defer cleanup()
-	result := python.ParseFuncYaml(appDir, NewLogger())
+	result := config.ParseFuncYaml(appDir, NewLogger())
 	resultRequestOptions := &knfn.ResourcesRequestsOptions{}
 	yaml.Unmarshal([]byte(result.Options["options-resources-requests"]), resultRequestOptions)
 
@@ -124,7 +125,7 @@ func TestParseFuncYaml_HasLimits(t *testing.T) {
 
 	appDir, cleanup := SetupTestDirectory(WithFuncResourceLimits(limitOptions))
 	defer cleanup()
-	result := python.ParseFuncYaml(appDir, NewLogger())
+	result := config.ParseFuncYaml(appDir, NewLogger())
 	resultLimitOptions := &knfn.ResourcesLimitsOptions{}
 	yaml.Unmarshal([]byte(result.Options["options-resources-limits"]), resultLimitOptions)
 

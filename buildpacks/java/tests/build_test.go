@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"github.com/buildpacks/libcnb"
+	. "github.com/onsi/gomega"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 
-	. "github.com/onsi/gomega"
-
+	"kn-fn/buildpacks/tests"
 	"kn-fn/java-function-buildpack/java"
 )
 
@@ -30,7 +30,7 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		build = java.Build{
-			Logger: NewLogger(),
+			Logger: tests.NewLogger(),
 		}
 	})
 
@@ -48,8 +48,8 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 					err    error
 				)
 
-				appDir, cleanupAppDir = SetupTestDirectory(
-					WithFuncYaml(),
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
 				)
 
 				context = makeBuildContext(
@@ -97,8 +97,8 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 					err    error
 				)
 
-				appDir, cleanupAppDir = SetupTestDirectory(
-					WithFuncYaml(),
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
 				)
 
 				context = makeBuildContext(
@@ -138,8 +138,8 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 					err    error
 				)
 
-				appDir, cleanupAppDir = SetupTestDirectory(
-					WithFuncYaml(),
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
 					WithTomcatJar(),
 				)
 

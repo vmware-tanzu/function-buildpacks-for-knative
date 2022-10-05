@@ -14,11 +14,12 @@ import (
 	function "knative.dev/kn-plugin-func"
 	"knative.dev/pkg/ptr"
 
+	"kn-fn/buildpacks/tests"
 	"kn-fn/java-function-buildpack/java"
 )
 
 func TestDetect(t *testing.T) {
-	spec.Run(t, "object", testDetect, spec.Report(report.Terminal{}))
+	spec.Run(t, "Detect", testDetect, spec.Report(report.Terminal{}))
 }
 
 func testDetect(t *testing.T, when spec.G, it spec.S) {
@@ -32,7 +33,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		detect = java.Detect{
-			Logger: NewLogger(),
+			Logger: tests.NewLogger(),
 		}
 	})
 
@@ -43,8 +44,8 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	when("func.yaml exists", func() {
 		it.Before(func() {
 			var appDir string
-			appDir, cleanupAppDir = SetupTestDirectory(
-				WithFuncYaml(),
+			appDir, cleanupAppDir = tests.SetupTestDirectory(
+				tests.WithFuncYaml(),
 			)
 			context = makeDetectContext(
 				withApplicationPath(appDir),
@@ -64,7 +65,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			Expect(os.Setenv("BP_FUNCTION", "function.Handler")).To(Succeed())
 
 			var appDir string
-			appDir, cleanupAppDir = SetupTestDirectory()
+			appDir, cleanupAppDir = tests.SetupTestDirectory()
 			context = makeDetectContext(
 				withApplicationPath(appDir),
 			)
@@ -85,7 +86,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	when("func.yaml does not exist", func() {
 		it.Before(func() {
 			var appDir string
-			appDir, cleanupAppDir = SetupTestDirectory()
+			appDir, cleanupAppDir = tests.SetupTestDirectory()
 			context = makeDetectContext(
 				withApplicationPath(appDir),
 			)
@@ -108,11 +109,11 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	when("func.yaml has configuration for envs or options", func() {
 		it.Before(func() {
 			var appDir string
-			appDir, cleanupAppDir = SetupTestDirectory(
-				WithFuncEnvs(map[string]string{
+			appDir, cleanupAppDir = tests.SetupTestDirectory(
+				tests.WithFuncEnvs(map[string]string{
 					"SOME_VAR": "SOME_VALUE",
 				}),
-				WithFuncScale(function.ScaleOptions{
+				tests.WithFuncScale(function.ScaleOptions{
 					Min: ptr.Int64(1),
 					Max: ptr.Int64(42),
 				}),
