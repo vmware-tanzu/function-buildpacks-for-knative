@@ -43,7 +43,9 @@ buildpacks.java.invoker.version := $(shell cat $(buildpacks.java.path)/../../inv
 buildpacks.java.invoker.url := $(base_url)/releases/download/java-invoker/v$(buildpacks.java.invoker.version)/java-function-invoker-$(buildpacks.java.invoker.version).jar
 buildpacks.java.invoker.sha := $(buildpacks.java.temp_dir)/invoker.sha256
 
-$(buildpacks.java.invoker.sha):
+buildpacks.java.invoker.sha.local :=
+
+$(buildpacks.java.invoker.sha): $(buildpacks.java.invoker.sha.local)
 	@mkdir -p $(@D)
 	curl -sw '\0' -L $(buildpacks.java.invoker.url).sha256 -o $@
 
@@ -157,8 +159,16 @@ buildpacks.java.tests.sources := \
 # Targets
 #########
 
-buildpacks.java.images.local: buildpacks.java.invoker.url=file://$(abspath $(invokers.out_dir)/java/java-function-invoker-$(buildpacks.java.invoker.version).jar)
-buildpacks.java.images.local: buildpacks.java.images.offline
+buildpacks.java.invoker.path = $(abspath $(invokers.out_dir)/java/java-function-invoker-$(buildpacks.java.invoker.version).jar)
+
+buildpacks.java.images.local:
+	$(MAKE) \
+		buildpacks.java.invoker.url=file://$(buildpacks.java.invoker.path) \
+		buildpacks.java.invoker.sha.local=$(buildpacks.java.invoker.path).sha256 \
+		buildpacks.java.images.local.internal
+
+buildpacks.java.images.local.internal: invokers.java buildpacks.java.images.offline
+.PHONY: buildpacks.java.images.local.internal
 
 buildpacks.java.images.offline: $(buildpacks.java.images.offline.out) $(buildpacks.java.images.offline.out).sha256
 buildpacks.java.images.online: $(buildpacks.java.images.online.out) $(buildpacks.java.images.online.out).sha256
@@ -181,7 +191,7 @@ buildpacks.java.clean:
 	rm -rf $(buildpacks.java.out_dir)
 
 all buildpacks .PHONY: buildpacks.java.images
-buildpacks.local .PHONY: buildpacks.images.local
+buildpacks.images.local .PHONY: buildpacks.java.images.local
 buildpacks.offline .PHONY: buildpacks.java.images.offline
 buildpacks.offline.publish .PHONY: buildpacks.java.images.offline.publish
 buildpacks.online .PHONY: buildpacks.java.images.online

@@ -4,10 +4,6 @@ This folder contains language-specific buildpacks.
 
 ## Running locally
 
-### Prerequisite
-Before you can build a local buildpack, you'll need the invoker files created.  
-Run `make invokers.<language>`
-
 ### Building
 To make a local buildpack image, run `make buildpacks.<language>.images.local`.
 

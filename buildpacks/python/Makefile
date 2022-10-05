@@ -45,11 +45,14 @@ buildpacks.python.invoker.sha := $(buildpacks.python.temp_dir)/invoker.sha256
 buildpacks.python.invoker_deps.url := $(base_url)/releases/download/python-invoker/v$(buildpacks.python.invoker.version)/pyfunc-invoker-deps-$(buildpacks.python.invoker.version).tar.gz
 buildpacks.python.invoker_deps.sha := $(buildpacks.python.temp_dir)/invoker_dep.sha256
 
-$(buildpacks.python.invoker.sha):
+buildpacks.python.invoker.sha.local :=
+buildpacks.python.invoker_deps.sha.local :=
+
+$(buildpacks.python.invoker.sha): $(buildpacks.python.invoker.sha.local)
 	@mkdir -p $(@D)
 	curl -fsSw '\0' -L $(buildpacks.python.invoker.url).sha256 -o $@
 
-$(buildpacks.python.invoker_deps.sha):
+$(buildpacks.python.invoker_deps.sha): $(buildpacks.python.invoker_deps.sha.local)
 	@mkdir -p $(@D)
 	curl -fsSw '\0' -L $(buildpacks.python.invoker_deps.url).sha256 -o $@
 
@@ -168,10 +171,19 @@ buildpacks.python.tests.sources := \
 # Targets
 #########
 
-buildpacks.python.images.local: invokers.python
-buildpacks.python.images.local: buildpacks.python.invoker.url=file://$(abspath $(invokers.out_dir)/python/pyfunc-invoker-$(buildpacks.python.invoker.version).tar.gz)
-buildpacks.python.images.local: buildpacks.python.invoker_deps.url=file://$(abspath $(invokers.out_dir)/python/pyfunc-invoker-deps-$(buildpacks.python.invoker.version).tar.gz)
-buildpacks.python.images.local: buildpacks.python.images.offline
+buildpacks.python.invoker.path = $(abspath $(invokers.out_dir)/python/pyfunc-invoker-$(buildpacks.python.invoker.version).tar.gz)
+buildpacks.python.invoker_deps.path = $(abspath $(invokers.out_dir)/python/pyfunc-invoker-deps-$(buildpacks.python.invoker.version).tar.gz)
+
+buildpacks.python.images.local:
+	$(MAKE) \
+		buildpacks.python.invoker.url=file://$(buildpacks.python.invoker.path) \
+		buildpacks.python.invoker.sha.local=$(buildpacks.python.invoker.path).sha256 \
+		buildpacks.python.invoker_deps.url=file://$(buildpacks.python.invoker_deps.path) \
+		buildpacks.python.invoker_deps.sha.local=$(buildpacks.python.invoker_deps.path).sha256 \
+		buildpacks.python.images.local.internal
+
+buildpacks.python.images.local.internal: invokers.python buildpacks.python.images.offline
+.PHONY: buildpacks.python.images.local.internal
 
 buildpacks.python.images.offline: $(buildpacks.python.images.offline.out) $(buildpacks.python.images.offline.out).sha256
 buildpacks.python.images.online: $(buildpacks.python.images.online.out) $(buildpacks.python.images.online.out).sha256
@@ -193,6 +205,7 @@ buildpacks.python.clean:
 	rm -rf $(buildpacks.python.temp_dir)
 	rm -rf $(buildpacks.python.out_dir)
 
+buildpacks.images.local .PHONY: buildpacks.python.images.local
 buildpacks.offline .PHONY: buildpacks.python.images.offline
 buildpacks.offline.publish .PHONY: buildpacks.python.images.offline.publish
 buildpacks.online .PHONY: buildpacks.python.images.online

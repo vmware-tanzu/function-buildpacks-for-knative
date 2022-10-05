@@ -8,12 +8,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"testing"
-
-	"net"
-	"strconv"
 
 	"github.com/paketo-buildpacks/occam"
 	"github.com/paketo-buildpacks/packit/v2/pexec"
@@ -52,6 +51,7 @@ func Pack() occam.Pack {
 func PackBuild(name string, source string, opts ...BuildOpts) (occam.Image, fmt.Stringer, error) {
 	b := Pack().Build.
 		WithBuilder(*Builder).
+		WithTrustBuilder().
 		WithPullPolicy(*PullPolicy)
 
 	for _, opt := range opts {

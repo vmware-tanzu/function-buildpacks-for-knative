@@ -21,6 +21,7 @@ buildpacks.tests:
 invokers.tests:
 smoke-tests:
 template-tests:
+integration-tests:
 
 .PHONY: clean main.clean
 main.clean:
