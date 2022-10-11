@@ -137,7 +137,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 					Requires: []libcnb.BuildPlanRequire{
 						{
 							Name: "java-function",
-							Metadata: map[string]interface{}{
+							Metadata: map[string]any{
 								"launch": true,
 								"func_yaml_envs": map[string]string{
 									"SOME_VAR": "SOME_VALUE",
@@ -149,7 +149,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 						},
 						{
 							Name: "jre",
-							Metadata: map[string]interface{}{
+							Metadata: map[string]any{
 								"launch": true,
 							},
 						},

@@ -18,14 +18,14 @@ type Invoker struct {
 	Logger           bard.Logger
 }
 
-func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) Invoker {
+func NewInvoker(dependency libpak.BuildpackDependency, cache libpak.DependencyCache) *Invoker {
 	contributor := libpak.NewDependencyLayerContributor(dependency, cache, libcnb.LayerTypes{
 		Launch: true,
 	})
-	return Invoker{LayerContributor: contributor}
+	return &Invoker{LayerContributor: contributor}
 }
 
-func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+func (i *Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	i.LayerContributor.Logger = i.Logger
 
 	return i.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
@@ -41,6 +41,6 @@ func (i Invoker) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	})
 }
 
-func (i Invoker) Name() string {
-	return i.LayerContributor.LayerName()
+func (i *Invoker) Name() string {
+	return "invoker"
 }

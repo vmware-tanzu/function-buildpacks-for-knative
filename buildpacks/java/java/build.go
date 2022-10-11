@@ -49,16 +49,16 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return result, nil
 	}
 
-	functionClass, isFuncDefDefault := cr.Resolve("BP_FUNCTION")
+	functionClass, isOverride := cr.Resolve("BP_FUNCTION")
 
 	functionLayer := NewFunction(context.Application.Path,
 		WithLogger(b.Logger),
-		WithFunctionClass(functionClass, isFuncDefDefault),
-		WithFuncYamlEnvs(e.Metadata["func_yaml_envs"].(map[string]interface{})),
+		WithFunctionClass(functionClass, isOverride),
+		WithFuncYamlEnvs(e.Metadata["func_yaml_envs"].(map[string]any)),
 	)
 	result.Layers = append(result.Layers, functionLayer)
 
-	for optionName, optionValue := range e.Metadata["func_yaml_options"].(map[string]interface{}) {
+	for optionName, optionValue := range e.Metadata["func_yaml_options"].(map[string]any) {
 		result.Labels = append(result.Labels, libcnb.Label{
 			Key:   optionName,
 			Value: optionValue.(string),

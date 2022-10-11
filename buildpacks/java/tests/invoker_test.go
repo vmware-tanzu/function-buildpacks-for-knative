@@ -14,7 +14,7 @@ import (
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 
-	"kn-fn/python-function-buildpack/python"
+	"kn-fn/java-function-buildpack/java"
 )
 
 func TestInvoker(t *testing.T) {
@@ -25,7 +25,7 @@ func testInvoker(t *testing.T, when spec.G, it spec.S) {
 	var Expect = NewWithT(t).Expect
 
 	var (
-		invoker   *python.Invoker
+		invoker   *java.Invoker
 		layer     libcnb.Layer
 		layersDir string
 	)
@@ -45,7 +45,7 @@ func testInvoker(t *testing.T, when spec.G, it spec.S) {
 
 	when("#Name", func() {
 		it("returns invoker layer name", func() {
-			invoker = python.NewInvoker(
+			invoker = java.NewInvoker(
 				libpak.BuildpackDependency{},
 				libpak.DependencyCache{},
 			)
@@ -56,7 +56,7 @@ func testInvoker(t *testing.T, when spec.G, it spec.S) {
 
 	when("#Contribute", func() {
 		it.Before(func() {
-			invoker = python.NewInvoker(
+			invoker = java.NewInvoker(
 				libpak.BuildpackDependency{
 					ID:     "invoker",
 					URI:    "https://www.example.com/sample-invoker.zip",
@@ -79,20 +79,18 @@ func testInvoker(t *testing.T, when spec.G, it spec.S) {
 			Expect(string(contents)).To(Equal("sample invoker"))
 		})
 
-		it("sets layer as cached launch layer", func() {
+		it("sets layer as uncached launch layer", func() {
 			Expect(layer.LayerTypes).To(Equal(libcnb.LayerTypes{
 				Build:  false,
-				Cache:  true,
+				Cache:  false,
 				Launch: true,
 			}))
 		})
 
-		it("appends layer path to python path", func() {
-			Expect(invoker.PythonPath()).To(Equal(layer.Path))
-
+		it("prepends layer path to class path", func() {
 			Expect(layer.LaunchEnvironment).To(Equal(libcnb.Environment{
-				"PYTHONPATH.append": layer.Path,
-				"PYTHONPATH.delim":  string(os.PathListSeparator),
+				"CLASSPATH.prepend": layer.Path,
+				"CLASSPATH.delim":   string(os.PathListSeparator),
 			}))
 		})
 	})
