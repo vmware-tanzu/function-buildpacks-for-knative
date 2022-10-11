@@ -26,14 +26,14 @@ type Function struct {
 	applicationPath string
 }
 
-func NewFunction(applicationPath string, opts ...FunctionOpt) Function {
-	f := Function{
+func NewFunction(applicationPath string, opts ...FunctionOpt) *Function {
+	f := &Function{
 		applicationPath: applicationPath,
 	}
 	meta := map[string]string{}
 
 	for _, opt := range opts {
-		opt(&f, meta)
+		opt(f, meta)
 	}
 
 	f.layerContributor = libpak.NewLayerContributor(
@@ -47,7 +47,7 @@ func NewFunction(applicationPath string, opts ...FunctionOpt) Function {
 	return f
 }
 
-func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+func (f *Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	f.layerContributor.Logger = f.logger
 
 	return f.layerContributor.Contribute(layer, func() (libcnb.Layer, error) {
@@ -67,7 +67,7 @@ func (f Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	})
 }
 
-func (f Function) Name() string {
+func (f *Function) Name() string {
 	return f.layerContributor.Name
 }
 
@@ -90,7 +90,7 @@ func WithFunctionClass(functionClass string, override bool) FunctionOpt {
 	}
 }
 
-func WithFuncYamlEnvs(funcYamlEnvs map[string]interface{}) FunctionOpt {
+func WithFuncYamlEnvs(funcYamlEnvs map[string]any) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
 		fun.funcYamlEnvs = map[string]string{}
 

@@ -50,7 +50,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		Requires: []libcnb.BuildPlanRequire{
 			{
 				Name: "java-function",
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"launch":            true,
 					"func_yaml_envs":    funcYaml.Envs,
 					"func_yaml_options": funcYaml.Options,
@@ -58,7 +58,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 			},
 			{
 				Name: "jre",
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"launch": true,
 				},
 			},

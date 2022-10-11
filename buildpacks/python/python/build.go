@@ -67,10 +67,10 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return result, nil
 	}
 
-	functionClass, isFuncDefDefault := cr.Resolve("BP_FUNCTION")
+	functionClass, isOverride := cr.Resolve("BP_FUNCTION")
 	functionLayer := NewFunction(
 		WithLogger(b.Logger),
-		WithFunctionClass(functionClass, isFuncDefDefault),
+		WithFunctionClass(functionClass, isOverride),
 		WithFuncYamlEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
 	)
 	result.Layers = append(result.Layers, functionLayer)
@@ -81,7 +81,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		invokerDepCacheLayer,
 		b.CommandRunner,
 		WithValidationLogger(b.Logger),
-		WithValidationFunctionClass(functionClass, isFuncDefDefault),
+		WithValidationFunctionClass(functionClass, isOverride),
 		WithValidationFunctionEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
 	)
 	result.Layers = append(result.Layers, validationLayer)
