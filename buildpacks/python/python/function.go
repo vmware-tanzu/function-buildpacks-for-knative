@@ -4,17 +4,9 @@
 package python
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
-)
-
-const (
-	EnvModuleName   = "MODULE_NAME"
-	EnvFunctionName = "FUNCTION_NAME"
 )
 
 type Function struct {
@@ -50,18 +42,6 @@ func (f *Function) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	f.layerContributor.Logger = f.logger
 
 	return f.layerContributor.Contribute(layer, func() (libcnb.Layer, error) {
-		functionClass := strings.Split(f.functionClass, ".")
-		functionModule := functionClass[0]
-		functionName := functionClass[1]
-
-		if f.overrideFunctionClass {
-			layer.LaunchEnvironment.Override(EnvModuleName, functionModule)
-			layer.LaunchEnvironment.Override(EnvFunctionName, functionName)
-		} else {
-			layer.LaunchEnvironment.Default(EnvModuleName, functionModule)
-			layer.LaunchEnvironment.Default(EnvFunctionName, functionName)
-		}
-
 		for envName, envValue := range f.funcYamlEnvs {
 			layer.LaunchEnvironment.Default(envName, envValue)
 		}
@@ -80,16 +60,6 @@ type FunctionOpt func(fun *Function, metadata map[string]string)
 func WithLogger(logger bard.Logger) FunctionOpt {
 	return func(fun *Function, metadata map[string]string) {
 		fun.logger = logger
-	}
-}
-
-func WithFunctionClass(functionClass string, override bool) FunctionOpt {
-	return func(fun *Function, metadata map[string]string) {
-		fun.functionClass = functionClass
-		fun.overrideFunctionClass = override
-
-		metadata["bp-function-class"] = functionClass
-		metadata["bp-function-class-override"] = strconv.FormatBool(override)
 	}
 }
 

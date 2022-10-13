@@ -4,7 +4,6 @@
 package tests
 
 import (
-	"os"
 	"testing"
 
 	"github.com/buildpacks/libcnb"
@@ -43,66 +42,92 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 	when("#Build", func() {
 		var result libcnb.BuildResult
 
-		it.Before(func() {
-			var (
-				appDir string
-				err    error
-			)
+		when("BP_FUNCTION is valid", func() {
+			it.Before(func() {
+				var (
+					appDir string
+					err    error
+				)
 
-			Expect(os.Setenv("BP_FUNCTION", "some_module.some_function"))
-			appDir, cleanupAppDir = tests.SetupTestDirectory(
-				tests.WithFuncYaml(),
-				WithFunctionFile("some_module", "some_function", HTTPFuncTemplate),
-			)
+				t.Setenv("BP_FUNCTION", "some_module.some_function")
 
-			context = makeBuildContext(
-				withBuildApplicationPath(appDir),
-				withDependencies([]map[string]any{
-					{"id": "invoker-deps", "version": "1.2.3"},
-					{"id": "invoker", "version": "2.3.4"},
-				}),
-				withOptions(map[string]any{
-					"some-option":       "some-value",
-					"some-other-option": "some-other-value",
-				}),
-			)
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
+					WithFunctionFile("some_module", "some_function", HTTPFuncTemplate),
+				)
 
-			result, err = build.Build(context)
-			Expect(err).NotTo(HaveOccurred())
+				context = makeBuildContext(
+					withBuildApplicationPath(appDir),
+					withDependencies([]map[string]any{
+						{"id": "invoker-deps", "version": "1.2.3"},
+						{"id": "invoker", "version": "2.3.4"},
+					}),
+					withOptions(map[string]any{
+						"some-option":       "some-value",
+						"some-other-option": "some-other-value",
+					}),
+				)
+
+				result, err = build.Build(context)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("adds expected layers", func() {
+				var layers []string
+				for _, l := range result.Layers {
+					layers = append(layers, l.Name())
+				}
+
+				Expect(layers).To(Equal([]string{
+					"invoker-deps",
+					"invoker",
+					"python-function",
+					"validation",
+				}))
+			})
+
+			it("adds expected labels", func() {
+				Expect(result.Labels).To(Equal([]libcnb.Label{
+					{Key: "some-option", Value: "some-value"},
+					{Key: "some-other-option", Value: "some-other-value"},
+				}))
+			})
+
+			it("adds launch command", func() {
+				Expect(result.Processes).To(Equal([]libcnb.Process{
+					{
+						Type:             "func",
+						Command:          "python",
+						Arguments:        []string{"-m", "pyfunc", "start", "-m", "some_module", "-f", "some_function"},
+						Direct:           false,
+						WorkingDirectory: "",
+						Default:          true,
+					},
+				}))
+			})
 		})
 
-		it("adds expected layers", func() {
-			var layers []string
-			for _, l := range result.Layers {
-				layers = append(layers, l.Name())
-			}
+		when("BP_FUNCTION is invalid", func() {
+			it.Before(func() {
+				var (
+					appDir string
+				)
 
-			Expect(layers).To(Equal([]string{
-				"invoker-deps",
-				"invoker",
-				"python-function",
-				"validation",
-			}))
-		})
+				t.Setenv("BP_FUNCTION", "invalid function")
 
-		it("adds expected labels", func() {
-			Expect(result.Labels).To(Equal([]libcnb.Label{
-				{Key: "some-option", Value: "some-value"},
-				{Key: "some-other-option", Value: "some-other-value"},
-			}))
-		})
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
+				)
 
-		it("adds launch command", func() {
-			Expect(result.Processes).To(Equal([]libcnb.Process{
-				{
-					Type:             "func",
-					Command:          "python",
-					Arguments:        []string{"-m", "pyfunc", "start"},
-					Direct:           false,
-					WorkingDirectory: "",
-					Default:          true,
-				},
-			}))
+				context = makeBuildContext(
+					withBuildApplicationPath(appDir),
+				)
+			})
+
+			it("returns an error", func() {
+				_, err := build.Build(context)
+				Expect(err).To(MatchError("invalid function class 'invalid function', expected format: '<module name>.<function name>'"))
+			})
 		})
 	})
 }

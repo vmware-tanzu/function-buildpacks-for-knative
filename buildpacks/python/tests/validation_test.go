@@ -62,7 +62,6 @@ func testFunctionValidator(t *testing.T, when spec.G, it spec.S) {
 				mockInvokerLayer,
 				mockInvokerDepsLayer,
 				mockCommandRunner,
-				python.WithValidationFunctionClass("some_module.some_function", true),
 			)
 
 			Expect(function.Name()).To(Equal("validation"))
@@ -74,11 +73,9 @@ func testFunctionValidator(t *testing.T, when spec.G, it spec.S) {
 			mockCommandRunner.EXPECT().Run(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) (string, error) {
 				// Validate command called correctly
 				cmdString := strings.Join(cmd.Args, " ")
-				Expect(cmdString).To(Equal("python -m pyfunc check -s some/app/path"))
+				Expect(cmdString).To(Equal("python -m pyfunc check -s some/app/path -m some_module -f some_function"))
 				Expect(cmd.Env).To(ContainElements(
 					"PYTHONPATH=invoker/python/path:invoker/deps/python/path:env/python/path",
-					"MODULE_NAME=some_module",
-					"FUNCTION_NAME=some_function",
 				))
 
 				// Pretend to run check
@@ -99,7 +96,7 @@ func testFunctionValidator(t *testing.T, when spec.G, it spec.S) {
 					mockInvokerLayer,
 					mockInvokerDepsLayer,
 					mockCommandRunner,
-					python.WithValidationFunctionClass("some_module.some_function", true),
+					python.WithValidationFunctionClass("some_module", "some_function"),
 				)
 
 				setupMockPythonCheck("", nil)
@@ -129,7 +126,7 @@ func testFunctionValidator(t *testing.T, when spec.G, it spec.S) {
 					mockInvokerLayer,
 					mockInvokerDepsLayer,
 					mockCommandRunner,
-					python.WithValidationFunctionClass("some_module.some_function", true),
+					python.WithValidationFunctionClass("some_module", "some_function"),
 				)
 
 				_, err = function.Contribute(layer)

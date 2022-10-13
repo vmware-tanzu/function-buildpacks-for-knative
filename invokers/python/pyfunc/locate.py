@@ -13,8 +13,8 @@ import cloudevents.sdk.event.base as ce_sdk
 
 from .config import Config
 
-def find_func(dir: str) -> typing.Callable:
-    cfg = Config(search_path=dir)
+def find_func(search_path: str, module_name: str, function_name: str) -> typing.Callable:
+    cfg = Config(search_path, module_name, function_name)
     
     workspace = pathlib.Path(cfg.search_path).resolve()
 
@@ -23,7 +23,7 @@ def find_func(dir: str) -> typing.Callable:
             file = f
             break
     else:
-        raise Exception(f"Module {cfg.module_name} not found in {dir}")
+        raise Exception(f"Module '{cfg.module_name}' not found in '{cfg.search_path}'")
     
     print(f"Importing from {file}")
 
@@ -52,10 +52,7 @@ def _func_from_module(module: types.ModuleType, handler_name: str) -> typing.Cal
             funcs.append(x)
     
     if len(funcs) == 0:
-        raise Exception(f"Function {handler_name} not found in module {module.__name__}")
-
-    if len(funcs) > 1:
-        raise Exception(f"Multiple handler functions {handler_name} matches expected signature in module {module.__name__}")
+        raise Exception(f"Function '{handler_name}' not found in module '{module.__name__}'")
 
     return funcs[0]
 

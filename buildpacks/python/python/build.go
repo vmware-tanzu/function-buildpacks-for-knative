@@ -24,9 +24,14 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	result := libcnb.NewBuildResult()
 
 	cr, err := libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
-
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
+	}
+
+	functionClass, _ := cr.Resolve("BP_FUNCTION")
+	moduleName, functionName, err := parseFunctionClass(functionClass)
+	if err != nil {
+		return libcnb.BuildResult{}, err
 	}
 
 	planResolver := libpak.PlanEntryResolver{Plan: context.Plan}
@@ -67,10 +72,8 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return result, nil
 	}
 
-	functionClass, isOverride := cr.Resolve("BP_FUNCTION")
 	functionLayer := NewFunction(
 		WithLogger(b.Logger),
-		WithFunctionClass(functionClass, isOverride),
 		WithFuncYamlEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
 	)
 	result.Layers = append(result.Layers, functionLayer)
@@ -81,7 +84,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		invokerDepCacheLayer,
 		b.CommandRunner,
 		WithValidationLogger(b.Logger),
-		WithValidationFunctionClass(functionClass, isOverride),
+		WithValidationFunctionClass(moduleName, functionName),
 		WithValidationFunctionEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
 	)
 	result.Layers = append(result.Layers, validationLayer)
@@ -95,7 +98,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 
 	cmd := "python"
-	arguments := []string{"-m", "pyfunc", "start"}
+	arguments := []string{"-m", "pyfunc", "start", "-m", moduleName, "-f", functionName}
 	result.Processes = append(result.Processes,
 		libcnb.Process{
 			Default:   true,

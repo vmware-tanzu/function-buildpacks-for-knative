@@ -1,14 +1,11 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-from .constants import *
-import os
-
 
 class Config:
-    def __init__(self, search_path=SEARCH_PATH_DEFAULT) -> None:
-        self._module_name = os.getenv(ENV_MODULE_NAME, MODULE_NAME_DEFAULT)
-        self._function_name = os.getenv(ENV_FUNCTION_NAME, FUNCTION_NAME_DEFAULT)
+    def __init__(self, search_path: str, module_name: str, function_name: str) -> None:
+        self._module_name = module_name
+        self._function_name = function_name
         self._search_path = search_path
 
     def __repr__(self) -> str:
