@@ -62,17 +62,13 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 	when("BP_FUNCTION is configured without func.yaml", func() {
 		it.Before(func() {
-			Expect(os.Setenv("BP_FUNCTION", "function.Handler")).To(Succeed())
+			t.Setenv("BP_FUNCTION", "function.Handler")
 
 			var appDir string
 			appDir, cleanupAppDir = tests.SetupTestDirectory()
 			context = makeDetectContext(
 				withApplicationPath(appDir),
 			)
-		})
-
-		it.After(func() {
-			Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
 		})
 
 		it("passes detection", func() {

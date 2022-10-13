@@ -4,8 +4,6 @@
 package python
 
 import (
-	"strings"
-
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
@@ -27,13 +25,10 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		return libcnb.DetectResult{}, err
 	}
 
-	functionHandler, funcFound := cr.Resolve("BP_FUNCTION")
-	funcParts := strings.Split(functionHandler, ".")
-	if funcFound {
-		if len(funcParts) != 2 || len(funcParts[0]) == 0 || len(funcParts[1]) == 0 { // We're expecting the format of module.func_name
-			d.Logger.Bodyf("BP_FUNCTION detected but is invalid, it should be in the form of `module.function_name`")
-			return libcnb.DetectResult{}, nil
-		}
+	functionClass, functionClassSet := cr.Resolve("BP_FUNCTION")
+	if _, _, err := parseFunctionClass(functionClass); err != nil {
+		d.Logger.Body(err.Error())
+		return libcnb.DetectResult{}, nil
 	}
 
 	result.Plans = append(result.Plans, libcnb.BuildPlan{
@@ -74,7 +69,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 		},
 	})
 
-	result.Pass = funcYaml.Exists || funcFound
+	result.Pass = funcYaml.Exists || functionClassSet
 
 	return result, nil
 }

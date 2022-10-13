@@ -4,7 +4,6 @@
 package tests
 
 import (
-	"os"
 	"testing"
 
 	"github.com/buildpacks/libcnb"
@@ -72,10 +71,6 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				)
 			})
 
-			it.After(func() {
-				Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
-			})
-
 			it("passes detection", func() {
 				result, err := detect.Detect(context)
 				Expect(err).NotTo(HaveOccurred())
@@ -109,10 +104,6 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			when("BP_FUNCTION is configured incorrectly", func() {
 				it.Before(func() {
 					t.Setenv("BP_FUNCTION", "invalid function")
-				})
-
-				it.After(func() {
-					Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
 				})
 
 				it("fails detection", func() {
@@ -194,7 +185,15 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 func makeDetectContext(opts ...func(*libcnb.DetectContext)) libcnb.DetectContext {
 	ctx := libcnb.DetectContext{
 		Application: libcnb.Application{},
-		Buildpack:   libcnb.Buildpack{},
+		Buildpack: libcnb.Buildpack{
+			Metadata: map[string]any{
+				"configurations": []map[string]any{
+					{
+						"name":    "BP_FUNCTION",
+						"default": "func.main",
+					},
+				}},
+		},
 		Platform: libcnb.Platform{
 			Environment: map[string]string{},
 		},

@@ -54,11 +54,9 @@ To check the current working directory for a module with default values (module=
 python -m pyfunc check
 ```
 
-To check for a different module, define an environment variable with the name `MODULE_NAME`.
-To check for a different function, define an environment variable with the name `FUNCTION_NAME`.
-For example, to check the current working directory with (module=`my_handler`, function=`my_func`):
+To check for a different module or function, use the `-m <module_name>` and `-f <function_name>` flags, respectively. For example:
 ```
-MODULE_NAME=my_handler FUNCTION_NAME=my_func python -m pyfunc check
+python -m pyfunc check -m my_module -f my_func
 ```
 
 To check a different directory, the `-s <path_to_search>` flag can be used to specify the directory to search for the function:

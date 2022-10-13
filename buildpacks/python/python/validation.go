@@ -77,9 +77,14 @@ func (f *FunctionValidationLayer) Contribute(layer libcnb.Layer) (libcnb.Layer, 
 			pythonPath = append(pythonPath, env)
 		}
 
-		cmd := exec.Command("python", "-m", "pyfunc", "check", "-s", f.applicationPath)
+		cmd := exec.Command(
+			"python", "-m", "pyfunc",
+			"check",
+			"-s", f.applicationPath,
+			"-m", f.module,
+			"-f", f.function,
+		)
 		cmd.Env = append(os.Environ(), fmt.Sprintf("PYTHONPATH=%s", strings.Join(pythonPath, string(os.PathListSeparator))))
-		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", EnvModuleName, f.module), fmt.Sprintf("%s=%s", EnvFunctionName, f.function))
 
 		if output, err := f.commandRunner.Run(cmd); err != nil {
 			return layer, fmt.Errorf("%v: %v", output, err)
@@ -100,30 +105,17 @@ func WithValidationLogger(logger bard.Logger) FunctionValidationOpts {
 	}
 }
 
-func WithValidationFunctionClass(functionClass string, override bool) FunctionValidationOpts {
+func WithValidationFunctionClass(moduleName string, functionName string) FunctionValidationOpts {
 	return func(vl *FunctionValidationLayer, metadata map[string]string) {
-		vl.override = override
-
-		fSplit := strings.Split(functionClass, ".")
-		if override || (vl.module == "" && vl.function == "") {
-			vl.module = fSplit[0]
-			vl.function = fSplit[1]
-			metadata[EnvModuleName] = fSplit[0]
-			metadata[EnvFunctionName] = fSplit[1]
-		}
+		vl.module = moduleName
+		vl.function = functionName
 	}
 }
 
 func WithValidationFunctionEnvs(envs map[string]any) FunctionValidationOpts {
 	return func(vl *FunctionValidationLayer, metadata map[string]string) {
 		for name, value := range envs {
-			if name == EnvModuleName && !vl.override {
-				vl.module = value.(string)
-			} else if name == EnvFunctionName && !vl.override {
-				vl.function = value.(string)
-			} else {
-				metadata[name] = value.(string)
-			}
+			metadata[name] = value.(string)
 		}
 	}
 }

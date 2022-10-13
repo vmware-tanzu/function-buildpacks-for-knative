@@ -2,14 +2,9 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from pyfunc.config import Config
-from pyfunc.constants import *
 
-def test_load_default():
-    cfg = Config()
-    assert cfg.module_name == MODULE_NAME_DEFAULT
-    assert cfg.function_name == FUNCTION_NAME_DEFAULT
-    assert cfg.search_path == SEARCH_PATH_DEFAULT
-
-def test_set_search_path():
-    cfg = Config(search_path='./workspace')
-    assert cfg.search_path == './workspace'
+def test_init():
+    cfg = Config('some/search/path', 'some_module', 'some_function')
+    assert cfg.search_path == 'some/search/path'
+    assert cfg.module_name == 'some_module'
+    assert cfg.function_name == 'some_function'

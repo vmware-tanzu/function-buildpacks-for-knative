@@ -79,8 +79,8 @@ def readiness():
     except Exception:
         raise HealthError("Can't connect to the file")
 
-def main(dir: str = "."):
-    func = find_func(dir)
+def main(search_path: str, module_name: str, function_name: str):
+    func = find_func(search_path, module_name, function_name)
     http_func = WrapFunction(func)
     # TODO: add option for GET / handle multiple functions
     app = flask.Flask(func.__name__)

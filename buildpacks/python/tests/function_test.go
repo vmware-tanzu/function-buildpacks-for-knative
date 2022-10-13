@@ -52,9 +52,7 @@ func testFunction(t *testing.T, when spec.G, it spec.S) {
 	when("#Contribute", func() {
 		when("always", func() {
 			it.Before(func() {
-				function := python.NewFunction(
-					python.WithFunctionClass("some_module.some_function", true),
-				)
+				function := python.NewFunction()
 
 				var err error
 				layer, err = function.Contribute(layer)
@@ -70,62 +68,9 @@ func testFunction(t *testing.T, when spec.G, it spec.S) {
 			})
 		})
 
-		when("overriding function class", func() {
-			it.Before(func() {
-				function := python.NewFunction(
-					python.WithFunctionClass("some_module.some_function", true),
-				)
-
-				var err error
-				layer, err = function.Contribute(layer)
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			it("sets function launch env vars as overrides", func() {
-				Expect(layer.LaunchEnvironment).To(Equal(libcnb.Environment{
-					"MODULE_NAME.override":   "some_module",
-					"FUNCTION_NAME.override": "some_function",
-				}))
-			})
-
-			it("sets layer metadata accordingly", func() {
-				Expect(layer.Metadata).To(Equal(map[string]any{
-					"bp-function-class":          "some_module.some_function",
-					"bp-function-class-override": "true",
-				}))
-			})
-		})
-
-		when("not overriding function class", func() {
-			it.Before(func() {
-				function := python.NewFunction(
-					python.WithFunctionClass("some_module.some_function", false),
-				)
-
-				var err error
-				layer, err = function.Contribute(layer)
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			it("sets function launch env vars as defaults", func() {
-				Expect(layer.LaunchEnvironment).To(Equal(libcnb.Environment{
-					"MODULE_NAME.default":   "some_module",
-					"FUNCTION_NAME.default": "some_function",
-				}))
-			})
-
-			it("sets layer metadata accordingly", func() {
-				Expect(layer.Metadata).To(Equal(map[string]any{
-					"bp-function-class":          "some_module.some_function",
-					"bp-function-class-override": "false",
-				}))
-			})
-		})
-
 		when("func.yaml envs are configured", func() {
 			it.Before(func() {
 				function := python.NewFunction(
-					python.WithFunctionClass("some_module.some_function", true),
 					python.WithFuncYamlEnvs(map[string]any{
 						"SOME_VAR": "SOME_VALUE",
 					}),
@@ -138,17 +83,13 @@ func testFunction(t *testing.T, when spec.G, it spec.S) {
 
 			it("adds env vars to launch environment as defaults", func() {
 				Expect(layer.LaunchEnvironment).To(Equal(libcnb.Environment{
-					"MODULE_NAME.override":   "some_module",
-					"FUNCTION_NAME.override": "some_function",
-					"SOME_VAR.default":       "SOME_VALUE",
+					"SOME_VAR.default": "SOME_VALUE",
 				}))
 			})
 
-			it("sets layer metadata accordingly", func() {
+			it("adds env vars to layer metadata", func() {
 				Expect(layer.Metadata).To(Equal(map[string]any{
-					"bp-function-class":          "some_module.some_function",
-					"bp-function-class-override": "true",
-					"SOME_VAR":                   "SOME_VALUE",
+					"SOME_VAR": "SOME_VALUE",
 				}))
 			})
 		})
