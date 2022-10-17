@@ -11,8 +11,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
+	"k8s.io/utils/pointer"
 	function "knative.dev/kn-plugin-func"
-	"knative.dev/pkg/ptr"
 
 	"kn-fn/buildpacks/tests"
 	"kn-fn/java-function-buildpack/java"
@@ -114,8 +114,8 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 					"SOME_VAR": "SOME_VALUE",
 				}),
 				tests.WithFuncScale(function.ScaleOptions{
-					Min: ptr.Int64(1),
-					Max: ptr.Int64(42),
+					Min: pointer.Int64(1),
+					Max: pointer.Int64(42),
 				}),
 			)
 			context = makeDetectContext(

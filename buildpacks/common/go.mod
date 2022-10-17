@@ -6,7 +6,6 @@ require (
 	github.com/paketo-buildpacks/libpak v1.63.0
 	gopkg.in/yaml.v3 v3.0.1
 	knative.dev/kn-plugin-func v0.19.0
-	knative.dev/pkg v0.0.0-20221010143036-21d3b47e2efe
 )
 
 require (
