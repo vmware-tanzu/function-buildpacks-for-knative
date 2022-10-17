@@ -10,7 +10,6 @@ require (
 	github.com/sclevine/spec v1.4.0
 	kn-fn/buildpacks v0.0.0
 	knative.dev/kn-plugin-func v0.19.0
-	knative.dev/pkg v0.0.0-20221010143036-21d3b47e2efe
 )
 
 require (

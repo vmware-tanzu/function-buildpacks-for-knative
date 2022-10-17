@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"gopkg.in/yaml.v3"
+	"k8s.io/utils/pointer"
 	knfn "knative.dev/kn-plugin-func"
-	"knative.dev/pkg/ptr"
 
 	"kn-fn/buildpacks/config"
 )
@@ -59,11 +59,11 @@ func TestParseFuncYaml_HasEnvs(t *testing.T) {
 
 func TestParseFuncYaml_HasScale(t *testing.T) {
 	scaleOption := knfn.ScaleOptions{
-		Min:         ptr.Int64(4),
-		Max:         ptr.Int64(9),
-		Metric:      ptr.String("rps"),
-		Target:      ptr.Float64(0.5),
-		Utilization: ptr.Float64(50),
+		Min:         pointer.Int64(4),
+		Max:         pointer.Int64(9),
+		Metric:      pointer.String("rps"),
+		Target:      pointer.Float64(0.5),
+		Utilization: pointer.Float64(50),
 	}
 
 	appDir, cleanup := SetupTestDirectory(WithFuncScale(scaleOption))
@@ -96,8 +96,8 @@ func TestParseFuncYaml_HasScale(t *testing.T) {
 
 func TestParseFuncYaml_HasRequests(t *testing.T) {
 	requestOptions := knfn.ResourcesRequestsOptions{
-		CPU:    ptr.String("1"),
-		Memory: ptr.String("40m"),
+		CPU:    pointer.String("1"),
+		Memory: pointer.String("40m"),
 	}
 
 	appDir, cleanup := SetupTestDirectory(WithFuncResourceRequests(requestOptions))
@@ -118,9 +118,9 @@ func TestParseFuncYaml_HasRequests(t *testing.T) {
 
 func TestParseFuncYaml_HasLimits(t *testing.T) {
 	limitOptions := knfn.ResourcesLimitsOptions{
-		CPU:         ptr.String("1"),
-		Memory:      ptr.String("40m"),
-		Concurrency: ptr.Int64(5),
+		CPU:         pointer.String("1"),
+		Memory:      pointer.String("40m"),
+		Concurrency: pointer.Int64(5),
 	}
 
 	appDir, cleanup := SetupTestDirectory(WithFuncResourceLimits(limitOptions))
