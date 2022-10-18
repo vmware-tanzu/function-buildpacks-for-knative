@@ -19,7 +19,7 @@ type FuncYaml struct {
 }
 
 func ParseFuncYaml(filedir string, logger bard.Logger) FuncYaml {
-	file := filepath.Join(filedir, knfn.ConfigFile)
+	file := filepath.Join(filedir, knfn.FunctionFile)
 	_, err := os.Stat(file)
 	if err != nil {
 		logger.Bodyf("unable to find file '%s'", file)
@@ -28,12 +28,12 @@ func ParseFuncYaml(filedir string, logger bard.Logger) FuncYaml {
 
 	cfg, err := knfn.NewFunction(filedir)
 	if err != nil {
-		logger.Bodyf("unable to parse '%s': %v", knfn.ConfigFile, err)
+		logger.Bodyf("unable to parse '%s': %v", knfn.FunctionFile, err)
 		return FuncYaml{}
 	}
 
-	options := optionsToMap(cfg.Options, logger)
-	envs := envsToMap(cfg.Envs, logger)
+	options := optionsToMap(cfg.Deploy.Options, logger)
+	envs := envsToMap(cfg.Run.Envs, logger)
 
 	return FuncYaml{
 		Options: options,
@@ -42,7 +42,7 @@ func ParseFuncYaml(filedir string, logger bard.Logger) FuncYaml {
 	}
 }
 
-func envsToMap(envs knfn.Envs, logger bard.Logger) map[string]string {
+func envsToMap(envs []knfn.Env, logger bard.Logger) map[string]string {
 	result := map[string]string{}
 	if envs == nil {
 		return result

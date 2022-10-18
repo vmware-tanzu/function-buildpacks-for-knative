@@ -5,6 +5,7 @@ package tests
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -40,37 +41,45 @@ func SetupTestDirectory(opts ...SetupOpts) (string, func()) {
 	return dir, cleanup
 }
 
+func createYaml(dir string) knfn.Function {
+	cfg, err := knfn.NewFunction(dir)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		panic(err)
+	} else if err != nil && errors.Is(err, os.ErrNotExist) {
+		cfg = knfn.Function{
+			Name:    "test",
+			Runtime: "unknown",
+			Root:    dir,
+		}
+	}
+
+	err = cfg.Write()
+	if err != nil {
+		panic(err)
+	}
+	return cfg
+}
+
 func WithFuncYaml() SetupOpts {
 	return func(directory string) {
-		cfg, err := knfn.NewFunction(directory)
-		if err != nil {
-			panic(err)
-		}
-
-		err = cfg.WriteConfig()
-		if err != nil {
-			panic(err)
-		}
+		createYaml(directory)
 	}
 }
 
 func WithFuncEnvs(envs map[string]string) SetupOpts {
 	return func(directory string) {
-		cfg, err := knfn.NewFunction(directory)
-		if err != nil {
-			panic(err)
-		}
+		cfg := createYaml(directory)
 
 		for envName, envValue := range envs {
 			name := envName
 			value := envValue
-			cfg.Envs = append(cfg.Envs, knfn.Env{
+			cfg.Run.Envs = append(cfg.Run.Envs, knfn.Env{
 				Name:  &name,
 				Value: &value,
 			})
 		}
 
-		err = cfg.WriteConfig()
+		err := cfg.Write()
 		if err != nil {
 			panic(err)
 		}
@@ -79,14 +88,11 @@ func WithFuncEnvs(envs map[string]string) SetupOpts {
 
 func WithFuncScale(scale knfn.ScaleOptions) SetupOpts {
 	return func(directory string) {
-		cfg, err := knfn.NewFunction(directory)
-		if err != nil {
-			panic(err)
-		}
+		cfg := createYaml(directory)
 
-		cfg.Options.Scale = &scale
+		cfg.Deploy.Options.Scale = &scale
 
-		err = cfg.WriteConfig()
+		err := cfg.Write()
 		if err != nil {
 			panic(err)
 		}
@@ -95,18 +101,15 @@ func WithFuncScale(scale knfn.ScaleOptions) SetupOpts {
 
 func WithFuncResourceRequests(requests knfn.ResourcesRequestsOptions) SetupOpts {
 	return func(directory string) {
-		cfg, err := knfn.NewFunction(directory)
-		if err != nil {
-			panic(err)
+		cfg := createYaml(directory)
+
+		if cfg.Deploy.Options.Resources == nil {
+			cfg.Deploy.Options.Resources = &knfn.ResourcesOptions{}
 		}
 
-		if cfg.Options.Resources == nil {
-			cfg.Options.Resources = &knfn.ResourcesOptions{}
-		}
+		cfg.Deploy.Options.Resources.Requests = &requests
 
-		cfg.Options.Resources.Requests = &requests
-
-		err = cfg.WriteConfig()
+		err := cfg.Write()
 		if err != nil {
 			panic(err)
 		}
@@ -115,18 +118,15 @@ func WithFuncResourceRequests(requests knfn.ResourcesRequestsOptions) SetupOpts 
 
 func WithFuncResourceLimits(limits knfn.ResourcesLimitsOptions) SetupOpts {
 	return func(directory string) {
-		cfg, err := knfn.NewFunction(directory)
-		if err != nil {
-			panic(err)
+		cfg := createYaml(directory)
+
+		if cfg.Deploy.Options.Resources == nil {
+			cfg.Deploy.Options.Resources = &knfn.ResourcesOptions{}
 		}
 
-		if cfg.Options.Resources == nil {
-			cfg.Options.Resources = &knfn.ResourcesOptions{}
-		}
+		cfg.Deploy.Options.Resources.Limits = &limits
 
-		cfg.Options.Resources.Limits = &limits
-
-		err = cfg.WriteConfig()
+		err := cfg.Write()
 		if err != nil {
 			panic(err)
 		}
