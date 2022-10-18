@@ -30,4 +30,4 @@ buildpacks.clean:
 clean .PHONY: buildpacks.clean
 
 buildpacks.tests:
-tests .PHONY: buildpacks.clean
+tests .PHONY: buildpacks.tests
