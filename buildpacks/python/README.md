@@ -4,7 +4,8 @@ The Python Function Buildpack is a Cloud Native Buildpack that provides a Python
 
 ## Behaviour
 This buildpack will participate if any of the following conditions are met:
-* A file with the name `func.yaml` is detected
+- The `BP_FUNCTION` environment variable is set.
+- A valid `func.yaml` exists in the function directory. See [func.yaml](#func.yaml) 
 
 The buildpack will do the following if detection passed:
 * Request for a Python runtime to be installed to a layer marked `build` and `launch`
@@ -37,17 +38,25 @@ From within this directory we require a few files to properly detect this as a P
     * You can find more details about the different accepted parameters [below](#fp).
 
 * <a name="func.yaml"></a>`func.yaml` (optional): This is the configuration used to configure your function.
-  * The python module and function name can be modified here by defining some environment variables in the `envs` section.
-    ```
-    envs:
-    - name: MODULE_NAME
-      value: my_module
-    - name: FUNCTION_NAME
-      value: my_func
-    ```
-    By defining the above, we will look for a `my_module.py` instead of `func.py` which contains a function with the name `my_func`.
+
+  The python module and function name can be modified here by defining some environment variables in the `envs` section.
+  ```
+  name: test
+  runtime: python
+  envs:
+  - name: MODULE_NAME
+    value: my_module
+  - name: FUNCTION_NAME
+    value: my_func
+  ```
+  By defining the above, we will look for a `my_module.py` instead of `func.py` which contains a function with the name `my_func`.
+ 
+  This buildpack makes use of `envs` and `options`. The keys `name` and `runtime` are required to maintain compatibility with Knative func cli, but are not used by this buildpack. 
+  See [Knative's func.yaml documentation](https://github.com/knative/func/blob/main/docs/reference/func_yaml.md) 
+  for more `func.yaml` information.
 
   **NOTE**: The environment variables here (namely `MODULE_NAME` and `FUNCTION_NAME` will be overriden by the values specified by `BP_FUNCTION`)
+
 
 * `requirements.txt`: This file is required by the Python dependency. It is used to define your function's dependencies. If you do not have any, you still need to provide an empty file.
 

@@ -23,7 +23,10 @@ The buildpack will do the following if detection passed:
 To get started you'll need to create a directory where your function will be defined.
 
 From within this directory we require a few files to properly detect this as a Java function:
-* `func.yaml` (optional): We use this to configure the runtime environment variables. See the [Knative Func CLI docs](https://github.com/knative-sandbox/kn-plugin-func/blob/main/docs/guides/func_yaml.md) for more details.
+* `func.yaml` (optional): We use this to configure the runtime environment variables.
+  This buildpack makes use of `envs` and `options`. The keys `name` and `runtime` are required to maintain compatibility with Knative func cli, but are not used by this buildpack.
+  See [Knative's func.yaml documentation](https://github.com/knative/func/blob/main/docs/reference/func_yaml.md)
+  for more `func.yaml` information.
 * `pom.xml` or `build.gradle`: These are used by the other Java buildpacks to compile your function.
 * Java package in folder `src/main/java/functions`: This is the default location your function will be detected. If you do choose to use another package to store your functions, you will need to define where your function is located with the `BP_FUNCTION` configuration for the buildpack.
 

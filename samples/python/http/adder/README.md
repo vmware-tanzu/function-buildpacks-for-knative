@@ -9,7 +9,7 @@ This example will take two number and add them up only if the requestor is authe
 ## Usage
 1. We want to first build the image:
     ```
-    pack build adder --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.1.0
+    pack build adder --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.1.0 --env BP_FUNCTION=func.main
     ```
 
 1. After the image is successfully built we can run it in docker.
