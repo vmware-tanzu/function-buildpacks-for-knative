@@ -18,7 +18,7 @@ type Detect struct {
 }
 
 func (d Detect) checkConfigs(cr libpak.ConfigurationResolver) bool {
-	if _, defined := cr.Resolve("BP_FUNCTION"); defined {
+	if val, defined := cr.Resolve("BP_FUNCTION"); defined && val != "" {
 		return true
 	}
 

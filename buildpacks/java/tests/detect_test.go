@@ -90,7 +90,21 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		when("BP_FUNCTION is not configured", func() {
 			it.Before(func() {
-				Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed())
+				t.Setenv("BP_FUNCTION", "")
+				Expect(os.Unsetenv("BP_FUNCTION")).To(Succeed()) // needed in combination with above, so original value will be restored
+			})
+
+			it("fails detection", func() {
+				result, err := detect.Detect(context)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(result.Pass).To(BeFalse())
+			})
+		})
+
+		when("BP_FUNCTION is empty", func() {
+			it.Before(func() {
+				t.Setenv("BP_FUNCTION", "")
 			})
 
 			it("fails detection", func() {
