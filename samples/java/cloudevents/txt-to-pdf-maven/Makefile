@@ -1,6 +1,6 @@
 .PHONY: build publish deploy destroy clean
 
-FUNCTION_IMAGE ?= us.gcr.io/daisy-284300/functions/demo:txttopdfjava
+FUNCTION_IMAGE ?= us.gcr.io/daisy-284300/functions/demo:txttopdfjavamaven
 
 FUNCTION := out/image
 $(FUNCTION):
