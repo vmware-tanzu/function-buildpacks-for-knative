@@ -153,7 +153,7 @@ $(buildpacks.python.images.offline.out): $(PACK) $(buildpacks.python.package.off
 ########
 
 $(buildpacks.python.path)/buildpack.toml: $(buildpacks.python.config)
-	sed 's/^/# /' $(ROOT_DIR)hack/boilerplate.go.txt > $@
+	sed 's/^/# /' $(ROOT_DIR)/hack/boilerplate.go.txt > $@
 	printf '#\n# DO NOT EDIT!! This file is auto-generated.\n\n' >> $@
 	cat $< >> $@
 

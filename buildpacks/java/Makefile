@@ -141,7 +141,7 @@ $(buildpacks.java.images.offline.out): $(PACK) $(buildpacks.java.package.offline
 ########
 
 $(buildpacks.java.path)/buildpack.toml: $(buildpacks.java.config)
-	sed 's/^/# /' $(ROOT_DIR)hack/boilerplate.go.txt > $@
+	sed 's/^/# /' $(ROOT_DIR)/hack/boilerplate.go.txt > $@
 	printf '#\n# DO NOT EDIT!! This file is auto-generated.\n\n' >> $@
 	cat $< >> $@
 
