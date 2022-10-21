@@ -1,4 +1,4 @@
-RULES.MK ?= ../../../rules.mk
+RULES.MK ?= ../../../../rules.mk
 include $(RULES.MK)
 
 path ?= .
@@ -6,18 +6,27 @@ template-ce.path := $(abspath $(path))
 
 $(eval $(call INCLUDE_FILE, $(ROOT_DIR)/builder))
 
-template-ce.image := kn-fn-test/template-ce
-template-ce.java_image_paths := $(shell find $(template-ce.path) -mindepth 1 -maxdepth 1 -type l | grep java-)
-template-ce.python_image_paths := $(shell find $(template-ce.path) -mindepth 1 -maxdepth 1 -type l | grep python-)
-$(template-ce.java_image_paths): $(PACK) $(builder.image.out)
-	cd $@ && $(PACK) build $(template-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_FUNCTION=functions.Handler --pull-policy if-not-present --clear-cache
-$(template-ce.python_image_paths): $(PACK) $(builder.image.out)
-	cd $@ && $(PACK) build $(template-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_FUNCTION=func.main --pull-policy if-not-present --clear-cache
+template-ce.templates.langs := $(filter-out %/README.md, $(wildcard $(abspath $(ROOT_DIR)/templates)/*))
+template-ce.sources := $(foreach lang, $(template-ce.templates.langs), $(addprefix $(lang)/, $(filter cloudevents%, $(notdir $(wildcard $(lang)/*)))))
+template-ce.dest := $(addprefix $(template-ce.path)/, $(foreach lang,$(template-ce.templates.langs),$(addprefix $(notdir $(lang))-, $(filter cloudevents%, $(notdir $(wildcard $(lang)/*))))))
 
-template-ce.clean := $(addsuffix .clean,$(template-ce.image_paths))
+template-ce.out := $(addprefix $(out_dir)/tests/template/,$(notdir $(template-ce.dest)))
+
+template-ce.java.bp_function := functions.Handler
+template-ce.python.bp_function := func.main
+
+.SECONDEXPANSION:
+$(template-ce.path)/%: $$(foreach v,%, $$(addprefix $(ROOT_DIR)/templates/,$$(firstword $$(subst -, ,$$(v)))/$$(subst $$(firstword $$(subst -, ,$$(v)))-,,$$(v))))
+	ln -sf $< $@
+
+$(template-ce.out): $(out_dir)/tests/template/%: $(template-ce.path)/% $(PACK) $(builder.image.out)
+	cd $< && $(PACK) build $(template-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_FUNCTION=$(template-ce.$(firstword $(subst -, ,$*)).bp_function) --pull-policy if-not-present --clear-cache
+
+template-ce.image := kn-fn-test/template-ce
+template-ce.clean := $(addsuffix .clean,$(template-ce.out))
 $(template-ce.clean):
 	-docker rmi -f $(template-ce.image):$(basename $(notdir $@))
 
 .PHONY: template-tests.images
-template-tests.images .PHONY: $(template-ce.java_image_paths) $(template-ce.python_image_paths)
+template-tests.images .PHONY: $(template-ce.out)
 clean .PHONY: $(template-ce.clean)

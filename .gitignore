@@ -1,3 +1,4 @@
+tests/testdata/template_and_smoke/template-*
 .DS_Store
 .idea
 .vscode
