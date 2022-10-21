@@ -1,6 +1,0 @@
-# Copyright 2021-2022 VMware, Inc.
-# SPDX-License-Identifier: BSD-2-Clause
-
-envs:
-- name: SPRING_CLOUD_FUNCTION_FUNCTION_CLASS
-  value: com.vmware.functions.Func
