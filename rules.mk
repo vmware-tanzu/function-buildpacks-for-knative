@@ -1,7 +1,7 @@
 ifndef RULES_MK # Prevent repeated "-include".
 RULES_MK := $(lastword $(MAKEFILE_LIST))
 RULES_INCLUDE_DIR := $(dir $(RULES_MK))
-ROOT_DIR := $(RULES_INCLUDE_DIR)
+ROOT_DIR := $(abspath $(RULES_INCLUDE_DIR))
 
 -include $(ROOT_DIR)/local.mk
 
