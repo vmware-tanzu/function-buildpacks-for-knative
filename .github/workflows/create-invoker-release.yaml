@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 name: Create Invoker Release
+run-name: Creating ${{ inputs.invoker }} invoker
 
 on:
   workflow_dispatch:

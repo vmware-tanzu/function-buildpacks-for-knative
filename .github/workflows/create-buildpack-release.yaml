@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 name: Create Buildpack Release
+run-name: Creating ${{ inputs.buildpack }} buildpack
 
 env:
   REGISTRY: ghcr.io
