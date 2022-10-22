@@ -1,5 +1,9 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-builders:
-  default: ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.1.0
+builderImages:
+  pack: ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.0
+
+buildEnvs:
+- name: BP_FUNCTION
+  value: functions.Handler
