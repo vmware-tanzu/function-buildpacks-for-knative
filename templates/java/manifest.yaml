@@ -5,7 +5,7 @@ buildpacks:
 - gcr.io/paketo-buildpacks/java:6.36.0
 - ghcr.io/vmware-tanzu/function-buildpacks-for-knative/java-buildpack:1.0.7
 builderImages:
-  pack: gcr.io/paketo-buildpacks/builder:base
+  pack: gcr.io/paketo-buildpacks/builder:buildpackless-full
 
 buildEnvs:
 - name: BP_FUNCTION

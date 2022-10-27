@@ -4,6 +4,8 @@
 buildpacks:
 - gcr.io/paketo-buildpacks/python:2.0.0
 - ghcr.io/vmware-tanzu/function-buildpacks-for-knative/python-buildpack-with-deps:1.1.0
+builderImages:
+  pack: gcr.io/paketo-buildpacks/builder:buildpackless-full
 
 buildEnvs:
 - name: BP_FUNCTION
