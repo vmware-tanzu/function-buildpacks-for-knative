@@ -10,3 +10,7 @@ builderImages:
 buildEnvs:
 - name: BP_FUNCTION
   value: functions.Handler
+
+healthEndpoints:
+  liveness: /actuator/health/liveness
+  readiness: /actuator/health/readiness
