@@ -5,7 +5,7 @@ FUNCTION_IMAGE ?= us.gcr.io/daisy-284300/functions/demo:reqresponsejavagradle
 FUNCTION := out/image
 $(FUNCTION):
 	@mkdir -p $(@D)
-	pack build $(FUNCTION_IMAGE) --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.1.0 --env BP_FUNCTION=com.vmware.functions.Handler
+	pack build $(FUNCTION_IMAGE) --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.1 --env BP_FUNCTION=com.vmware.functions.Handler
 	printf $(FUNCTION_IMAGE) > $@
 
 build: $(FUNCTION)
