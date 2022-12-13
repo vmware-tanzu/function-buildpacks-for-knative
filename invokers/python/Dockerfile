@@ -4,13 +4,13 @@
 FROM python@sha256:301797d06f5828195f496f1f3022e370d5743e44044e56656f45c4a3c4174ca4
 
 RUN python -m pip install --upgrade pip
-RUN pip install tox==3 pytest==7.2
+RUN pip install tox==3.27 pytest==7.2
 
 COPY . /workspace/invoker
 WORKDIR /workspace/invoker
-RUN tox --sdist
+RUN tox sdist
 RUN mkdir -p /out
-RUN cp /workspace/invoker/.tox/.pkg/dist/*.tar.gz /out
+RUN cp /workspace/invoker/.tox/dist/*.tar.gz /out
 RUN pip download --no-binary 'MarkupSafe' -d /workspace/dependencies .
 RUN tar -cvzf /out/pyfunc-invoker-deps-$(cat /workspace/invoker/VERSION).tar.gz -C /workspace/dependencies .
 
