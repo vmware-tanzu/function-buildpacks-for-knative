@@ -8,7 +8,7 @@ RUN pip install tox pytest
 
 COPY . /workspace/invoker
 WORKDIR /workspace/invoker
-RUN tox sdist
+RUN tox --sdist
 RUN mkdir -p /out
 RUN cp /workspace/invoker/.tox/dist/*.tar.gz /out
 RUN pip download --no-binary 'MarkupSafe' -d /workspace/dependencies .
