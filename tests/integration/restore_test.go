@@ -20,6 +20,11 @@ import (
 
 var restoreTestData = filepath.Join("..", "testdata", "restore")
 
+// The invoker is using Spring 3 which requires Java 17.
+var java17 = map[string]string{
+	"BP_JVM_VERSION": "17",
+}
+
 func TestRestorePython(t *testing.T) {
 	t.Parallel()
 	Expect := NewWithT(t).Expect
@@ -40,13 +45,13 @@ func TestRestorePython(t *testing.T) {
 
 	// Do the first build
 	{
-		image, logs, err := PackBuild(name, source1)
+		image, logs, err := PackBuild(name, source1, withEnvs(java17))
 		Expect(err).NotTo(HaveOccurred(), logs.String())
 		defer docker.Image.Remove.Execute(image.ID)
 	}
 
 	// Do the second build
-	image, logs, err := PackBuild(name, source2)
+	image, logs, err := PackBuild(name, source2, withEnvs(java17))
 	Expect(err).NotTo(HaveOccurred(), logs.String())
 	defer docker.Image.Remove.Execute(image.ID)
 
@@ -92,13 +97,13 @@ func TestRestoreJava(t *testing.T) {
 
 	// Do the first build
 	{
-		image, logs, err := PackBuild(name, source1)
+		image, logs, err := PackBuild(name, source1, withEnvs(java17))
 		Expect(err).NotTo(HaveOccurred(), logs.String())
 		defer docker.Image.Remove.Execute(image.ID)
 	}
 
 	// Do the second build
-	image, logs, err := PackBuild(name, source2)
+	image, logs, err := PackBuild(name, source2, withEnvs(java17))
 	Expect(err).NotTo(HaveOccurred(), logs.String())
 	defer docker.Image.Remove.Execute(image.ID)
 

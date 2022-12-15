@@ -172,6 +172,9 @@ func TestJava(t *testing.T) {
 			sourcePaths: []string{
 				filepath.Join(packCliTestData, "java", "http_default"),
 			},
+			envs: map[string]string{
+				"BP_JVM_VERSION": "17",
+			},
 		},
 		{
 			name: "HTTP with BP_FUNCTION only",
@@ -179,7 +182,8 @@ func TestJava(t *testing.T) {
 				filepath.Join(packCliTestData, "java", "http_default"),
 			},
 			envs: map[string]string{
-				"BP_FUNCTION": "functions.Handler",
+				"BP_FUNCTION":    "functions.Handler",
+				"BP_JVM_VERSION": "17",
 			},
 			buildSuccess:   true,
 			expectedResult: "Hello World!",
@@ -190,7 +194,8 @@ func TestJava(t *testing.T) {
 				filepath.Join(packCliTestData, "java", "http_custom"),
 			},
 			envs: map[string]string{
-				"BP_FUNCTION": "com.example.functions.HelloWorld",
+				"BP_FUNCTION":    "com.example.functions.HelloWorld",
+				"BP_JVM_VERSION": "17",
 			},
 			buildSuccess:   true,
 			expectedResult: "Hello World!",
@@ -200,6 +205,9 @@ func TestJava(t *testing.T) {
 			sourcePaths: []string{
 				filepath.Join(packCliTestData, "java", "cloudevent_default"),
 			},
+			envs: map[string]string{
+				"BP_JVM_VERSION": "17",
+			},
 		},
 		{
 			name: "CloudEvent with BP_FUNCTION only",
@@ -207,7 +215,8 @@ func TestJava(t *testing.T) {
 				filepath.Join(packCliTestData, "java", "cloudevent_default"),
 			},
 			envs: map[string]string{
-				"BP_FUNCTION": "functions.Handler",
+				"BP_FUNCTION":    "functions.Handler",
+				"BP_JVM_VERSION": "17",
 			},
 			contentType: "application/cloudevents+json",
 			data: `{
@@ -236,7 +245,8 @@ func TestJava(t *testing.T) {
 				filepath.Join(packCliTestData, "java", "cloudevent_custom"),
 			},
 			envs: map[string]string{
-				"BP_FUNCTION": "com.example.functions.Hire",
+				"BP_FUNCTION":    "com.example.functions.Hire",
+				"BP_JVM_VERSION": "17",
 			},
 			contentType: "application/cloudevents+json",
 			data: `{

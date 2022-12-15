@@ -44,7 +44,7 @@ ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder
 ### <a name="usage"></a> Usage
 Build the function container with the Buildpack CLI
 ```
-pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:<version>
+pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:<version> --env BP_JVM_VERSION=17
 ```
 
 Publish it to your registry:

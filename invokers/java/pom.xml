@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.5</version>
+		<version>3.0.0</version>
 	</parent>
 	<groupId>com.vmware</groupId>
 	<artifactId>java-function-invoker</artifactId>
@@ -18,8 +18,8 @@
 	<name>Java Function Invoker</name>
 	<description>Detect and run a function by leveraging Spring Cloud Functions.</description>
 	<properties>
-		<java.version>11</java.version>
-		<spring-cloud-function.version>3.2.8</spring-cloud-function.version>
+		<java.version>17</java.version>
+		<spring-cloud-function.version>4.0.0</spring-cloud-function.version>
 	</properties>
 
 	<dependencies>

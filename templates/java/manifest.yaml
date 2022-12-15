@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 buildpacks:
-- gcr.io/paketo-buildpacks/java:6.36.0
+- gcr.io/paketo-buildpacks/java:8.3.0
 - ghcr.io/vmware-tanzu/function-buildpacks-for-knative/java-buildpack:1.0.7
 builderImages:
   pack: gcr.io/paketo-buildpacks/builder:buildpackless-full
