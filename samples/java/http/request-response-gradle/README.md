@@ -12,7 +12,7 @@ This is a sample function for how to create and send HTTP requests via our Java 
 1.  Build the image:
 
     ```
-    pack build request-response --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.1 --env BP_FUNCTION=com.vmware.functions.Handler
+    pack build request-response --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.1 --env BP_FUNCTION=com.vmware.functions.Handler --env BP_JVM_VERSION=17
     ```
 
 1. Run it in Docker:

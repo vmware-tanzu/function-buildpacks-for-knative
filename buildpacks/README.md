@@ -14,10 +14,11 @@ _Java example:_
 ```
 cd <path-to-java-function>
 pack build \
-  -b gcr.io/paketo-buildpacks/java:7.0.0 \
+  -b gcr.io/paketo-buildpacks/java:8.3.0 \
   -b <local-image> \
   --builder paketobuildpacks/builder-jammy-buildpackless-base:latest \
   --verbose --clear-cache --pull-policy if-not-present \
+  --env BP_JVM_VERSION=17 \
   <output-image>
 ```
 
