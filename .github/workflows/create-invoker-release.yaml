@@ -38,22 +38,24 @@ jobs:
           path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
           release-type: ${{ github.event.inputs.release-type }}
           pre-release: ${{ github.event.inputs.pre-release-label }}
+        env:
+          path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
           version: ${{ steps.version.outputs.version }}
       - name: Bump version
         run: |
           printf $version > $path
       - name: Run Tests
-        with:
+        env:
           target: invokers.${{ github.event.inputs.invoker }}.tests
         run: |
           make $target
       - name: Build
-        with:
+        env:
           target: invokers.${{ github.event.inputs.invoker }}.tests
         run: |
           make $target
       - name: Commit Version
-        with:
+        env:
           path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
           message: Update ${{ github.event.inputs.invoker }} invoker version to ${{ steps.version.outputs.version }}
         run: |
@@ -64,14 +66,14 @@ jobs:
           git push
       - name: Create Tag
         id: tag
-        with:
+        env:
           tag: ${{ github.event.inputs.invoker }}-invoker/v${{ steps.version.outputs.version }}
         run: |
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
       - id: artifacts
-        with:
+        env:
           files: ./out/invokers/${{ github.event.inputs.invoker }}/*.sha256
         run: |
           echo 'invoker_files<<EOF' >> $GITHUB_ENV
