@@ -40,24 +40,30 @@ jobs:
           pre-release: ${{ github.event.inputs.pre-release-label }}
       - name: Bump version
         run: |
-          printf "${{ steps.version.outputs.version }}" > ./invokers/${{ github.event.inputs.invoker }}/VERSION
+          version="${{ steps.version.outputs.version }}"
+          version_output_path="./invokers/${{ github.event.inputs.invoker }}/VERSION"
+          printf $version > $version_output_path
       - name: Run Tests
         run: |
-          make invokers.${{ github.event.inputs.invoker }}.tests
+          target="invokers.${{ github.event.inputs.invoker }}.tests"
+          make $target
       - name: Build
         run: |
-          make invokers.${{ github.event.inputs.invoker }}
+          target="invokers.${{ github.event.inputs.invoker }}"
+          make $target
       - name: Commit Version
         run: |
-          git add ./invokers/${{ github.event.inputs.invoker }}/VERSION
+          version_path="./invokers/${{ github.event.inputs.invoker }}/VERSION"
+          git add $version_path
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git commit -m 'Update ${{ github.event.inputs.invoker }} invoker version to ${{ steps.version.outputs.version }}'
+          commit_message="Update ${{ github.event.inputs.invoker }} invoker version to ${{ steps.version.outputs.version }}"
+          git commit -m '$commit_message'
           git push
       - name: Create Tag
         id: tag
         run: |
-          tag=${{ github.event.inputs.invoker }}-invoker/v${{ steps.version.outputs.version }}
+          tag="${{ github.event.inputs.invoker }}-invoker/v${{ steps.version.outputs.version }}"
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
