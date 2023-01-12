@@ -13,7 +13,7 @@ curl \
   --show-error \
   --silent \
   --location \
-  "https://srp-cli.s3.amazonaws.com/srp-cli-latest.tgz" \
+  "$SRP_CLIENT_URL" \
 | tar -C "$HOME/bin" -xz srp
 
 chmod 755 "$HOME/bin/srp"
