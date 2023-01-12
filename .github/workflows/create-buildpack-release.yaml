@@ -53,44 +53,51 @@ jobs:
           path: ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
           release-type: ${{ github.event.inputs.release-type }}
           pre-release: ${{ github.event.inputs.pre-release-label }}
+          version: ${{ steps.version.outputs.version }}
       - name: Bump Version
         run: |
-          version="${{ steps.version.outputs.version }}"
-          version_location_output="./buildpacks/${{ github.event.inputs.buildpack }}/VERSION"
-          printf  $version > $version_location_output
+            printf  $version > $path
       - name: Run Tests
+        with:
+          target: buildpacks.${{ github.event.inputs.buildpack }}.tests
         run: |
-          target="buildpacks.${{ github.event.inputs.buildpack }}.tests"
           make $target
       - name: Publish Container
+        with:
+          url: ${{ env.DEPENDENCY_BASE_URL }}
+          registry: ${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} buildpacks.${{ github.event.inputs.buildpack }}.images.publish
         run: |
-          base_url="${{ env.DEPENDENCY_BASE_URL }}"
-          registry="${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} buildpacks.${{ github.event.inputs.buildpack }}.images.publish"
-          make base_url=$base_url registry.location=other REGISTRY=$registry
+          make base_url=$url registry.location=other REGISTRY=$registry
       - name: Prepare Commit
+        with:
+          target: buildpacks.${{ github.event.inputs.buildpack }}.commit.prep
         run: |
-          target="buildpacks.${{ github.event.inputs.buildpack }}.commit.prep"
           make $target
       - name: Commit
+        with:
+          version: ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
+          buildpack: ./buildpacks/${{ github.event.inputs.buildpack }}/buildpack.toml
+          message: Update ${{ github.event.inputs.buildpack }} buildpack version to ${{ steps.version.outputs.version }}
         run: |
-          git add ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
-          git add ./buildpacks/${{ github.event.inputs.buildpack }}/buildpack.toml
+          git add $version
+          git add $buildpack
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git commit -m 'Update ${{ github.event.inputs.buildpack }} buildpack version to ${{ steps.version.outputs.version }}'
+          git commit -m '$message'
           git push
       - name: Create Tag
         id: tag
+        with:
+          tag: ${{ github.event.inputs.buildpack }}-buildpack/v${{ steps.version.outputs.version }}
         run: |
-          tag="${{ github.event.inputs.buildpack }}-buildpack/v${{ steps.version.outputs.version }}"
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
       - id: artifacts
+        with:
+          online_image_file: ./out/buildpacks/${{ github.event.inputs.buildpack }}/${{ steps.version.outputs.version }}/${{ github.event.inputs.buildpack }}-buildpack-${{ steps.version.outputs.version }}.image
+          offline_image_file: ./out/buildpacks/${{ github.event.inputs.buildpack }}/${{ steps.version.outputs.version }}/${{ github.event.inputs.buildpack }}-buildpack-with-deps-${{ steps.version.outputs.version }}.image
         run: |
-          online_image_file=./out/buildpacks/${{ github.event.inputs.buildpack }}/${{ steps.version.outputs.version }}/${{ github.event.inputs.buildpack }}-buildpack-${{ steps.version.outputs.version }}.image
-          offline_image_file=./out/buildpacks/${{ github.event.inputs.buildpack }}/${{ steps.version.outputs.version }}/${{ github.event.inputs.buildpack }}-buildpack-with-deps-${{ steps.version.outputs.version }}.image
-
           echo "::set-output name=online_image_file::${online_image_file}"
           echo "::set-output name=online_image_file_content::$(head ${online_image_file})"
           echo "::set-output name=online_image_sha_file::${online_image_file}.sha256"

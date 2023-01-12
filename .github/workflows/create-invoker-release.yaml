@@ -38,39 +38,42 @@ jobs:
           path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
           release-type: ${{ github.event.inputs.release-type }}
           pre-release: ${{ github.event.inputs.pre-release-label }}
+          version: ${{ steps.version.outputs.version }}
       - name: Bump version
         run: |
-          version="${{ steps.version.outputs.version }}"
-          version_output_path="./invokers/${{ github.event.inputs.invoker }}/VERSION"
-          printf $version > $version_output_path
+          printf $version > $path
       - name: Run Tests
+        with:
+          target: invokers.${{ github.event.inputs.invoker }}.tests
         run: |
-          target="invokers.${{ github.event.inputs.invoker }}.tests"
           make $target
       - name: Build
+        with:
+          target: invokers.${{ github.event.inputs.invoker }}.tests
         run: |
-          target="invokers.${{ github.event.inputs.invoker }}"
           make $target
       - name: Commit Version
+        with:
+          path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
+          message: Update ${{ github.event.inputs.invoker }} invoker version to ${{ steps.version.outputs.version }}
         run: |
-          version_path="./invokers/${{ github.event.inputs.invoker }}/VERSION"
-          git add $version_path
+          git add $path
           git config user.name github-actions
           git config user.email github-actions@github.com
-          commit_message="Update ${{ github.event.inputs.invoker }} invoker version to ${{ steps.version.outputs.version }}"
-          git commit -m '$commit_message'
+          git commit -m '$message'
           git push
       - name: Create Tag
         id: tag
+        with:
+          tag: ${{ github.event.inputs.invoker }}-invoker/v${{ steps.version.outputs.version }}
         run: |
-          tag="${{ github.event.inputs.invoker }}-invoker/v${{ steps.version.outputs.version }}"
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
       - id: artifacts
+        with:
+          files: ./out/invokers/${{ github.event.inputs.invoker }}/*.sha256
         run: |
-          files=./out/invokers/${{ github.event.inputs.invoker }}/*.sha256
-
           echo 'invoker_files<<EOF' >> $GITHUB_ENV
           ls ${files} | rev | cut -d. -f 2- | rev >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
