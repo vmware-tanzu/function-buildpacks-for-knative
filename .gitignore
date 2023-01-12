@@ -96,3 +96,6 @@ templates/java/cloudevents-maven/target/
 templates/java/http-gradle/.gradle/
 templates/java/http-maven/target/
 tests/cases/echo-ce/java/target/
+
+# Github Actions
+node_modules/

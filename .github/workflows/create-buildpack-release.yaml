@@ -55,16 +55,22 @@ jobs:
           pre-release: ${{ github.event.inputs.pre-release-label }}
       - name: Bump Version
         run: |
-          printf "${{ steps.version.outputs.version }}" > ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
+          version="${{ steps.version.outputs.version }}"
+          version_location_output="./buildpacks/${{ github.event.inputs.buildpack }}/VERSION"
+          printf  $version > $version_location_output
       - name: Run Tests
         run: |
-          make buildpacks.${{ github.event.inputs.buildpack }}.tests
+          target="buildpacks.${{ github.event.inputs.buildpack }}.tests"
+          make $target
       - name: Publish Container
         run: |
-          make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} buildpacks.${{ github.event.inputs.buildpack }}.images.publish
+          base_url="${{ env.DEPENDENCY_BASE_URL }}"
+          registry="${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} buildpacks.${{ github.event.inputs.buildpack }}.images.publish"
+          make base_url=$base_url registry.location=other REGISTRY=$registry
       - name: Prepare Commit
         run: |
-          make buildpacks.${{ github.event.inputs.buildpack }}.commit.prep
+          target="buildpacks.${{ github.event.inputs.buildpack }}.commit.prep"
+          make $target
       - name: Commit
         run: |
           git add ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
@@ -76,7 +82,7 @@ jobs:
       - name: Create Tag
         id: tag
         run: |
-          tag=${{ github.event.inputs.buildpack }}-buildpack/v${{ steps.version.outputs.version }}
+          tag="${{ github.event.inputs.buildpack }}-buildpack/v${{ steps.version.outputs.version }}"
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
