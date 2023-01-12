@@ -58,7 +58,7 @@ jobs:
           version: ${{ steps.version.outputs.version }}
       - name: Bump Version
         run: |
-            printf  $version > $path
+          printf  $version > $path
       - name: Run Tests
         env:
           target: buildpacks.${{ github.event.inputs.buildpack }}.tests
