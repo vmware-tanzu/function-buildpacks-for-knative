@@ -47,13 +47,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: install dependencies
-        env:
-          path: ./.github/actions/semver-bump
-        run: |
-         pushd $path
-         npm ci
-         popd
       - id: version
         uses: ./.github/actions/semver-bump
         with:

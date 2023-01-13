@@ -19,4 +19,5 @@ outputs: # output will be available to future steps
     description: 'The current version'
 runs:
   using: 'node12'
+  pre: 'prepare'
   main: 'dist/index.js'
