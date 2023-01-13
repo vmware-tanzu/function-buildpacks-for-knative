@@ -48,9 +48,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: install dependencies
-        with:
+        env:
           path: ./.github/actions/semver-bump
-        run: npm ci
+        run: |
+         pushd $path
+         npm ci
+         popd
       - id: version
         uses: ./.github/actions/semver-bump
         with:
