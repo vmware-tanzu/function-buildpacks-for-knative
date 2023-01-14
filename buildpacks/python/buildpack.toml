@@ -8,7 +8,7 @@ api = "0.7"
 [buildpack]
 id = "kn-fn/python-function"
 name = "Python Function Buildpack"
-version = "1.1.0"
+version = "1.1.1"
 sbom-formats = ["application/vnd.syft+json", "application/vnd.cyclonedx+json"]
 
 [[stacks]]
@@ -26,21 +26,21 @@ name = "BP_FUNCTION"
 [[metadata.dependencies]]
 id = "invoker"
 name = "Python Invoker"
-version = "0.2.0"
-uri = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.0/pyfunc-invoker-0.2.0.tar.gz"
-sha256 = "51577a18eb2a5453cf841f507dad59aaad3644778f391035c944065255d9b25e"
+version = "0.2.8"
+uri = "https://github.com/dolfolife/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.8/pyfunc-invoker-0.2.8.tar.gz"
+sha256 = "a088656968aa9863002d45af14c4434ea676a488b2a8ece50ebf78253ae6498d"
 stacks = ["*"]
-purl = "pkg:generic/pyfunc_invoker@0.2.0?checksum=51577a18eb2a5453cf841f507dad59aaad3644778f391035c944065255d9b25e&download_url=https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.0/pyfunc-invoker-0.2.0.tar.gz"
+purl = "pkg:generic/pyfunc_invoker@0.2.8?checksum=a088656968aa9863002d45af14c4434ea676a488b2a8ece50ebf78253ae6498d&download_url=https://github.com/dolfolife/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.8/pyfunc-invoker-0.2.8.tar.gz"
 licenses = ["BSD-2-Clause"]
-cpes = ["cpe:2.3:a:vmware:pyfunc_invoker:0.2.0:*:*:*:*:*:*:*"]
+cpes = ["cpe:2.3:a:vmware:pyfunc_invoker:0.2.8:*:*:*:*:*:*:*"]
 
 [[metadata.dependencies]]
 id = "invoker-deps"
 name = "Python Invoker Deps"
-version = "0.2.0"
-uri = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.0/pyfunc-invoker-deps-0.2.0.tar.gz"
-sha256 = "834c0abf6c483e049f29640ce6924fe1f935a998f654062d8a25dca627ad7608"
+version = "0.2.8"
+uri = "https://github.com/dolfolife/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.8/pyfunc-invoker-deps-0.2.8.tar.gz"
+sha256 = "093dd86094243e80b8bbba61c786f8f40d6b340b929efc5e3877b20194b8ab64"
 stacks = ["*"]
-purl = "pkg:generic/pyfunc_invoker_deps@0.2.0?checksum=834c0abf6c483e049f29640ce6924fe1f935a998f654062d8a25dca627ad7608&download_url=https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.0/pyfunc-invoker-deps-0.2.0.tar.gz"
+purl = "pkg:generic/pyfunc_invoker_deps@0.2.8?checksum=093dd86094243e80b8bbba61c786f8f40d6b340b929efc5e3877b20194b8ab64&download_url=https://github.com/dolfolife/function-buildpacks-for-knative/releases/download/python-invoker/v0.2.8/pyfunc-invoker-deps-0.2.8.tar.gz"
 licenses = ["BSD-3-Clause", "MIT", "Apache-2.0", "BSD-2-Clause or Apache-2.0", "ZPL-2.1"]
 cpes = ["cpe:2.3:a:agendaless:waitress:2.1.2:*:*:*:*:*:*:*", "cpe:2.3:a:brian_curtin:deprecation:2.1.0:*:*:*:*:*:*:*", "cpe:2.3:a:cloudevents:sdk-python:1.6.1:*:*:*:*:*:*:*", "cpe:2.3:a:fedora-infrastructure:flask-healthz:0.0.3:*:*:*:*:*:*:*", "cpe:2.3:a:jaraco:zipp:3.8.1:*:*:*:*:*:*:*", "cpe:2.3:a:palletsproject:click:8.1.3:*:*:*:*:*:*:*", "cpe:2.3:a:palletsproject:flask:2.2.2:*:*:*:*:*:*:*", "cpe:2.3:a:palletsproject:itsdangerous:2.1.2:*:*:*:*:*:*:*", "cpe:2.3:a:palletsproject:jinja2:3.1.2:*:*:*:*:*:*:*", "cpe:2.3:a:palletsproject:markupsafe:2.1.1:*:*:*:*:*:*:*", "cpe:2.3:a:palletsproject:werkzeug:2.2.2:*:*:*:*:*:*:*", "cpe:2.3:a:pypa:packaging:21.3:*:*:*:*:*:*:*", "cpe:2.3:a:pyparsing:pyparsing:3.0.9:*:*:*:*:*:*:*", "cpe:2.3:a:python:importlib_metadata:4.12.0:*:*:*:*:*:*:*"]
