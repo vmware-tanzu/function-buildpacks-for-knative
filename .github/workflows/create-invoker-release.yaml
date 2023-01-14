@@ -76,7 +76,6 @@ jobs:
         env:
           files_path: "./out/invokers/${{ github.event.inputs.invoker }}"
         run: |
-          ls $files_path
           files=$files_path/*.sha256
           echo 'invoker_files<<EOF' >> $GITHUB_ENV
           ls ${files} | rev | cut -d. -f 2- | rev >> $GITHUB_ENV
