@@ -51,7 +51,7 @@ jobs:
           make $target
       - name: Build
         env:
-          target: invokers.${{ github.event.inputs.invoker }}.tests
+          target: invokers.${{ github.event.inputs.invoker }}
         run: |
           make $target
       - name: Commit Version
