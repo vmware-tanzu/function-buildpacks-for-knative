@@ -38,10 +38,10 @@ jobs:
           path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
           release-type: ${{ github.event.inputs.release-type }}
           pre-release: ${{ github.event.inputs.pre-release-label }}
+      - name: Bump version
         env:
           path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
           version: ${{ steps.version.outputs.version }}
-      - name: Bump version
         run: |
           printf $version > $path
       - name: Run Tests

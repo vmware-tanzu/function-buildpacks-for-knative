@@ -53,10 +53,10 @@ jobs:
           path: ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
           release-type: ${{ github.event.inputs.release-type }}
           pre-release: ${{ github.event.inputs.pre-release-label }}
+      - name: Bump Version
         env:
           path: ./buildpacks/${{ github.event.inputs.buildpack }}/VERSION
           version: ${{ steps.version.outputs.version }}
-      - name: Bump Version
         run: |
           printf  $version > $path
       - name: Run Tests

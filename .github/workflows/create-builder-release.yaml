@@ -43,8 +43,10 @@ jobs:
           release-type: ${{ github.event.inputs.release-type }}
           pre-release: ${{ github.event.inputs.pre-release-label }}
       - name: Bump Version
+        env:
+          version: "${{ steps.version.outputs.version }}"
         run: |
-          printf "${{ steps.version.outputs.version }}" > ./builder/VERSION
+          printf $version > ./builder/VERSION
       - name: Run Smoke Tests
         run: |
           make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} smoke-tests
