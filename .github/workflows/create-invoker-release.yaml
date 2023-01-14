@@ -57,12 +57,12 @@ jobs:
       - name: Commit Version
         env:
           path: ./invokers/${{ github.event.inputs.invoker }}/VERSION
-          message: Update ${{ github.event.inputs.invoker }} invoker version to ${{ steps.version.outputs.version }}
+          message: "Update ${{ github.event.inputs.invoker }} invoker version to ${{ steps.version.outputs.version }}"
         run: |
           git add $path
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git commit -m '$message'
+          git commit -m $message
           git push
       - name: Create Tag
         id: tag
