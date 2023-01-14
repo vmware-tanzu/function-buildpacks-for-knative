@@ -43,31 +43,44 @@ jobs:
           release-type: ${{ github.event.inputs.release-type }}
           pre-release: ${{ github.event.inputs.pre-release-label }}
       - name: Bump Version
+        env:
+          version: "${{ steps.version.outputs.version }}"
         run: |
-          printf "${{ steps.version.outputs.version }}" > ./builder/VERSION
+          printf $version > ./builder/VERSION
       - name: Run Smoke Tests
+        env:
+          base_url: "${{ env.DEPENDENCY_BASE_URL }}"
+          registry: "${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }}"
         run: |
-          make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} smoke-tests
+          make base_url=$base_url registry.location=other REGISTRY=$registry smoke-tests
       - name: Publish Container
+        env:
+          base_url: "${{ env.DEPENDENCY_BASE_URL }}"
+          registry: "${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }}"
         run: |
-          make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} builder.publish
+          make base_url=$base_url registry.location=other REGISTRY=$registry builder.publish
       - name: Commit Version
+        env:
+          version_file: "./builder/VERSION"
+          message: "Update builder version to ${{ steps.version.outputs.version }}"
         run: |
-          git add ./builder/VERSION
+          git add $version_file
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git commit -m 'Update builder version to ${{ steps.version.outputs.version }}'
+          git commit -m "${message}"
           git push
       - name: Create Tag
         id: tag
+        env:
+          tag: "builder/v${{ steps.version.outputs.version }}"
         run: |
-          tag=builder/v${{ steps.version.outputs.version }}
           git tag $tag
           git push --tags
           echo "::set-output name=tag::$tag"
       - id: artifacts
+        env:
+          image_file: ./out/builder/${{ steps.version.outputs.version }}/builder.image
         run: |
-          image_file=./out/builder/${{ steps.version.outputs.version }}/builder.image
           echo "::set-output name=image_file::${image_file}"
           echo "::set-output name=image_file_content::$(head ${image_file})"
           echo "::set-output name=image_sha_file::${image_file}.sha256"
