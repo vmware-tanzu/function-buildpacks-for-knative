@@ -74,7 +74,7 @@ jobs:
           echo "::set-output name=tag::$tag"
       - id: artifacts
         env:
-          files: ./out/invokers/${{ github.event.inputs.invoker }}/*.sha256
+          files: "./out/invokers/${{ github.event.inputs.invoker }}/*.sha256"
         run: |
           echo 'invoker_files<<EOF' >> $GITHUB_ENV
           ls ${files} | rev | cut -d. -f 2- | rev >> $GITHUB_ENV
