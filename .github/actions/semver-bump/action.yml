@@ -18,5 +18,5 @@ outputs: # output will be available to future steps
   version:
     description: 'The current version'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
