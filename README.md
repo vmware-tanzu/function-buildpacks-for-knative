@@ -41,12 +41,12 @@ The builder is also built and published as an image to `ghcr.io` -- to build an 
 
 For example:
 ```
-pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.1
+pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.1 --env BP_FUNCTION=path.function
 ```
 
 You can get started by working with any of our scaffolded code found in `samples` or `templates` in the root directory.
 
-To learn about local deployment and testing via `curl`, check out [DEPLOYING](DEPLOYING.md).
+To learn about local deployment, setting flags, and testing via `curl`, check out [DEPLOYING](DEPLOYING.md).
 
 ## Links
 
