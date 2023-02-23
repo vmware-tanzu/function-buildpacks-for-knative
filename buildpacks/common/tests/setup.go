@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/paketo-buildpacks/libpak/bard"
-	knfn "knative.dev/kn-plugin-func"
+	knfn "knative.dev/func"
 )
 
 func NewLogger() bard.Logger {

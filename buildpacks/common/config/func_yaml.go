@@ -9,7 +9,7 @@ import (
 
 	"github.com/paketo-buildpacks/libpak/bard"
 	"gopkg.in/yaml.v3"
-	knfn "knative.dev/kn-plugin-func"
+	knfn "knative.dev/func"
 )
 
 type FuncYaml struct {

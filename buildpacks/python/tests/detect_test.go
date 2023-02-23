@@ -11,7 +11,7 @@ import (
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"k8s.io/utils/pointer"
-	function "knative.dev/kn-plugin-func"
+	function "knative.dev/func"
 
 	"kn-fn/buildpacks/tests"
 	"kn-fn/python-function-buildpack/python"
