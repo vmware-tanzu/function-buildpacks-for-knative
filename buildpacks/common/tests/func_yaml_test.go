@@ -8,7 +8,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 	"k8s.io/utils/pointer"
-	knfn "knative.dev/kn-plugin-func"
+	knfn "knative.dev/func"
 
 	"kn-fn/buildpacks/config"
 )
