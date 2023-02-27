@@ -11,8 +11,8 @@ metadata:
   #@overlay/match by="id"
   - id: invoker
     cpes:
-    - cpe:2.3:a:spring_cloud:spring_boot_starter_parent:2.7.5:*:*:*:*:*:*:*
-    - cpe:2.3:a:spring_cloud:spring_boot_starter_actuator:2.7.5:*:*:*:*:*:*:*
-    - cpe:2.3:a:spring_cloud:spring_boot_starter_web:2.7.5:*:*:*:*:*:*:*
-    - cpe:2.3:a:vmware:spring_cloud_function_deployer::3.2.8:*:*:*:*:*:*:*
-    - cpe:2.3:a:vmware:spring_cloud_function_web::3.2.8:*:*:*:*:*:*:*
+    - cpe:2.3:a:spring_cloud:spring_boot_starter_parent:3.0.0:*:*:*:*:*:*
+    - cpe:2.3:a:spring_cloud:spring_boot_starter_actuator:3.0.0:*:*:*:*:*:*
+    - cpe:2.3:a:spring_cloud:spring_boot_starter_web:3.0.0:*:*:*:*:*:*
+    - cpe:2.3:a:vmware:spring_cloud_function_deployer:4.0.0:*:*:*:*:*:*
+    - cpe:2.3:a:vmware:spring_cloud_function_web:4.0.0:*:*:*:*:*:*
