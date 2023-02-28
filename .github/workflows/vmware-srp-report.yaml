@@ -25,6 +25,8 @@ jobs:
         client-secret: ${{ secrets.SRP_CLIENT_SECRET }}
     - name: Install SRP
       uses: ./.github/actions/srp-helper/install
+      with:
+        client-url: ${{ secrets.SRP_CLIENT_URL }}
     - name: Initialize SRP
       uses: ./.github/actions/srp-helper/init
       with:
