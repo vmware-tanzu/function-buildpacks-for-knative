@@ -1,0 +1,5 @@
+# Copyright 2021-2023 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+ignore_files:
+  - .github/actions/semver-bump/dist/*
