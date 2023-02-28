@@ -13,7 +13,9 @@ curl \
   --show-error \
   --silent \
   --location \
-  "$SRP_CLIENT_URL" \
-| tar -C "$HOME/bin" -xz srp
+  --output "$HOME/bin/srp" \
+  "$SRP_CLIENT_URL"
 
 chmod 755 "$HOME/bin/srp"
+
+"$HOME/bin/srp" --version
