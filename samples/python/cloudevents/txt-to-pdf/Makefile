@@ -5,7 +5,7 @@ FUNCTION_IMAGE ?= us.gcr.io/daisy-284300/functions/demo:txttopdf
 FUNCTION := out/image
 $(FUNCTION): app/*
 	@mkdir -p $(@D)
-	pack build $(FUNCTION_IMAGE) --path ./app/ --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.1 --env BP_FUNCTION=main.main
+	pack build $(FUNCTION_IMAGE) --path ./app/ --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.3.1 --env BP_FUNCTION=main.main
 	printf $(FUNCTION_IMAGE) > $@
 
 build: $(FUNCTION)

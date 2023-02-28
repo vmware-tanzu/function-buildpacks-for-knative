@@ -22,3 +22,11 @@ then you may try the new `pack build` command outputted from that result. Includ
 
 Please note that these `uri`s should remain unchanged except for a version number bump for RELEASE builds, so your PR should contain the necessary changes to `buildpacks` and `invokers`, but not necessarily to this directory.
 
+### Cut a Builder Release
+
+1. If you modified the invokers or buildpacks, following the [Cut a Buildpack Release](../buildpacks/README.md) instructions.
+2. If you haven't already, disable Github Branch Protection rules as described in the Buildpack Release Instructions. 
+3. Choose [Create Builder Release](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/create-builder-release.yaml)
+4. Click "Run Workflow" and choose the type of release.  This will create a commit that updates builder/VERSION.
+5. Search through the project files for `pack build` commands that reference the version of the builder. Update the builder version to the new builder's version.
+6. Re-enable Branch Protection rules. 

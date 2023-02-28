@@ -5,7 +5,7 @@ FUNCTION_IMAGE ?= us.gcr.io/daisy-284300/functions/demo:txttopdfjavamaven
 FUNCTION := out/image
 $(FUNCTION):
 	@mkdir -p $(@D)
-	pack build $(FUNCTION_IMAGE) --path ./spring-java-fn/ --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.2.1 --env BP_FUNCTION=com.example.demo.DemoApplication --env BP_JVM_VERSION=17
+	pack build $(FUNCTION_IMAGE) --path ./spring-java-fn/ --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.3.1 --env BP_FUNCTION=com.example.demo.DemoApplication --env BP_JVM_VERSION=17
 	printf $(FUNCTION_IMAGE) > $@
 
 build: $(FUNCTION)
