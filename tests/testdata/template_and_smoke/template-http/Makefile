@@ -20,7 +20,7 @@ $(template-http.path)/%: $$(foreach v,%, $$(addprefix $(ROOT_DIR)/templates/,$$(
 	ln -sf $< $@
 
 $(template-http.out): $(out_dir)/tests/template/%: $(template-http.path)/% $(PACK) $(builder.image.out)
-	cd $< && $(PACK) build $(template-http.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_FUNCTION=$(template-http.$(firstword $(subst -, ,$*)).bp_function) --pull-policy if-not-present --clear-cache
+	cd $< && $(PACK) build $(template-http.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_FUNCTION=$(template-http.$(firstword $(subst -, ,$*)).bp_function) --env BP_JVM_VERSION=17 --pull-policy if-not-present --clear-cache
 
 template-http.image := kn-fn-test/template-http
 template-http.clean := $(addsuffix .clean,$(template-http.out))
