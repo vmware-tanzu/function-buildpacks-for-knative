@@ -13,7 +13,7 @@ echo-ce.image := kn-fn-test/echo-ce
 echo-ce.image_paths := $(filter-out %/Makefile, $(wildcard $(echo-ce.path)/*))
 
 $(echo-ce.image_paths): $(PACK) $(builder.image.out)
-	cd $@ && $(PACK) build $(echo-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_FUNCTION=$(echo-ce.env.$(notdir $@)) --pull-policy if-not-present --clear-cache
+	cd $@ && $(PACK) build $(echo-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_JVM_VERSION=17 --env BP_FUNCTION=$(echo-ce.env.$(notdir $@)) --pull-policy if-not-present --clear-cache
 
 echo-ce.clean := $(addsuffix .clean,$(echo-ce.image_paths))
 $(echo-ce.clean):

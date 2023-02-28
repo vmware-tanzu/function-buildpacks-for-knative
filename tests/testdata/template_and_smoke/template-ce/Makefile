@@ -20,7 +20,7 @@ $(template-ce.path)/%: $$(foreach v,%, $$(addprefix $(ROOT_DIR)/templates/,$$(fi
 	ln -sf $< $@
 
 $(template-ce.out): $(out_dir)/tests/template/%: $(template-ce.path)/% $(PACK) $(builder.image.out)
-	cd $< && $(PACK) build $(template-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_FUNCTION=$(template-ce.$(firstword $(subst -, ,$*)).bp_function) --pull-policy if-not-present --clear-cache
+	cd $< && $(PACK) build $(template-ce.image):$(notdir $@) --builder $(shell cat $(builder.image.out)) --env BP_JVM_VERSION=17 --env BP_FUNCTION=$(template-ce.$(firstword $(subst -, ,$*)).bp_function) --pull-policy if-not-present --clear-cache
 
 template-ce.image := kn-fn-test/template-ce
 template-ce.clean := $(addsuffix .clean,$(template-ce.out))
