@@ -44,7 +44,7 @@ require (
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
-	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -55,5 +55,6 @@ require (
 
 replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
+	golang.org/x/net => golang.org/x/net v0.1.1-0.20221104162952-702349b0e862
 	k8s.io/client-go => k8s.io/client-go v0.25.2
 )
