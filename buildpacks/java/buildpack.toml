@@ -8,7 +8,7 @@ api = "0.7"
 [buildpack]
 id = "kn-fn/java-function"
 name = "Java Function Buildpack"
-version = "1.0.8"
+version = "1.0.9-v1.0.9.0"
 sbom-formats = ["application/vnd.syft+json", "application/vnd.cyclonedx+json"]
 
 [[stacks]]
