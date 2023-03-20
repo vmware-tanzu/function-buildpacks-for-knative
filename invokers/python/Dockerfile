@@ -8,14 +8,13 @@ RUN pip install tox pytest
 
 COPY . /workspace/invoker
 WORKDIR /workspace/invoker
-RUN tox sdist
+RUN tox -e sdist
 RUN mkdir -p /out
-RUN cp /workspace/invoker/.tox/dist/*.tar.gz /out
+RUN cp /workspace/invoker/.tox/.pkg/dist/*.tar.gz /out
 RUN pip download --no-binary 'MarkupSafe' -d /workspace/dependencies .
 RUN tar -cvzf /out/pyfunc-invoker-deps-$(cat /workspace/invoker/VERSION).tar.gz -C /workspace/dependencies .
 
-ENTRYPOINT [ "tox" ]
-CMD [ "tests" ]
+ENTRYPOINT [ "tox", "-e", "tests" ]
 
 # We're currently generating the sha from outside the docker container.
 # WORKDIR /out
