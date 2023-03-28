@@ -14,6 +14,20 @@ As you can see in the diagram's example above, a developer is using one of our F
 
 If we break down what the `--builder` flag entains, it runs the builder provided against our code. This builder could be our provided URL _or_ a local path for an experimental builder.
 
+### Working with the packages in the repository
+
+The `invokers` layer is the lowest level package. They have no dependencies and are the "invokers" of the function. They are responsible for running the function and exposing the function's port. They are also responsible for setting up the environment variables that the function will need to run.
+
+An abstraction level above, `buildpacks` uses `invokers` as a dependency along with bundling other dependencies. The `buildpacks` layer is responsible for taking the function code and bundling it with the invoker. It is also responsible for setting up the environment variables that the function will need to run.
+
+Lastly, at the highest level, the `builder` references the `buildpacks` by URI and SHA as an aggregator. The `builder` is responsible for aggregating the buildpacks and invokers into a single image that can be used to build functions.
+
+Each layer has a branch for each language we support. For example, the python invoker for version 0.0.1 will have a branch python-invoker/v0.0.x where we develop and patch that version. The same goes for the buildpacks and builder. The builder will have a branch for each version of the builder. For example, the builder for version 0.0.1 will have a branch builder/v0.0.x where we work all patches of that version.
+
+If you want to work on a new version of any package you can create a new branch for that version from main. For example, if you want to work on the builder for version 0.1.0 you can create a branch builder/v0.1.x from main. If you want to work on a new version of the python invoker you can create a branch python-invoker/v0.1.x from main. If you want to work on a new version of the python buildpack you can create a branch python-buildpack/v0.1.x from main. 
+
+On the other hand, if you want to extend or patch a specific version of a package, you can check the branch of that specific version (for minor and major versions), and work on that branch. When you are ready to cut a new release follow [these instructions](https://github.com/vmware-tanzu/function-buildpacks-for-knative/tree/main/builder#cut-a-builder-release) after your changes are merged and the tests pass in the branch you are extending.
+
 ## Layers Explained
 
 The function-buildpacks-for-knative project is organized into "layers" that sum into our functions experience. These layers create an image that can be used to deploy a FaaS experience in a few short commands.
