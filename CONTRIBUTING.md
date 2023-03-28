@@ -26,7 +26,7 @@ Each layer has a branch for each language we support. For example, the python in
 
 If you want to work on a new version of any package you can create a new branch for that version from main. For example, if you want to work on the builder for version 0.1.0 you can create a branch builder/v0.1.x from main. If you want to work on a new version of the python invoker you can create a branch python-invoker/v0.1.x from main. If you want to work on a new version of the python buildpack you can create a branch python-buildpack/v0.1.x from main. 
 
-On the other hand, if you want to extend or patch a specific version of a package, you can check the branch of that specific version (for minor and major versions), and work on that branch. Then, to cut a new release from that branch simply create a new tag with the version you want to release. For example, if you want to patch the python invoker for version 0.0.1 you can work from the branch python-invoker/v0.0.x and create the tag python-invoker/v0.0.1 after you are finished, and push the tag to the remote repository. The same goes for the buildpacks and builder (after the PR from your changes are merged in the python-invoker/v0.0.x).
+On the other hand, if you want to extend or patch a specific version of a package, you can check the branch of that specific version (for minor and major versions), and work on that branch. When you are ready to cut a new release follow [these instructions](https://github.com/vmware-tanzu/function-buildpacks-for-knative/tree/main/builder#cut-a-builder-release) after your changes are merged and the tests pass in the branch you are extending.
 
 ## Layers Explained
 
