@@ -26,6 +26,9 @@ jobs:
       run: make invokers.python.tests
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.txt
+        flags: test-invokers-python
 
   test-java-invoker:
     name: Test Java Invoker
@@ -36,4 +39,7 @@ jobs:
       run: make invokers.java.tests
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.txt
+        flags: test-invokers-java
 
