@@ -9,6 +9,6 @@
   "author": "Rodolfo Sanchez",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.31.0"
+    "@aws-sdk/client-sqs": "^3.348.0"
   }
 }
