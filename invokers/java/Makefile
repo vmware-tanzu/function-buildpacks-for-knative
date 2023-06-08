@@ -47,7 +47,7 @@ $(invokers.java.publish): $(GSUTIL) $(invokers.java.artifacts)
 
 .PHONY: invokers.java.tests
 invokers.java.tests: $(invokers.java.builder.image) $(invokers.java.sources)
-	docker run $(shell cat $<)
+	docker run -v $(invokers.java.path)/target:/usr/src/invoker/target $(shell cat $<)
 
 .PHONY: invokers.java.clean
 invokers.java.clean:

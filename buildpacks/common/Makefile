@@ -21,6 +21,6 @@ buildpacks.common.tests.sources := \
 #########
 
 buildpacks.common.tests: $(buildpacks.common.tests.sources)
-	cd $(buildpacks.common.path) && go test -v -count=1 -timeout 30s kn-fn/buildpacks/tests
+	cd $(buildpacks.common.path) && go test -v -count=1 -timeout 30s -race -covermode=atomic -coverprofile=coverage.out kn-fn/buildpacks/tests
 
 buildpacks.tests .PHONY: buildpacks.common.tests

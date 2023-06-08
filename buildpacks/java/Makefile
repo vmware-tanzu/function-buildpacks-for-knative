@@ -183,7 +183,7 @@ buildpacks.java.images.publish: buildpacks.java.images.offline.publish buildpack
 buildpacks.java.commit.prep: $(buildpacks.java.path)/buildpack.toml
 
 buildpacks.java.tests: $(buildpacks.java.bin.sources) $(buildpacks.java.tests.sources)
-	cd $(buildpacks.java.path) && go test -v -count=1 -timeout 30s kn-fn/java-function-buildpack/tests
+	cd $(buildpacks.java.path) && go test -v -count=1 -timeout 30s -race -coverprofile=coverage.out -covermode=atomic kn-fn/java-function-buildpack/tests
 
 buildpacks.java.clean:
 	rm -rf $(buildpacks.java.build_dir)

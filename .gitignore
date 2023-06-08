@@ -11,7 +11,7 @@ local.mk
 __pycache__/
 *.py[cod]
 *$py.class
-
+*.lcov
 # C extensions
 *.so
 
@@ -46,6 +46,8 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+coverage.txt
+coverage.out
 *.cover
 .hypothesis/
 .pytest_cache/
