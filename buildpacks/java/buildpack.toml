@@ -8,7 +8,7 @@ api = "0.7"
 [buildpack]
 id = "kn-fn/java-function"
 name = "Java Function Buildpack"
-version = "1.1.1"
+version = "1.1.2"
 sbom-formats = ["application/vnd.syft+json", "application/vnd.cyclonedx+json"]
 
 [[stacks]]
@@ -26,9 +26,9 @@ name = "BP_FUNCTION"
 [[metadata.dependencies]]
 id = "invoker"
 name = "Java Invoker"
-version = "0.2.1"
-uri = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker/v0.2.1/java-function-invoker-0.2.1.jar"
-sha256 = "32b083973c518a625baad5f1cee16307d63a328876e2bc2f8a3522ef9be1cac5"
+version = "0.2.2"
+uri = "https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker/v0.2.2/java-function-invoker-0.2.2.jar"
+sha256 = "80ee3ac09fffff4c78126be131dd87e0d5a974fc05bae457a334ccc69a6e98be"
 stacks = ["*"]
-purl = "pkg:generic/java_invoker@0.2.1?checksum=32b083973c518a625baad5f1cee16307d63a328876e2bc2f8a3522ef9be1cac5&download_url=https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker/v0.2.1/java-function-invoker-0.2.1.jar"
-cpes = ["cpe:2.3:a:vmware:java_invoker:0.2.1:*:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_parent:3.0.5:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_actuator:3.0.5:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_web:3.0.5:*:*:*:*:*:*", "cpe:2.3:a:vmware:spring_cloud_function_deployer:4.0.2:*:*:*:*:*:*", "cpe:2.3:a:vmware:spring_cloud_function_web:4.0.2:*:*:*:*:*:*"]
+purl = "pkg:generic/java_invoker@0.2.2?checksum=80ee3ac09fffff4c78126be131dd87e0d5a974fc05bae457a334ccc69a6e98be&download_url=https://github.com/vmware-tanzu/function-buildpacks-for-knative/releases/download/java-invoker/v0.2.2/java-function-invoker-0.2.2.jar"
+cpes = ["cpe:2.3:a:vmware:java_invoker:0.2.2:*:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_parent:3.1.0:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_actuator:3.1.0:*:*:*:*:*:*", "cpe:2.3:a:spring_cloud:spring_boot_starter_web:3.1.0:*:*:*:*:*:*", "cpe:2.3:a:vmware:spring_cloud_function_deployer:4.0.3:*:*:*:*:*:*", "cpe:2.3:a:vmware:spring_cloud_function_web:4.0.3:*:*:*:*:*:*"]
