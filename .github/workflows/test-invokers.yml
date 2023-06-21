@@ -31,6 +31,8 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN}}
         file: ./invokers/python/coverage.xml
         flags: test-invokers-python
+        name: test-invoker-python
+        network_prefix: test-invoker-python
 
   test-java-invoker:
     name: Test Java Invoker
@@ -45,4 +47,6 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN}}
         file: ./invokers/java/target/reports/jacoco.xml
         flags: test-invokers-java
+        name: test-invoker-java
+        network_prefix: test-invoker-java
 
