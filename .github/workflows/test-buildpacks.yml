@@ -26,3 +26,5 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
        token: ${{ secrets.CODECOV_TOKEN}}
+       files: ./buildpacks/common/coverage.out, ./buildpacks/java/coverage.out, ./buildpacks/python/coverage.out 
+       flags: test-buildpacks
