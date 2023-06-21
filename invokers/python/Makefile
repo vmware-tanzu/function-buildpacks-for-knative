@@ -55,7 +55,7 @@ $(invokers.python.publish): $(GSUTIL) $(invokers.python.artifacts)
 
 .PHONY: invokers.python.tests
 invokers.python.tests: $(invokers.python.builder.image) $(invokers.python.sources)
-	docker run $(shell cat $<)
+	docker run -v $(invokers.python.path)/:/workspace/invoker/ $(shell cat $<)
 
 .PHONY: invokers.python.clean
 invokers.python.clean:

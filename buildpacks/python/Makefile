@@ -198,7 +198,7 @@ buildpacks.python.images.publish: buildpacks.python.images.offline.publish build
 buildpacks.python.commit.prep: $(buildpacks.python.path)/buildpack.toml
 
 buildpacks.python.tests: $(buildpacks.python.bin.sources) $(buildpacks.python.tests.sources)
-	cd $(buildpacks.python.path) && go test -v -count=1 -timeout 30s kn-fn/python-function-buildpack/tests
+	cd $(buildpacks.python.path) && go test -v -count=1 -timeout 30s -race -coverprofile=coverage.out -covermode=atomic kn-fn/python-function-buildpack/tests
 
 buildpacks.python.clean:
 	rm -rf $(buildpacks.python.build_dir)

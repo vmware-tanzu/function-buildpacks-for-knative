@@ -1,17 +1,18 @@
 # Copyright 2021-2022 VMware, Inc.
 # SPDX-License-Identifier: BSD-2-Clause
 
-name: Test Buildpacks
+name: CodeCov
 on:
   workflow_dispatch: {}
   push:
     paths:
     - 'buildpacks/**'
+    - 'invokers/**'
   schedule:
     - cron: '0 6 * * 1'
 
 jobs:
-  buildpack-tests:
+  code-cov:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -22,9 +23,12 @@ jobs:
     - run: go version
     - name: Run Buildpack Tests
       run: make buildpacks.tests
+    - name: Run Python Invoker Tests
+      id: python-invoker-tests
+      run: make invokers.python.tests
+    - name: Run Java Invoker Tests
+      run: make invokers.java.tests
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       with:
        token: ${{ secrets.CODECOV_TOKEN}}
-       files: ./buildpacks/common/coverage.out, ./buildpacks/java/coverage.out, ./buildpacks/python/coverage.out 
-       flags: test-buildpacks

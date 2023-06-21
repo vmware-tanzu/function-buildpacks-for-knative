@@ -23,12 +23,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run Python Invoker Tests
+      id: python-invoker-tests
       run: make invokers.python.tests
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       with:
-        files: ./coverage.txt
+        token: ${{ secrets.CODECOV_TOKEN}}
+        file: ./invokers/python/coverage.xml
         flags: test-invokers-python
+        name: test-invoker-python
+        network_prefix: test-invoker-python
 
   test-java-invoker:
     name: Test Java Invoker
@@ -40,6 +44,9 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       with:
-        files: ./coverage.txt
+        token: ${{ secrets.CODECOV_TOKEN}}
+        file: ./invokers/java/target/reports/jacoco.xml
         flags: test-invokers-java
+        name: test-invoker-java
+        network_prefix: test-invoker-java
 

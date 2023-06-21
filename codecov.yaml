@@ -1,0 +1,39 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+codecov:
+  disable_default_path_fixes: true
+coverage:
+  status:
+    project:
+      default: off
+      buildpacks:
+        target: auto
+        flags:
+          - buildpacks
+      invokers:
+        target: auto
+        flags:
+          - invokers
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
+  require_base: yes
+  require_head: yes
+  branches: null
+
+flags:
+  buildpacks:
+    paths:
+      - buildpacks/common
+      - buildpacks/java
+      - buildpacks/python
+    carryforward: true
+  invokers:
+    paths:
+      - invokers/java
+      - invokers/python
+    carryforward: true
+  tests:
+    paths:
+      - tests/
