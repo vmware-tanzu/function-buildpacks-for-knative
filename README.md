@@ -1,7 +1,7 @@
 
 # Function Buildpacks for Knative 
 
-⚡ Build and deploy your functions fast -- a FaaS experience for HTTP and CloudEvents leveraging buildpacks.
+⚡ Build and deploy your HTTP + CloudEvents functions fast -- a FaaS experience leveraging buildpacks.
 
 Function Buildpacks for Knative (aka "Functions") brings functions as a programming model, to allow you to quickly build and deploy independent units of logic. Easily handle tasks such as asynchronous event reactions, cloud provider automations, and more. Soon, [func](https://github.com/knative-sandbox/kn-plugin-func) support will allow users to deploy Functions via CLI in a matter of seconds.
 
@@ -23,21 +23,19 @@ Function Buildpacks for Knative (aka "Functions") brings functions as a programm
 [![Check Copyright and License](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/check-copyright-and-license.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/check-copyright-and-license.yml)
 [![CodeQL](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/codeql-analysis.yml)
 
-:warning: Currently in Alpha
+:warning: Currently in Beta.
 | Language    | HTTP        | CloudEvents  |
 | ----------- | ----------- | ------------ |
 | Python      | Supported   | Supported    |
 | Java        | Supported   | Supported    |
-| NodeJS      | In-Progress | In-Progress  |
-| .NET        | Planned     | Planned      |
+| NodeJS      | Accelerator | Accelerator  |
+| .NET        | Dropped     | Dropped      |
 
 ## Getting Started
 
 ### Building
 
-The buildpacks in this repository have been built, published, and included in the builder. 
-
-The builder is also built and published as an image to `ghcr.io` -- to build an image from source, simply use the builder as shown below.
+You can either build the builder manually or use our convenient pre-built in the example below. To build an image from source, simply use the builder as shown below.
 
 For example:
 ```
