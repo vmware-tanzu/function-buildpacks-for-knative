@@ -14,11 +14,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/onsi/gomega/format"
 	"github.com/paketo-buildpacks/occam"
 	"github.com/paketo-buildpacks/packit/v2/pexec"
 
 	"github.com/onsi/gomega"
 )
+
+func init() {
+	format.MaxLength = 0
+}
 
 func GetFreePort() (string, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:0")
