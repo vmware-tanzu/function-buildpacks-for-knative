@@ -4,8 +4,6 @@ include $(RULES.MK)
 path ?= .
 tests.path := $(abspath $(path))
 
-$(eval $(call INCLUDE_FILE, $(ROOT_DIR)/builder))
-
 # Include test case images
 SUBDIRS := $(wildcard $(addprefix $(tests.path), /testdata/template_and_smoke/*))
 $(foreach dir,$(SUBDIRS),$(eval $(call INCLUDE_FILE, $(dir))))
@@ -20,7 +18,7 @@ template-tests.run: template-tests.images
 
 tests template-tests .PHONY: template-tests.run
 
-integration-tests.run: builder.image.local $(builder.image.out) $(PACK)
-	cd $(tests.path) && go test ./integration/... -v -count=1 -args -pack=$(PACK) -builder=$(shell cat $(builder.image.out))
+integration-tests.run: $(PACK)
+	cd $(tests.path) && go test ./integration/... -v -count=1 -args -pack=$(PACK) -builder=paketobuildpacks/builder:base
 
 tests integration-tests .PHONY: integration-tests.run

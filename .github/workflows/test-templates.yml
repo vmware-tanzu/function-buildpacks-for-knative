@@ -6,7 +6,6 @@ on:
   workflow_dispatch: {}
   push:
     paths:
-    - 'builder/**'
     - 'templates/**'
     - 'tests/**'
   schedule:

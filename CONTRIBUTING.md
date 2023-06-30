@@ -10,9 +10,9 @@ as an open-source patch.
 
 ![System Architecture Diagram](hack/architecture-diagram.png)
 
-As you can see in the diagram's example above, a developer is using one of our Function Templates to write their code into. They run `pack build <name> --builder <builder-version>` to build a version of their code with dependencies included, then they run it in Docker locally to interact as an end user. This is a potential open-source use-case; a Tanzu Application involved use-case would skip several steps and run `tanzu workload create`. 
+As you can see in the diagram's example above, a developer is using one of our Function Templates to write their code into. They run `pack build <name> --builder <builder>` to build a version of their code with dependencies included, then they run it in Docker locally to interact as an end user. This is a potential open-source use-case; a Tanzu Application involved use-case would skip several steps and run `tanzu workload create`. 
 
-If we break down what the `--builder` flag entains, it runs the builder provided against our code. This builder could be our provided URL _or_ a local path for an experimental builder.
+> See the [buildpacks.io documentation](https://buildpacks.io/docs/operator-guide/create-a-builder) to learn more about builders.
 
 ### Working with the packages in the repository
 
@@ -20,13 +20,11 @@ The `invokers` layer is the lowest level package. They have no dependencies and 
 
 An abstraction level above, `buildpacks` uses `invokers` as a dependency along with bundling other dependencies. The `buildpacks` layer is responsible for taking the function code and bundling it with the invoker. It is also responsible for setting up the environment variables that the function will need to run.
 
-Lastly, at the highest level, the `builder` references the `buildpacks` by URI and SHA as an aggregator. The `builder` is responsible for aggregating the buildpacks and invokers into a single image that can be used to build functions.
+Each layer has a branch for each language we support. For example, the python invoker for version 0.0.1 will have a branch python-invoker/v0.0.x where we develop and patch that version. The same goes for the buildpacks.
 
-Each layer has a branch for each language we support. For example, the python invoker for version 0.0.1 will have a branch python-invoker/v0.0.x where we develop and patch that version. The same goes for the buildpacks and builder. The builder will have a branch for each version of the builder. For example, the builder for version 0.0.1 will have a branch builder/v0.0.x where we work all patches of that version.
+If you want to work on a new version of any package you can create a new branch for that version from main. For example, if you want to work on a new version of the python invoker, you can create a branch python-invoker/v0.1.x from main. If you want to work on a new version of the python buildpack, you can create a branch python-buildpack/v0.1.x from main. 
 
-If you want to work on a new version of any package you can create a new branch for that version from main. For example, if you want to work on the builder for version 0.1.0 you can create a branch builder/v0.1.x from main. If you want to work on a new version of the python invoker you can create a branch python-invoker/v0.1.x from main. If you want to work on a new version of the python buildpack you can create a branch python-buildpack/v0.1.x from main. 
-
-On the other hand, if you want to extend or patch a specific version of a package, you can check the branch of that specific version (for minor and major versions), and work on that branch. When you are ready to cut a new release follow [these instructions](https://github.com/vmware-tanzu/function-buildpacks-for-knative/tree/main/builder#cut-a-builder-release) after your changes are merged and the tests pass in the branch you are extending.
+On the other hand, if you want to extend or patch a specific version of a package, you can check the branch of that specific version (for minor and major versions), and work on that branch. When you are ready to cut a new release follow [these instructions](/buildpacks/README.md#cut-a-buildpack-release) after your changes are merged and the tests pass in the branch you are extending.
 
 ## Layers Explained
 
@@ -36,9 +34,7 @@ The `invokers` layer is the lowest level package.
 
 An abstraction level above, `buildpacks` uses `invokers` as a dependency along with bundling other dependencies.
 
-Lastly, at the highest level, the `builder` references the `buildpacks` by URI and SHA as an aggregator. 
-
-The end user should only be interacting with the builder. The name is as it implies -- the builder "builds" functions into images. Interacting with the invokers directly, for example, breaks the abstraction barrier. To learn more about each layer, you may read the `README` for each respective layer's directory.
+The end user should only be interacting with the buildpacks (usually via a builder). Interacting with the invokers directly, for example, breaks the abstraction barrier. To learn more about each layer, you may read the `README` for each respective layer's directory.
 
 New additions to the `samples/` and `templates/` directories are welcome -- each directory also has information about usage and testing. We can only accept PRs for these that DO NOT include imports from unvetted repositories or infringing licenses. Please keep them as lightweight and template-able as possible.
 

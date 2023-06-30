@@ -30,21 +30,14 @@ From within this directory we require a few files to properly detect this as a J
 * `pom.xml` or `build.gradle`: These are used by the other Java buildpacks to compile your function.
 * Java package in folder `src/main/java/functions`: This is the default location your function will be detected. If you do choose to use another package to store your functions, you will need to define where your function is located with the `BP_FUNCTION` configuration for the buildpack.
 
-## Compiling Your Function
-To compile your function with the buildpack, we've provided a builder which has all the pre-requisites ready to go.
-You can find it [on github](https://github.com/vmware-tanzu/function-buildpacks-for-knative/pkgs/container/function-buildpacks-for-knative%2Ffunctions-builder).
-
-```
-ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder
-```
-
 ### Prerequisites
+
 * [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
 
-### <a name="usage"></a> Usage
+### Usage
 Build the function container with the Buildpack CLI
 ```
-pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:<version> --env BP_JVM_VERSION=17
+pack build <your_image_name_and_tag> --builder paketobuildpacks/builder:base --post-buildpack ghcr.io/vmware-tanzu/function-buildpacks-for-knative/java-buildpack:<version> --env BP_JVM_VERSION=17
 ```
 
 Publish it to your registry:

@@ -38,9 +38,8 @@ func NewDocker() occam.Docker {
 	return occam.NewDocker()
 }
 
-var PackExecutable = flag.String("pack", "pack", "Builder for the test")
+var PackExecutable = flag.String("pack", "pack", "Pack executable for the test")
 var Builder = flag.String("builder", "", "Builder for the test")
-var PullPolicy = flag.String("pull-policy", "never", "Builder for the test")
 
 type BuildOpts func(occam.PackBuild) occam.PackBuild
 
@@ -50,9 +49,7 @@ func Pack() occam.Pack {
 
 func PackBuild(name string, source string, opts ...BuildOpts) (occam.Image, fmt.Stringer, error) {
 	b := Pack().Build.
-		WithBuilder(*Builder).
-		WithTrustBuilder().
-		WithPullPolicy(*PullPolicy)
+		WithBuilder(*Builder)
 
 	for _, opt := range opts {
 		b = opt(b)

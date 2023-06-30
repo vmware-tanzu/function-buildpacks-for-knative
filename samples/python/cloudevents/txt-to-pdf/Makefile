@@ -5,7 +5,11 @@ FUNCTION_IMAGE ?= us.gcr.io/daisy-284300/functions/demo:txttopdf
 FUNCTION := out/image
 $(FUNCTION): app/*
 	@mkdir -p $(@D)
-	pack build $(FUNCTION_IMAGE) --path ./app/ --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.4.2 --env BP_FUNCTION=main.main
+	pack build $(FUNCTION_IMAGE) \
+		--path ./app/ \
+		--builder paketobuildpacks/builder:0.3.50-base \
+		--post-buildpack ghcr.io/vmware-tanzu/function-buildpacks-for-knative/python-buildpack:1.1.2 \
+		--env BP_FUNCTION=main.main
 	printf $(FUNCTION_IMAGE) > $@
 
 build: $(FUNCTION)
@@ -29,5 +33,5 @@ destroy:
 	kapp delete -a demo
 
 clean:
-	docker rmi $(FUNCTION_IMAGE)
+	docker rmi $(FUNCTION_IMAGE) || true
 	rm -rf ./out/

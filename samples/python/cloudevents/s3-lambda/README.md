@@ -1,9 +1,4 @@
-To deploy this, first create the container with the buildpack cli
+To create the container with the Pack CLI:
 ```
-pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.4.2 --env BP_FUNCTION=main.main
-```
-
-Publish it to your registry:
-```
-docker push <your_image_name_and_tag>
+pack build s3lambda --builder paketobuildpacks/builder:0.3.50-base --post-buildpack ghcr.io/vmware-tanzu/function-buildpacks-for-knative/python-buildpack:1.1.2 --env BP_FUNCTION=func.main
 ```

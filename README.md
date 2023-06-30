@@ -14,7 +14,6 @@ Function Buildpacks for Knative (aka "Functions") brings functions as a programm
 
 ## Support Table
 
-[![Test Builder](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-builder.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-builder.yml)
 [![Test Buildpacks](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-buildpacks.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-buildpacks.yml)
 [![Test Invokers](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-invokers.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-invokers.yml)
 [![Test Templates](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-templates.yml/badge.svg)](https://github.com/vmware-tanzu/function-buildpacks-for-knative/actions/workflows/test-templates.yml)
@@ -34,13 +33,6 @@ Function Buildpacks for Knative (aka "Functions") brings functions as a programm
 ## Getting Started
 
 ### Building
-
-You can either build the builder manually or use our convenient pre-built in the example below. To build an image from source, simply use the builder as shown below.
-
-For example:
-```
-pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.4.2 --env BP_FUNCTION=path.function
-```
 
 You can get started by working with any of our scaffolded code found in `samples` or `templates` in the root directory.
 

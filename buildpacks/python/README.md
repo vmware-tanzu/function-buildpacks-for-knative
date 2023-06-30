@@ -73,13 +73,6 @@ The function handles either HTTP or CloudEvents based on the parameter's name an
 | body | HTTP | Body of HTTP request (flask) | request.get_data() |
 | headers | HTTP | HTTP request (flask) headers | request.headers |
 
-## Compiling Your Function
-To compile your function with the buildpack, we've provided a builder which has all the pre-requisites ready to go.
-You can find it [on github](https://github.com/vmware-tanzu/function-buildpacks-for-knative/pkgs/container/function-buildpacks-for-knative%2Ffunctions-builder).
-
-```
-ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder
-```
 ### Prerequisites
 * [Buildpack CLI](https://buildpacks.io/docs/tools/pack/)
 
@@ -91,9 +84,9 @@ ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder
 | -------------------- | ----------- |
 | `$BP_FUNCTION` | Configure the function handler.  Defaults to `func.main`. |
 
-Build the function container with the Buildpack CLI
+Build the function container with the Pack CLI
 ```
-pack build <your_image_name_and_tag> --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:<version>
+pack build <your_image_name_and_tag> --builder paketobuildpacks/builder:0.3.50-base --post-buildpack ghcr.io/vmware-tanzu/function-buildpacks-for-knative/python-buildpack:<version>
 ```
 
 Publish it to your registry:
