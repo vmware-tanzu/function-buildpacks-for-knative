@@ -18,11 +18,11 @@
   "homepage": "https://github.com/vmware-tanzu/function-buildpacks-for-knative/.github/actions/semver-bump#readme",
   "dependencies": {
     "@actions/core": "^1.2.5",
-    "semver": "^7.3.6"
+    "semver": "^7.5.2"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.33.3",
-    "eslint": "^8.13.0",
-    "jest": "^27.5.1"
+    "eslint": "^8.44.0",
+    "jest": "^29.5.0"
   }
 }
