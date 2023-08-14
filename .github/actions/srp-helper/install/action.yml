@@ -9,5 +9,5 @@ runs:
     - id: install
       run: ${{ github.action_path }}/install.sh
       env:
-        SRP_CLIENT_URL: ${{ inputs.client-url }}
+        SRP_TOOLS_URL: ${{ inputs.srp_tools_url }}
       shell: bash

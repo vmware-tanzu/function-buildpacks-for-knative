@@ -1,0 +1,27 @@
+# Copyright 2021-2022 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+name: 'SRP Helper Start Action'
+description: 'Start the SRP observer, build and publish the container, stop the SRP observations'
+inputs:
+  client-id:
+    description: 'Client ID associated with your CSP org'
+    required: true
+  client-secret:
+    description: 'Client Secret associated with your CSP org'
+    required: true
+  buildpack:
+    description: 'Language of buildpack'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - id: publish
+      env:
+        CLIENT_ID: ${{ inputs.client-id }}
+        CLIENT_SECRET: ${{ inputs.client-secret }}
+        BUILDPACK: ${{ inputs.buildpack }}
+        VES_DOCKER: /usr/bin/docker
+      run: ${{ github.action_path }}/publish.sh
+      shell: bash
