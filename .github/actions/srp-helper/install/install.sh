@@ -6,16 +6,12 @@ set -euo pipefail
 
 echo "Installing SRP CLI"
 
-mkdir -p "$HOME/bin"
-echo "$HOME/bin" >> "$GITHUB_PATH"
+mkdir -p "$HOME/srp-tools"
+echo "$HOME/srp-tools" >> "$GITHUB_PATH"
+echo "$HOME/srp-tools/observer/bin" >> "$GITHUB_PATH"
 
-curl \
-  --show-error \
-  --silent \
-  --location \
-  --output "$HOME/bin/srp" \
-  "$SRP_CLIENT_URL"
+SRP_CLI_VERSION='0.9.9-20230724044630-61ef470-169'
+curl -L "${SRP_TOOLS_URL}/${SRP_CLI_VERSION}/srp-tools-linux-amd64-${SRP_CLI_VERSION}.tar.gz" | tar -xz -C "$HOME/srp-tools"
 
-chmod 755 "$HOME/bin/srp"
-
-"$HOME/bin/srp" --version
+"$HOME/srp-tools/srp" --version
+"$HOME/srp-tools/observer/bin/observer_agent" --version

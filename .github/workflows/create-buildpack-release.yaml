@@ -8,6 +8,7 @@ env:
   REGISTRY: ghcr.io
   CONTAINER_PATH: ${{ github.repository }}
   DEPENDENCY_BASE_URL: https://github.com/${{ github.repository }}
+  SRP_WORKING_DIR: /tmp/srp
 
 on:
   workflow_dispatch:
@@ -47,6 +48,8 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          VES_DOCKER: /usr/bin/docker
       - id: version
         uses: ./.github/actions/semver-bump
         with:
@@ -64,13 +67,26 @@ jobs:
           target: buildpacks.${{ github.event.inputs.buildpack }}.tests
         run: |
           make $target
+      - name: Check SRP Creds
+        uses: ./.github/actions/srp-helper/check-srp-creds
+        with:
+          client-id: ${{ secrets.SRP_CLIENT_ID }}
+          client-secret: ${{ secrets.SRP_CLIENT_SECRET }}
+      - name: Install SRP
+        uses: ./.github/actions/srp-helper/install
+        with:
+          srp_tools_url: ${{ secrets.SRP_TOOLS_URL }}
       - name: Publish Container
+        with:
+          client-id: ${{ secrets.SRP_CLIENT_ID }}
+          client-secret: ${{ secrets.SRP_CLIENT_SECRET }}
+          buildpack: ${{ github.event.inputs.buildpack }}
         env:
           url: ${{ env.DEPENDENCY_BASE_URL }}
           registry: "${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }}"
           target: "buildpacks.${{ github.event.inputs.buildpack }}.images.publish"
-        run: |
-          make base_url=$url registry.location=other REGISTRY=$registry $target
+          version: "${{ steps.version.outputs.version }}"
+        uses: ./.github/actions/srp-helper/publish-container
       - name: Prepare Commit
         env:
           target: buildpacks.${{ github.event.inputs.buildpack }}.commit.prep
@@ -132,3 +148,5 @@ jobs:
             ${{ steps.artifacts.outputs.offline_image_file }}
             ${{ steps.artifacts.outputs.offline_image_sha_file }}
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Submit SRP
+        uses: ./.github/actions/srp-helper/submit
