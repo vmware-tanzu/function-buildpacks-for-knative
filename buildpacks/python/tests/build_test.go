@@ -107,6 +107,50 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 			})
 		})
 
+		when("nil plan entry", func() {
+			it.Before(func() {
+				var (
+					appDir string
+					err    error
+				)
+
+				t.Setenv("BP_FUNCTION", "some_module.some_function")
+
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
+					WithFunctionFile("some_module", "some_function", HTTPFuncTemplate),
+				)
+
+				context = makeBuildContextWithNilPlanEntry(
+					withBuildApplicationPath(appDir),
+					withDependencies([]map[string]any{
+						{"id": "invoker-deps", "version": "1.2.3"},
+						{"id": "invoker", "version": "2.3.4"},
+					}),
+					withOptions(map[string]any{
+						"some-option":       "some-value",
+						"some-other-option": "some-other-value",
+					}),
+				)
+
+				result, err = build.Build(context)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("adds launch command", func() {
+				Expect(result.Processes).To(Equal([]libcnb.Process{
+					{
+						Type:             "func",
+						Command:          "python",
+						Arguments:        []string{"-m", "pyfunc", "start", "-m", "some_module", "-f", "some_function"},
+						Direct:           false,
+						WorkingDirectory: "",
+						Default:          true,
+					},
+				}))
+			})
+		})
+
 		when("BP_FUNCTION is invalid", func() {
 			it.Before(func() {
 				var (
@@ -147,6 +191,34 @@ func makeBuildContext(opts ...func(*libcnb.BuildContext)) libcnb.BuildContext {
 					Name: "python-function",
 					Metadata: map[string]any{
 						"func_yaml_envs": map[string]any{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, opt := range opts {
+		opt(&ctx)
+	}
+
+	return ctx
+}
+
+func makeBuildContextWithNilPlanEntry(opts ...func(*libcnb.BuildContext)) libcnb.BuildContext {
+	ctx := libcnb.BuildContext{
+		Application: libcnb.Application{},
+		Buildpack: libcnb.Buildpack{
+			Metadata: map[string]any{},
+		},
+		Platform: libcnb.Platform{
+			Environment: map[string]string{},
+		},
+		Plan: libcnb.BuildpackPlan{
+			Entries: []libcnb.BuildpackPlanEntry{
+				{
+					Name: "python-function",
+					Metadata: map[string]any{
+						"func_yaml_envs": nil,
 					},
 				},
 			},

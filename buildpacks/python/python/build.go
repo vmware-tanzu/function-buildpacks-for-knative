@@ -5,11 +5,10 @@ package python
 
 import (
 	"fmt"
-	"sort"
-
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
+	"sort"
 
 	"kn-fn/buildpacks/command"
 )
@@ -72,6 +71,10 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		return result, nil
 	}
 
+	if functionPlan.Metadata["func_yaml_envs"] == nil {
+		functionPlan.Metadata["func_yaml_envs"] = map[string]any{}
+	}
+
 	functionLayer := NewFunction(
 		WithLogger(b.Logger),
 		WithFuncYamlEnvs(functionPlan.Metadata["func_yaml_envs"].(map[string]any)),
@@ -89,13 +92,15 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	)
 	result.Layers = append(result.Layers, validationLayer)
 
-	for optionName, optionValue := range functionPlan.Metadata["func_yaml_options"].(map[string]any) {
-		result.Labels = append(result.Labels, libcnb.Label{
-			Key:   optionName,
-			Value: optionValue.(string),
-		})
+	if functionPlan.Metadata["func_yaml_options"] != nil {
+		for optionName, optionValue := range functionPlan.Metadata["func_yaml_options"].(map[string]any) {
+			result.Labels = append(result.Labels, libcnb.Label{
+				Key:   optionName,
+				Value: optionValue.(string),
+			})
+		}
+		sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 	}
-	sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 
 	cmd := "python"
 	arguments := []string{"-m", "pyfunc", "start", "-m", moduleName, "-f", functionName}

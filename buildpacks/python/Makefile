@@ -20,7 +20,7 @@ buildpacks.python.bin.sources := \
 	$(buildpacks.python.path)/go.mod \
 	$(buildpacks.python.path)/go.sum \
 	$(shell find '$(buildpacks.python.path)' -type f -iname '*.go' -not -path '$(buildpacks.python.path)/tests/*') \
-	$(shell find '$(buildpacks.python.path)' -type d -not -path '$(buildpacks.python.path)/tests' -mindepth 1) \
+	$(shell find '$(buildpacks.python.path)' -mindepth 1 -type d -not -path '$(buildpacks.python.path)/tests') \
 
 buildpacks.python.bin.build := $(buildpacks.python.build_dir)/bin/build
 buildpacks.python.bin.detect := $(buildpacks.python.build_dir)/bin/detect

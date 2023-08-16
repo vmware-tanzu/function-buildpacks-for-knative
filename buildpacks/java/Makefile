@@ -20,7 +20,7 @@ buildpacks.java.bin.sources := \
 	$(buildpacks.java.path)/go.mod \
 	$(buildpacks.java.path)/go.sum \
 	$(shell find '$(buildpacks.java.path)' -type f -iname '*.go' -not -path '$(buildpacks.java.path)/tests/*') \
-	$(shell find '$(buildpacks.java.path)' -type d -not -path '$(buildpacks.java.path)/tests' -mindepth 1) \
+	$(shell find '$(buildpacks.java.path)' -mindepth 1 -type d -not -path '$(buildpacks.java.path)/tests') \
 
 buildpacks.java.bin.build := $(buildpacks.java.build_dir)/bin/build
 buildpacks.java.bin.detect := $(buildpacks.java.build_dir)/bin/detect
