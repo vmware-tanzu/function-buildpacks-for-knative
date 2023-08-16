@@ -51,6 +51,10 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	functionClass, isOverride := cr.Resolve("BP_FUNCTION")
 
+	if e.Metadata["func_yaml_envs"] == nil {
+		e.Metadata["func_yaml_envs"] = map[string]any{}
+	}
+
 	functionLayer := NewFunction(context.Application.Path,
 		WithLogger(b.Logger),
 		WithFunctionClass(functionClass, isOverride),
@@ -58,13 +62,15 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	)
 	result.Layers = append(result.Layers, functionLayer)
 
-	for optionName, optionValue := range e.Metadata["func_yaml_options"].(map[string]any) {
-		result.Labels = append(result.Labels, libcnb.Label{
-			Key:   optionName,
-			Value: optionValue.(string),
-		})
+	if e.Metadata["func_yaml_options"] != nil {
+		for optionName, optionValue := range e.Metadata["func_yaml_options"].(map[string]any) {
+			result.Labels = append(result.Labels, libcnb.Label{
+				Key:   optionName,
+				Value: optionValue.(string),
+			})
+		}
+		sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 	}
-	sort.Slice(result.Labels, func(i, j int) bool { return result.Labels[i].Key < result.Labels[j].Key })
 
 	dep, err := dr.Resolve("invoker", "")
 	if err != nil {

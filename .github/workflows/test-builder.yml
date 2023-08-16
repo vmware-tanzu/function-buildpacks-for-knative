@@ -24,7 +24,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: '1.19'
+        go-version: '1.20'
     - run: go version
     - name: Run Smoke Tests
       run: make base_url=${{ env.DEPENDENCY_BASE_URL }} registry.location=other REGISTRY=${{ env.REGISTRY }}/${{ env.CONTAINER_PATH }} smoke-tests

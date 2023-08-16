@@ -89,6 +89,47 @@ func testBuild(t *testing.T, when spec.G, it spec.S) {
 
 		})
 
+		when("always but nil plan entry", func() {
+			it.Before(func() {
+				var (
+					appDir string
+					err    error
+				)
+
+				appDir, cleanupAppDir = tests.SetupTestDirectory(
+					tests.WithFuncYaml(),
+				)
+
+				context = makeBuildContextWithNilPlanEntry(
+					withBuildApplicationPath(appDir),
+					withDependencies([]map[string]any{
+						{"id": "invoker", "version": "2.3.4"},
+					}),
+					withOptions(map[string]any{
+						"some-other-option": "some-other-value",
+						"some-option":       "some-value",
+					}),
+				)
+
+				result, err = build.Build(context)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("adds launch command", func() {
+				Expect(result.Processes).To(Equal([]libcnb.Process{
+					{
+						Type:             "func",
+						Command:          "java",
+						Arguments:        []string{"org.springframework.boot.loader.JarLauncher"},
+						Direct:           false,
+						WorkingDirectory: "",
+						Default:          true,
+					},
+				}))
+			})
+
+		})
+
 		when("without tomcat", func() {
 
 			it.Before(func() {
@@ -189,6 +230,34 @@ func makeBuildContext(opts ...func(*libcnb.BuildContext)) libcnb.BuildContext {
 					Name: "java-function",
 					Metadata: map[string]any{
 						"func_yaml_envs": map[string]any{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, opt := range opts {
+		opt(&ctx)
+	}
+
+	return ctx
+}
+
+func makeBuildContextWithNilPlanEntry(opts ...func(*libcnb.BuildContext)) libcnb.BuildContext {
+	ctx := libcnb.BuildContext{
+		Application: libcnb.Application{},
+		Buildpack: libcnb.Buildpack{
+			Metadata: map[string]any{},
+		},
+		Platform: libcnb.Platform{
+			Environment: map[string]string{},
+		},
+		Plan: libcnb.BuildpackPlan{
+			Entries: []libcnb.BuildpackPlanEntry{
+				{
+					Name: "java-function",
+					Metadata: map[string]any{
+						"func_yaml_envs": nil,
 					},
 				},
 			},

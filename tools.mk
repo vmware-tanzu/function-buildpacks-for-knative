@@ -12,12 +12,12 @@ GSUTIL := $(tools.path)/gsutil/gsutil
 
 $(PACK).darwin:
 	@mkdir -p $(@D)
-	curl -sL https://github.com/buildpacks/pack/releases/download/v0.21.1/pack-v0.21.1-macos.tgz | tar -xz -C $(@D)
+	curl -sL https://github.com/buildpacks/pack/releases/download/v0.29.0/pack-v0.29.0-macos.tgz | tar -xz -C $(@D)
 	touch $@
 
 $(PACK).linux:
 	@mkdir -p $(@D)
-	curl -sL https://github.com/buildpacks/pack/releases/download/v0.21.1/pack-v0.21.1-linux.tgz | tar -xz -C $(@D)
+	curl -sL https://github.com/buildpacks/pack/releases/download/v0.29.0/pack-v0.29.0-linux.tgz | tar -xz -C $(@D)
 	touch $@
 
 $(PACK): $(PACK).$(os.name)
