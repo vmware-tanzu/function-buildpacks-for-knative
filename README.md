@@ -39,7 +39,7 @@ You can either build the builder manually or use our convenient pre-built in the
 
 For example:
 ```
-pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.4.2 --env BP_FUNCTION=path.function
+pack build <image_name> --path /path/to/function --builder ghcr.io/vmware-tanzu/function-buildpacks-for-knative/functions-builder:0.4.3 --env BP_FUNCTION=path.function
 ```
 
 You can get started by working with any of our scaffolded code found in `samples` or `templates` in the root directory.
