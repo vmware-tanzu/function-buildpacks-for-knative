@@ -1,6 +1,8 @@
 
 # Contributing to function-buildpacks-for-knative
 
+> ⚠️ Following builder release `0.4.3`, this project is deprecated and will no longer be officially maintained by VMware. Users should not use this project, builder, buildpacks, invokers, or application accelerator counterparts anymore.
+
 The function-buildpacks-for-knative project team welcomes contributions from the community. Before you start working with function-buildpacks-for-knative, please
 read our [Developer Certificate of Origin](https://cla.vmware.com/dco). All contributions to this repository must be
 signed as described on that page. Your signature certifies that you wrote the patch or have the right to pass it on
