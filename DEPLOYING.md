@@ -1,5 +1,7 @@
 # Deploying
 
+> ⚠️ Following builder release `0.4.3`, this project is deprecated and will no longer be officially maintained by VMware. Users should not use this project, builder, buildpacks, invokers, or application accelerator counterparts anymore.
+
 ## Building your function
 
 You can build your function using our provided builder, which already includes buildpacks and an invoker layer:
