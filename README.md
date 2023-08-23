@@ -3,6 +3,8 @@
 
 > ⚠️ Following builder release `0.4.3`, this project is deprecated and will no longer be officially maintained by VMware. Users should not use this project, builder, buildpacks, invokers, or application accelerator counterparts anymore.
 
+> If you are looking to migrate your functions project outside the set of buildpack we offer in this repository please follow the [Migration Guide](./MIGRATION.md)
+
 ⚡ Build and deploy your HTTP + CloudEvents functions fast -- a FaaS experience leveraging buildpacks.
 
 Function Buildpacks for Knative (aka "Functions") brings functions as a programming model, to allow you to quickly build and deploy independent units of logic. Easily handle tasks such as asynchronous event reactions, cloud provider automations, and more. Soon, [func](https://github.com/knative-sandbox/kn-plugin-func) support will allow users to deploy Functions via CLI in a matter of seconds.
