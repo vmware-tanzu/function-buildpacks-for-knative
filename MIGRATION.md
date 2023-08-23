@@ -14,9 +14,9 @@ If you want to delete your dependency on the function invoker you might need to 
 
 ### Python
 
-The way our invoker is set up is to wrap your function in a [Flask](https://flask.palletsprojects.com/) endpoint https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/invokers/python/pyfunc/invoke.py#L94 with a few extra configuration that helps cloud native applications be more kubernetes friendly like liveness and readiness probes.
+The way our invoker is set up wraps your function in a [Flask](https://flask.palletsprojects.com/) [handler](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/invokers/python/pyfunc/invoke.py#L94) with a default set of configurations.
 
-You can take as a starting point the invoker project [PyFunc](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/invokers/python/pyfunc/) and add your business login in the [handler function](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/invokers/python/pyfunc/invoke.py#L33) 
+You can take the [PyFunc](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/invokers/python/pyfunc/) (our invoker) as a starting point of your project and add your business logic in the [handler function](https://github.com/vmware-tanzu/function-buildpacks-for-knative/blob/main/invokers/python/pyfunc/invoke.py#L33). 
 
 ### Java
 
