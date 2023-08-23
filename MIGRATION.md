@@ -4,7 +4,7 @@ The Function Buildpacks currently hosted in this repository are no longer suppor
 
 ## Migration from Function Buildpacks
 
-This repository is just one of the list of trusted builders by the Knatinve Function CLI. You can find more function buildpacks on https://github.com/boson-project/buildpacks/tree/main/buildpacks.
+This repository is just one of the list of trusted builders by the Knative Function CLI. You can find more function buildpacks on https://github.com/boson-project/buildpacks/tree/main/buildpacks.
 
 ## Function to Languague Buildpack
 
